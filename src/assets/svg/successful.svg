@@ -1,0 +1,26 @@
+import * as React from "react";
+import Svg, { Rect, Path } from "react-native-svg";
+
+const Successful = ({ style, color = "#64BA67", ...props }) => (
+  <Svg xmlns="http://www.w3.org/2000/svg" style={style} {...props}>
+    {/* Background Rect */}
+    <Rect width={30} height={30} fill="" rx={25} />
+    
+    {/* Circle for Success Icon */}
+    <Path
+      fill={color}
+      d="M72 1c3.438 1.938 3.438 1.938 6 5 1.057 4.46.53 7.896-1.438 12-3.636 2.838-6.988 3.44-11.562 3-2.921-1.765-4.48-2.958-6-6-.581-7.09-.581-7.09 1.875-10.938C64.478.567 67.027.502 72 1Z"
+    />
+    
+    {/* Checkmark Path */}
+    <Path
+      stroke="#fff"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M10 15l2.5 2.5L20 10"
+    />
+  </Svg>
+);
+
+export default Successful;

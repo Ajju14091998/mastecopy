@@ -1,0 +1,92 @@
+{
+    "products": [
+      {
+        "id": 1,
+        "name": "Laminate A",
+        "category": "Laminate",
+        "subCategory": "Wooden Laminate",
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmWbupIprLw3OD0HbgSQiCT7D308edeEmOZp1k0zbCwWogBsBxWryqk-ol1U7k048Ifc0&usqp=CAU",
+        "description": "High-quality wooden laminate for modern interiors.",
+        "qty": 50
+      },
+      {
+        "id": 2,
+        "name": "Wall Panel B",
+        "category": "Wall Panel",
+        "subCategory": "3D Wall Panel",
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTtptUxpJ8u-joj0ktHXhVSaBTJm8g7B9-MgQ&s",
+        "description": "Stylish 3D wall panel perfect for living rooms.",
+        "qty": 30
+      },
+      {
+        "id": 3,
+        "name": "UV Panel C",
+        "category": "UV Panel",
+        "subCategory": "UV Protection Panel",
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTWTCa7NlrrJaEEFLNCPre9nYdzf3XD4QQE6g&s",
+        "description": "Durable UV panel for high protection and longer life.",
+        "qty": 20
+      },
+      {
+        "id": 4,
+        "name": "Laminate B",
+        "category": "Laminate",
+        "subCategory": "Glossy Laminate",
+        "image": "https://images.jdmagicbox.com/quickquotes/images_main/wardrobe-finished-in-wood-and-ivory-high-gloss-laminate-2217200762-e89bf8j0.jpg",
+        "description": "Glossy laminate for elegant and modern design.",
+        "qty": 40
+      },
+      {
+        "id": 5,
+        "name": "Wall Panel D",
+        "category": "Wall Panel",
+        "subCategory": "Wooden Wall Panel",
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThTbhwbNp_7v-TziCNLCoLIilFOqibafuYUA&s",
+        "description": "Natural wooden wall panel, a blend of tradition and modern style.",
+        "qty": 60
+      },
+      {
+        "id": 6,
+        "name": "UV Panel E",
+        "category": "UV Panel",
+        "subCategory": "Sun Protection Panel",
+        "image": "https://www.mywallpanels.com/product-images/SBUVMS31032_C.jpg/1655739000047902274/400x400",
+        "description": "UV protection panel designed for extreme weather conditions.",
+        "qty": 25
+      },
+      {
+        "id": 7,
+        "name": "Laminate C",
+        "category": "Laminate",
+        "subCategory": "Matte Laminate",
+        "image": "https://material-depot-content-files.s3.ap-south-1.amazonaws.com/CollectionImages/matte_finish_laminate.jpg",
+        "description": "Matte laminate with a smooth finish for subtle elegance.",
+        "qty": 70
+      },
+      {
+        "id": 8,
+        "name": "Wall Panel F",
+        "category": "Wall Panel",
+        "subCategory": "Marble Wall Panel",
+        "image": "https://arkdeko.com/cdn/shop/articles/arkdeko_marble_wall_with_a_brasilian_quartz_white_with_giant_grain_in_a_saudi_desert_villa.jpg?v=1712052710",
+        "description": "Elegant marble wall panel perfect for luxury interiors.",
+        "qty": 15
+      }
+    ],
+    "categories": [
+      { "name": "Laminate" },
+      { "name": "Wall Panel" },
+      { "name": "UV Panel" }
+    ],
+    "subCategories": [
+      { "name": "Wooden Laminate" },
+      { "name": "Glossy Laminate" },
+      { "name": "Matte Laminate" },
+      { "name": "3D Wall Panel" },
+      { "name": "Wooden Wall Panel" },
+      { "name": "Marble Wall Panel" },
+      { "name": "UV Protection Panel" },
+      { "name": "Sun Protection Panel" }
+    ]
+  }
+  
