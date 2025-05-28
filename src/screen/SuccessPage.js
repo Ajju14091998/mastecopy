@@ -151,10 +151,10 @@ const SuccessScreen = () => {
           </View>
         </View>
 
-        <Text style={[Textstyle.pr, styles.messageText]}>
-          You have successfully completed your shopping cart list!
+        <Text style={[Textstyle.pb, styles.messageText]}>
+         Successfully Enquiry placed
         </Text>
-        <Text style={[Textstyle.pb,styles.successText]}>Successful!</Text>
+        {/* <Text style={[Textstyle.pb,styles.successText]}>Successful!</Text> */}
 
         <TouchableOpacity
           style={styles.button}
@@ -197,8 +197,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   messageText: {
-    fontSize: 16,
-    color: '#666',
+    fontSize: 20,
+    color: '#111827',
     textAlign: 'center',
     marginBottom: 10,
     // fontFamily: 'pr',

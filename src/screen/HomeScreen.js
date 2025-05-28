@@ -1,186 +1,377 @@
-import React, {useState} from 'react';
+// import React, {useState} from 'react';
+// import {
+//   View,
+//   Text,
+//   ScrollView,
+//   TouchableOpacity,
+//   StyleSheet,
+// } from 'react-native';
+// import Feather from 'react-native-vector-icons/Feather';
+// import {SafeAreaView} from 'react-native-safe-area-context';
+// import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+// import DropDownPicker from 'react-native-dropdown-picker';
+
+// export default function HomeScreen({navigation}) {
+//   const orders = [
+//     {
+//       id: 'MI0001',
+//       title: 'V S PORTABLE CABINS TALOJA',
+//       date: '06/05/2025',
+//       qty: 250,
+//       salesperson: 'Rajesh Kumar',
+//       status: 'Pending',
+//     },
+//     {
+//       id: 'MI0002',
+//       title: 'FIXON SALES VASHI NEW',
+//       date: '06/05/2025',
+//       qty: 175,
+//       salesperson: 'Anil Sharma',
+//       status: 'Pending',
+//     },
+//     {
+//       id: 'MI0003',
+//       title: 'SHRI HARI SONS MALVAN',
+//       date: '06/05/2025',
+//       qty: 116,
+//       salesperson: 'Ajay Agunde',
+//       status: 'Pending',
+//     },
+//   ];
+
+//   const [dropdownOpen, setDropdownOpen] = useState(false);
+//   const [dropdownValue, setDropdownValue] = useState(null);
+//   const [dropdownItems, setDropdownItems] = useState([
+//     {label: 'Ajay', value: 'ajay'},
+//     {label: 'Sujay', value: 'sujay'},
+//     {label: 'Vijay', value: 'vijay'},
+//   ]);
+
+//   return (
+//     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+//       {/* Header */}
+//       <View style={styles.header}>
+//         <TouchableOpacity
+//           onPress={() => navigation.getParent('Drawer')?.openDrawer()}>
+//           <Feather name="menu" size={24} color="#333" />
+//         </TouchableOpacity>
+//         <View style={{alignItems: 'flex-end'}}>
+//           <Text style={styles.welcome}>👋 Welcome to Master Impex</Text>
+//           <Text style={styles.subtitle}>
+//             Here's your organization's overviews
+//           </Text>
+//         </View>
+//       </View>
+
+//       {/* Dropdown: Select Salesperson */}
+//       <View style={{zIndex: 1000, marginTop: 25}}>
+//         <DropDownPicker
+//           open={dropdownOpen}
+//           value={dropdownValue}
+//           items={dropdownItems}
+//           setOpen={setDropdownOpen}
+//           setValue={setDropdownValue}
+//           setItems={setDropdownItems}
+//           placeholder="Select Salesperson"
+//           style={{
+//             borderColor: '#ccc',
+//             borderRadius: 12,
+//             paddingHorizontal: 10,
+//           }}
+//           dropDownContainerStyle={{
+//             borderColor: '#ccc',
+//             borderRadius: 12,
+//           }}
+//         />
+//       </View>
+
+//       {/* Cards */}
+//       <View style={styles.statsRow}>
+//         <View style={styles.statCard}>
+//           <MaterialCommunityIcons
+//             name="cart-outline"
+//             size={24}
+//             color="#FF7A00"
+//           />
+//           <Text style={styles.statValue}>1432</Text>
+//           <Text style={styles.statLabel}>Total Enquiry</Text>
+//         </View>
+//         <View style={styles.statCard}>
+//           <Feather name="file-text" size={24} color="#FF7A00" />
+//           <Text style={styles.statValue}>12</Text>
+//           <Text style={styles.statLabel}>Today Enquiry</Text>
+//         </View>
+//       </View>
+
+//       {/* Tabs */}
+//       <View style={styles.tabRow}>
+//         <View style={{flexDirection: 'row'}}>
+//           <TouchableOpacity style={styles.tabActive}>
+//             <Text style={styles.tabTextActive}>Today Enquiry</Text>
+//           </TouchableOpacity>
+//           <TouchableOpacity style={styles.tabInactive}>
+//             <Text style={styles.tabTextInactive}>Total Enquiry</Text>
+//           </TouchableOpacity>
+//         </View>
+//         <TouchableOpacity>
+//           <Text style={styles.showAll}>Show All</Text>
+//         </TouchableOpacity>
+//       </View>
+
+//       {/* Orders List */}
+//       <ScrollView style={{marginTop: dropdownOpen ? 160 : 20}}>
+//         {orders.map((order, index) => (
+//           <View key={index} style={styles.orderCard}>
+//             <Text style={styles.orderTitle}>{order.title}</Text>
+//             <Text style={styles.orderDetail}>
+//               Enquiry id : <Text style={styles.blueText}>{order.id}</Text>
+//             </Text>
+
+//             <Text style={styles.orderDetail}>
+//               Enquiry Date : <Text style={styles.blueText}>{order.date}</Text>
+//             </Text>
+
+//             <Text style={styles.orderDetail}>
+//               Quantity : <Text style={styles.blueText}>{order.qty}</Text>
+//             </Text>
+
+//             <Text style={styles.orderDetail}>
+//               Salesperson:{' '}
+//               <Text style={styles.blueText}>{order.salesperson}</Text>
+//             </Text>
+
+//             <View style={styles.statusBadge}>
+//               <Text style={styles.statusText}>{order.status}</Text>
+//             </View>
+//           </View>
+//         ))}
+//       </ScrollView>
+//     </SafeAreaView>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: '#fff',
+//     paddingHorizontal: 16,
+//   },
+//   header: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     marginTop: 20,
+//   },
+//   welcome: {
+//     fontSize: 18,
+//     fontWeight: '600',
+//     color: '#333',
+//   },
+//   subtitle: {
+//     color: '#000000',
+//   },
+//   statsRow: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     marginTop: 20,
+//   },
+//   statCard: {
+//     backgroundColor: '#F9F9F9',
+//     borderRadius: 12,
+//     width: '48%',
+//     padding: 16,
+//     alignItems: 'center',
+//   },
+//   statValue: {
+//     fontSize: 22,
+//     fontWeight: '700',
+//     marginTop: 8,
+//   },
+//   statLabel: {
+//     color: '#666666',
+//     marginTop: 4,
+//   },
+//   tabRow: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     marginTop: 20,
+//   },
+//   tabActive: {
+//     backgroundColor: '#FF7A00',
+//     paddingVertical: 6,
+//     paddingHorizontal: 16,
+//     borderRadius: 20,
+//     marginRight: 10,
+//   },
+//   tabInactive: {
+//     backgroundColor: '#F1F1F1',
+//     paddingVertical: 6,
+//     paddingHorizontal: 16,
+//     borderRadius: 20,
+//   },
+//   tabTextActive: {
+//     color: '#fff',
+//     fontWeight: '600',
+//   },
+//   tabTextInactive: {
+//     color: '#181C2E',
+//     fontWeight: '600',
+//   },
+//   showAll: {
+//     color: '#181C2E',
+//     fontWeight: '600',
+//   },
+//   orderCard: {
+//     backgroundColor: '#F9F9F9',
+//     borderRadius: 12,
+//     padding: 16,
+//     marginBottom: 16,
+//     position: 'relative',
+//   },
+//   orderTitle: {
+//     fontSize: 16,
+//     fontWeight: '600',
+//     marginBottom: 8,
+//     color: '#181C2E',
+//   },
+//   orderDetail: {
+//     color: '#666666',
+//     marginBottom: 4,
+//   },
+//   statusBadge: {
+//     position: 'absolute',
+//     top: 16,
+//     right: 16,
+//     backgroundColor: '#F58731',
+//     paddingHorizontal: 12,
+//     paddingVertical: 4,
+//     borderRadius: 12,
+//   },
+//   statusText: {
+//     color: '#FFFFFF',
+//     fontWeight: '600',
+//     fontSize: 12,
+//   },
+
+//   blueText: {
+//     color: '#181C2E',
+//     fontWeight: '600',
+//   },
+// });
+
+import React, {useRef, useState} from 'react';
 import {
   View,
   Text,
+  TouchableOpacity,
   StyleSheet,
-  TextInput,
+  ImageBackground,
   FlatList,
-  Pressable,
-  ActivityIndicator,
-  SafeAreaView,
-  Image,
-  StatusBar,
-  Platform,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
 import Feather from 'react-native-vector-icons/Feather';
-import Textstyle from '../assets/style/Textstyle';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
-const HomeScreen = () => {
-  const [loading, setLoading] = useState(false);
-  const dashboardData = [
-    {id: '1', icon: 'user', title: 'Total Order', value: '5,600'},
-    {id: '2', icon: 'users', title: 'Today Order', value: '4,220'},
+export default function HomeScreen({navigation}) {
+  const productCards = [
+    {
+      title: 'Age Strong Partition',
+      image: require('../assets/images/Category1.png'),
+    },
+    {
+      title: 'SS Bond',
+      image: require('../assets/images/Category2.png'),
+    },
+    {
+      title: 'Shera Bond',
+      image: require('../assets/images/Category3.png'),
+    },
+    {
+      title: 'SS Partition',
+      image: require('../assets/images/Category4.png'),
+    },
+
   ];
-  const navigation = useNavigation();
 
   const renderCard = ({item}) => (
-    <Pressable style={styles.card} onPress={() => handleCardPress()}>
-      <Feather
-        name={item.icon}
-        size={24}
-        color="#F58731"
-        style={{marginRight: 15}}
-      />
-      <View>
-        <Text style={[Textstyle.pb, styles.cardValue]}>{item.value}</Text>
-        <Text style={[Textstyle.pr, styles.cardTitle]}>{item.title}</Text>
-      </View>
-    </Pressable>
+    <TouchableOpacity style={styles.card}>
+      <ImageBackground
+        source={item.image}
+        style={styles.image}
+        imageStyle={{borderRadius: 12}}></ImageBackground>
+    </TouchableOpacity>
   );
-
-  const handleCardPress = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      navigation.navigate('Orderdetails');
-    }, 2000);
-  };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      {/* Status bar background */}
-      {/* <StatusBar barStyle="dark-content" backgroundColor="#fff" /> */}
-      <View style={styles.container}>
-        {loading ? (
-          <View style={styles.loaderContainer}>
-            <ActivityIndicator size="large" color="#F58731" />
-          </View>
-        ) : (
-          <>
-            <View style={styles.searchContainer}>
-              <Image
-                source={require('../icons/icons/searchIcon.png')}
-                style={styles.searchIcon}
-              />
-              <TextInput
-                placeholder="Search..."
-                style={styles.searchInput}
-                placeholderTextColor="#888"
-              />
-            </View>
-
-            <View style={styles.welcomeContainer}>
-              <Text style={[Textstyle.pr, styles.welcomeText]}>
-                Welcome To,
-              </Text>
-              <Text style={[Textstyle.pr, styles.appName]}>
-                Our Master Impex
-              </Text>
-            </View>
-
-            <Text style={[Textstyle.pb, styles.dashboardTitle]}>
-              Dashboard
-            </Text>
-            <FlatList
-              data={dashboardData}
-              renderItem={renderCard}
-              keyExtractor={item => item.id}
-              contentContainerStyle={styles.dashboardContainer}
-            />
-          </>
-        )}
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => navigation.getParent('Drawer')?.openDrawer()}>
+          <Feather name="menu" size={24} color="#333" />
+        </TouchableOpacity>
+        <View style={{alignItems: 'flex-end'}}>
+          <Text style={styles.welcome}>👋 Welcome to Master Impex</Text>
+          <Text style={styles.subtitle}>
+            Here's your organization's overviews
+          </Text>
+        </View>
       </View>
+
+      {/* Product Cards */}
+      <FlatList
+        data={productCards}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={renderCard}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{paddingTop: 20, paddingBottom: 30}}
+      />
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#fff',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-  },
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    paddingHorizontal: 16,
   },
-  searchContainer: {
+  header: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#F3F4F5',
-    borderRadius: 30,
-    paddingHorizontal: 15,
-    height: 50,
     marginTop: 20,
-    marginHorizontal: 20,
   },
-  searchIcon: {
-    width: 15,
-    height: 15,
-    tintColor: '#000',
-    marginRight: 10,
+  welcome: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+
   },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    height: '100%',
-    paddingVertical: 0,
-    borderWidth: 0,
+  subtitle: {
     color: '#000',
-  },
-  welcomeContainer: {
-    marginTop: 20,
-    marginBottom: 20,
-    paddingHorizontal: 20,
-  },
-  welcomeText: {
-    fontSize: 25,
-    fontWeight: 'bold',
-    color: '#F58731',
-    lineHeight: 40,
-  },
-  appName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#666',
-  },
-  dashboardTitle: {
-    fontSize: 15,
-    color: '#181C2E',
-    marginBottom: 10,
-    paddingLeft: 20,
-  },
-  dashboardContainer: {
-    paddingBottom: 20,
+    fontSize: 12,
   },
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 15,
-    marginBottom: 15,
-    marginHorizontal: 20,
-    shadowColor: 'rgba(0,0,0,0.5)',
-    shadowOpacity: 10,
-    shadowRadius: 20,
-    elevation: 10,
-    shadowOffset: {width: 0, height: 10},
+    marginBottom: 20,
+    height: 160,
+    borderRadius: 12,
+    overflow: 'hidden',
   },
-  cardValue: {
-    fontSize: 16,
-    color: '#181C2E',
-  },
-  cardTitle: {
-    fontSize: 13,
-    color: '#666',
-  },
-  loaderContainer: {
+  image: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
+  },
+  cardOverlay: {
+    backgroundColor: '#E40000',
+    paddingVertical: 12,
     alignItems: 'center',
+    borderBottomLeftRadius: 12,
+    borderBottomRightRadius: 12,
+  },
+  cardText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '700',
   },
 });
-
-export default HomeScreen;

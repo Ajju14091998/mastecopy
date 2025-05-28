@@ -435,10 +435,10 @@ import {
   Platform,
   ActivityIndicator
 } from "react-native";
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import Entypo from 'react-native-vector-icons/Entypo';
+// import AntDesign from 'react-native-vector-icons/AntDesign';
+// import Entypo from 'react-native-vector-icons/Entypo';
 import { useNavigation } from "@react-navigation/native";
-import Setting from "../assets/svg/setting.js";
+// import Setting from "../assets/svg/setting.js";
 
 
 const Orderdetails = () => {

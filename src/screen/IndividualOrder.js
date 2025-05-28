@@ -368,7 +368,7 @@
 
 
 // According to cli 
-import React from "react";
+import React, {useRef, useState} from 'react';
 import {
   View,
   Text,

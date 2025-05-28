@@ -1,6 +1,6 @@
 import {useFocusEffect} from 'expo-router';
 // import { useFocusEffect } from '@react-navigation/native';
-import * as React from 'react';
+import React, {useRef, useState} from 'react';
 import {
   Button,
   View,
