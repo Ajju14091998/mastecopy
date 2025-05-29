@@ -1,290 +1,285 @@
-//According to cli 
-import React, {useRef, useState} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   TextInput,
-  Image,
   TouchableOpacity,
-  ActivityIndicator,s
-  // PermissionsAndroid,
-  // Platform,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import Icon from "react-native-vector-icons/AntDesign";
-import { launchImageLibrary } from "react-native-image-picker";
-import Cart from "../assets/svg/Vector.js";
-import Myorder from "../assets/svg/myorder.js";
-import Logout from "../assets/svg/logout";
-import Textstyle from "../assets/style/Textstyle.js";
+  StyleSheet,
+  ScrollView,
+  SafeAreaView,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import Feather from 'react-native-vector-icons/Feather';
 
-export default function Profile() {
-  const navigation = useNavigation();
-  const [profileImage, setProfileImage] = useState(
-    "https://www.securityforum.org/wp-content/uploads/2022/10/Alex-Jordon-scaled-e1710797283626.jpeg"
-  );
-  const [selectedGender, setSelectedGender] = useState("Male");
-  const [loading, setLoading] = useState(false);
+export default function MyOrderScreen({navigation}) {
+  const [activeTab, setActiveTab] = useState('today');
 
-  // Function to handle image upload
-  const handleImageUpload = async () => {
-    if (Platform.OS === 'android') {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-          {
-            title: "Storage Permission",
-            message: "App needs access to your storage to upload images",
-            buttonNeutral: "Ask Me Later",
-            buttonNegative: "Cancel",
-            buttonPositive: "OK"
-          }
-        );
-        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-          alert("Permission to access media library is required!");
-          return;
-        }
-      } catch (err) {
-        console.warn(err);
-        return;
-      }
-    }
+  const todayOrders = [
+    {id: 'MI0001', date: '05/05/2025', qty: 250, status: 'Pending'},
+    {id: 'MI0002', date: '05/05/2025', qty: 175, status: 'Pending'},
+  ];
 
-    const options = {
-      mediaType: 'photo',
-      quality: 1,
-      maxWidth: 500,
-      maxHeight: 500,
-      includeBase64: false,
-    };
+  const totalOrders = [
+    {id: 'MI0003', date: '04/05/2025', qty: 116, status: 'Pending'},
+    {id: 'MI0004', date: '03/05/2025', qty: 223, status: 'Pending'},
+    {id: 'MI0005', date: '01/05/2025', qty: 189, status: 'Pending'},
+    {id: 'MI0006', date: '02/05/2025', qty: 189, status: 'Pending'},
+    {id: 'MI0007', date: '19/05/2025', qty: 189, status: 'Pending'},
+    {id: 'MI0008', date: '18/05/2025', qty: 189, status: 'Pending'},
+    {id: 'MI0009', date: '17/05/2025', qty: 189, status: 'Pending'},
+    {id: 'MI0010', date: '16/05/2025', qty: 189, status: 'Pending'},
+    {id: 'MI0011', date: '15/05/2025', qty: 189, status: 'Pending'},
+    {id: 'MI0012', date: '14/05/2025', qty: 189, status: 'Pending'},
+    {id: 'MI0013', date: '13/05/2025', qty: 189, status: 'Pending'},
+  ];
 
-    launchImageLibrary(options, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else if (response.assets && response.assets[0].uri) {
-        setProfileImage(response.assets[0].uri);
-      }
-    });
-  };
-
-  // Function to handle logout
-  const handleLogout = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      navigation.navigate("Login");
-    }, 2000);
-  };
+  const orders = activeTab === 'today' ? todayOrders : totalOrders;
 
   return (
-    <View style={styles.container}>
-      {/* Profile Image Section */}
-      <TouchableOpacity
-        style={styles.imageContainer}
-        onPress={handleImageUpload}
-      >
-        <Image source={{ uri: profileImage }} style={styles.profileImage} />
-        <Text style={[Textstyle.psb,styles.uploadText]}>Upload Image</Text>
-      </TouchableOpacity>
-
-      {/* User Info Section */}
-      <View style={styles.infoContainer}>
-        <View style={styles.inputWrapper}>
-          <Text style={[Textstyle.psb,styles.label]}>Name:</Text>
-          <TextInput style={[Textstyle.pr,styles.input]} value="Ajay Agunde" editable={true} />
-        </View>
-        <View style={styles.inputWrapper}>
-          <Text style={[Textstyle.psb,styles.label]}>Mobile:</Text>
-          <TextInput style={styles.input} value="9876543210" editable={true} />
-        </View>
-        <View style={styles.inputWrapper}>
-          <Text style={[Textstyle.psb,styles.label]}>Email:</Text>
-          <TextInput
-            style={styles.input}
-            value="rikafashionshop@gmail.com"
-            editable={false}
-          />
-        </View>
-        <View style={styles.genderContainer}>
-          <Text style={[Textstyle.psb,styles.label]}>Gender:</Text>
-          <TouchableOpacity
-            style={[
-              styles.genderButton,
-              selectedGender === "Male" && styles.genderButtonActive,
-            ]}
-            onPress={() => setSelectedGender("Male")}
-          >
-            <Text
-              style={[
-                styles.genderText,
-                selectedGender === "Male" && styles.genderTextActive,
-                Textstyle.pr,
-              ]}
-            >
-              Male
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.genderButton,
-              selectedGender === "Female" && styles.genderButtonActive,
-            ]}
-            onPress={() => setSelectedGender("Female")}
-          >
-            <Text
-              style={[
-                styles.genderText,
-                selectedGender === "Female" && styles.genderTextActive,
-                Textstyle.pr,
-              ]}
-            >
-              Female
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* My Orders */}
-      <View style={styles.orderSection}>
+    <SafeAreaView style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
         <TouchableOpacity
-          style={styles.orderButton}
-          onPress={() => navigation.navigate("Orderdetails")}
-        >
-          <Myorder style={{ width: 50, height: 50, top: 4 }} color="#000" />
-          <Text style={[Textstyle.psb,styles.orderText]}>My Order</Text>
-          <Image
-            source={require('../icons/icons/rightarrow.png')} // Local image
-            style={{ width: 25, height: 25, tintColor: "black", marginLeft: 0 }}
-          /> 
+          style={styles.iconButton}
+          onPress={() => navigation.navigate('HomeScreen')}>
+          <Icon name="arrow-back" size={20} color="#fff" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>My Order</Text>
+        <TouchableOpacity style={styles.iconButton} onPress={() => {}}>
+          <Icon name="filter-list" size={20} color="#fff" />
         </TouchableOpacity>
       </View>
 
-      {/* Logout Button */}
-      <TouchableOpacity
-        style={styles.logoutButton}
-        onPress={handleLogout}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator size="small" color="#fff" />
-        ) : (
-          <>
-          <Image
-            source={require('../icons/icons/logout.png')} 
-            style={{ width: 25, height: 25, tintColor: "white", marginLeft: 0 }}
-          /> 
-            <Text style={[Textstyle.psb,styles.logoutText]}>Log Out</Text>
-          </>
-        )}
-      </TouchableOpacity>
-    </View>
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <Feather name="search" size={18} color="#999" />
+        <TextInput
+          placeholder="Search"
+          placeholderTextColor="#999"
+          style={styles.searchInput}
+        />
+      </View>
+
+      {/* Stats */}
+      <View style={styles.statsRow}>
+        <View style={styles.statCard}>
+          <View style={styles.iconWrap}>
+            <Icon name="today" size={20} color="#D00000" />
+          </View>
+          <View>
+            <Text style={styles.statValue}>12</Text>
+            <Text style={styles.statLabel}>Today Order</Text>
+          </View>
+        </View>
+        <View style={styles.statCard}>
+          <View style={styles.iconWrap}>
+            <Icon name="shopping-cart" size={20} color="#D00000" />
+          </View>
+          <View>
+            <Text style={styles.statValue}>1432</Text>
+            <Text style={styles.statLabel}>Total Order</Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Tabs */}
+      <View style={styles.tabs}>
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            activeTab === 'today' ? styles.activeTab : styles.inactiveTab,
+          ]}
+          onPress={() => setActiveTab('today')}>
+          <Text
+            style={
+              activeTab === 'today'
+                ? styles.activeTabText
+                : styles.inactiveTabText
+            }>
+            Today Order
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            activeTab === 'total' ? styles.activeTab : styles.inactiveTab,
+          ]}
+          onPress={() => setActiveTab('total')}>
+          <Text
+            style={
+              activeTab === 'total'
+                ? styles.activeTabText
+                : styles.inactiveTabText
+            }>
+            Total Order
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Order List */}
+      <ScrollView contentContainerStyle={{paddingBottom: 20}}>
+        {orders.map((order, index) => (
+          <TouchableOpacity
+            key={index}
+            onPress={() => navigation.navigate('IndividualOrder', {order})}
+            style={styles.orderCard}>
+            <Text style={styles.orderLine}>
+              <Text style={styles.label}>Order id : </Text>
+              <Text style={styles.value}>{order.id}</Text>
+            </Text>
+            <Text style={styles.orderLine}>
+              <Text style={styles.label}>Order Date : </Text>
+              <Text style={styles.value}>{order.date}</Text>
+            </Text>
+            <Text style={styles.orderLine}>
+              <Text style={styles.label}>Quantity : </Text>
+              <Text style={styles.value}>{order.qty}</Text>
+            </Text>
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{order.status}</Text>
+            </View>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    padding: 20,
-    paddingTop: 70,
+    backgroundColor: '#fff',
+    paddingHorizontal: 16,
   },
-  imageContainer: {
-    alignItems: "center",
-    marginBottom: 20,
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 40,
+    marginBottom: 16,
   },
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 10,
+  iconButton: {
+    backgroundColor: '#D00000',
+    padding: 8,
+    borderRadius: 100,
   },
-  uploadText: {
-    fontSize: 14,
-    color: "#181C2E",
-    // fontFamily: "psb",
-    textAlign: "center",
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#000',
   },
-  infoContainer: {
-    marginBottom: 20,
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F3F3F3',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 16,
   },
-  inputWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  label: {
-    fontSize: 14,
-    color: "#666",
-    width: 80,
-  },
-  input: {
+  searchInput: {
     flex: 1,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    fontSize: 16,
-    paddingVertical: 5,
+    marginLeft: 8,
+    color: '#000',
   },
-  genderContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 15,
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
   },
-  genderButton: {
+  statCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '48%',
+    backgroundColor: '#fff',
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: '#EEE',
+    padding: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  iconWrap: {
+    width: 40,
+    height: 40,
     borderRadius: 20,
-    paddingHorizontal: 15,
-    paddingVertical: 5,
-    marginLeft: 10,
-  },
-  genderButtonActive: {
-    backgroundColor: "#F58731",
-  },
-  genderText: {
-    color: "#333",
-  },
-  genderTextActive: {
-    color: "#fff",
-  },
-  orderSection: {
-    marginBottom: 20,
-  },
-  orderButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 10,
-    paddingLeft: 5,
-    paddingRight: 5,
-  },
-  orderIcon: {
-    width: 24,
-    height: 24,
+    backgroundColor: '#F3F3F3',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 10,
   },
-  orderText: {
-    fontSize: 16,
-    color: "#333",
-    flex: 1,
-    textAlign: "left",
-  },
-  logoutButton: {
-    backgroundColor: "#F58731",
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    height: 50,
-  },
-  logoutText: {
+  statValue: {
     fontSize: 20,
-    color: "#fff",
-    marginLeft: 10,
+    fontWeight: '700',
+    color: '#000',
+  },
+  statLabel: {
+    fontSize: 13,
+    color: '#444',
+    marginTop: 4,
+  },
+  tabs: {
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 20,
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  activeTab: {
+    backgroundColor: '#D00000',
+  },
+  inactiveTab: {
+    backgroundColor: '#fff',
+    borderColor: '#D00000',
+    borderWidth: 1.5,
+  },
+  activeTabText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  inactiveTabText: {
+    color: '#000',
+    fontWeight: '600',
+  },
+  orderCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#EEE',
+    marginBottom: 12,
+    position: 'relative',
+  },
+  orderLine: {
+    marginBottom: 4,
+  },
+  label: {
+    fontSize: 13,
+    color: '#777',
+  },
+  value: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#000',
+  },
+  badge: {
+    position: 'absolute',
+    right: 16,
+    top: 16,
+    backgroundColor: '#F58731',
+    borderRadius: 12,
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+  },
+  badgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
   },
 });

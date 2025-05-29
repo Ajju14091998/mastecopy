@@ -260,22 +260,29 @@
 //   },
 // });
 
-import React, {useRef, useState} from 'react';
+
+
+import React from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
+  Image,
   ImageBackground,
   FlatList,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 
-export default function HomeScreen({navigation}) {
+
+export default function HomeScreen()  {
+  const navigation = useNavigation();
+
   const productCards = [
     {
-      title: 'Age Strong Partition',
+      title: 'Super Strong Partition',
       image: require('../assets/images/Category1.png'),
     },
     {
@@ -290,16 +297,21 @@ export default function HomeScreen({navigation}) {
       title: 'SS Partition',
       image: require('../assets/images/Category4.png'),
     },
-
   ];
 
-  const renderCard = ({item}) => (
-    <TouchableOpacity style={styles.card}>
+const renderCard = ({ item }) => (
+    <View style={styles.card}>
       <ImageBackground
         source={item.image}
         style={styles.image}
-        imageStyle={{borderRadius: 12}}></ImageBackground>
-    </TouchableOpacity>
+        imageStyle={{ borderRadius: 12 }}>
+        <TouchableOpacity
+          style={styles.buttonContainer}
+          onPress={() => navigation.navigate('Order')}>
+          <Text style={styles.cardText}>{item.title}</Text>
+        </TouchableOpacity>
+      </ImageBackground>
+    </View>
   );
 
   return (
@@ -310,11 +322,12 @@ export default function HomeScreen({navigation}) {
           onPress={() => navigation.getParent('Drawer')?.openDrawer()}>
           <Feather name="menu" size={24} color="#333" />
         </TouchableOpacity>
-        <View style={{alignItems: 'flex-end'}}>
-          <Text style={styles.welcome}>👋 Welcome to Master Impex</Text>
-          <Text style={styles.subtitle}>
-            Here's your organization's overviews
-          </Text>
+        <View style={styles.headerRight}>
+          <Image
+            source={require('../assets/images/star.png')} // Replace with your uploaded asset
+            style={styles.starIcon}
+          />
+          <Text style={styles.welcome}>Welcome to Master Impex</Text>
         </View>
       </View>
 
@@ -342,11 +355,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 20,
   },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  starIcon: {
+    width: 18,
+    height: 18,
+    marginRight: 8,
+    resizeMode: 'contain',
+  },
   welcome: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     color: '#333',
-
   },
   subtitle: {
     color: '#000',
@@ -358,17 +380,23 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
   },
+
   image: {
     flex: 1,
     justifyContent: 'flex-end',
-  },
-  cardOverlay: {
-    backgroundColor: '#E40000',
-    paddingVertical: 12,
     alignItems: 'center',
-    borderBottomLeftRadius: 12,
-    borderBottomRightRadius: 12,
+    paddingBottom: 16, // Space from bottom
   },
+
+  buttonContainer: {
+    width: 400, 
+    height: 46, 
+    backgroundColor: '#E40000',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
   cardText: {
     color: '#fff',
     fontSize: 14,
