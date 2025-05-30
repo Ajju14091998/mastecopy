@@ -260,8 +260,149 @@
 //   },
 // });
 
+// main code 29-5-25
+// import React from 'react';
+// import {
+//   View,
+//   Text,
+//   TouchableOpacity,
+//   StyleSheet,
+//   Image,
+//   ImageBackground,
+//   FlatList,
+// } from 'react-native';
+// import Feather from 'react-native-vector-icons/Feather';
+// import {SafeAreaView} from 'react-native-safe-area-context';
+// import { useNavigation } from '@react-navigation/native';
 
+// export default function HomeScreen()  {
+//   const navigation = useNavigation();
 
+//   const productCards = [
+//     {
+//       title: 'Super Strong Partition',
+//       image: require('../assets/images/Category1.png'),
+//     },
+//     {
+//       title: 'SS Bond',
+//       image: require('../assets/images/Category2.png'),
+//     },
+//     {
+//       title: 'Shera Bond',
+//       image: require('../assets/images/Category3.png'),
+//     },
+//     {
+//       title: 'SS Partition',
+//       image: require('../assets/images/Category4.png'),
+//     },
+//   ];
+
+// const renderCard = ({ item }) => (
+//     <View style={styles.card}>
+//       <ImageBackground
+//         source={item.image}
+//         style={styles.image}
+//         imageStyle={{ borderRadius: 12 }}>
+//         <TouchableOpacity
+//           style={styles.buttonContainer}
+//           onPress={() => navigation.navigate('Order')}>
+//           <Text style={styles.cardText}>{item.title}</Text>
+//         </TouchableOpacity>
+//       </ImageBackground>
+//     </View>
+//   );
+
+//   return (
+//     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+//       {/* Header */}
+//       <View style={styles.header}>
+//         <TouchableOpacity
+//           onPress={() => navigation.getParent('Drawer')?.openDrawer()}>
+//           <Feather name="menu" size={24} color="#333" />
+//         </TouchableOpacity>
+//         <View style={styles.headerRight}>
+//           <Image
+//             source={require('../assets/images/star.png')} // Replace with your uploaded asset
+//             style={styles.starIcon}
+//           />
+//           <Text style={styles.welcome}>Welcome to Master Impex</Text>
+//         </View>
+//       </View>
+
+//       {/* Product Cards */}
+//       <FlatList
+//         data={productCards}
+//         keyExtractor={(item, index) => index.toString()}
+//         renderItem={renderCard}
+//         showsVerticalScrollIndicator={false}
+//         contentContainerStyle={{paddingTop: 20, paddingBottom: 30}}
+//       />
+//     </SafeAreaView>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: '#fff',
+//     paddingHorizontal: 16,
+//   },
+//   header: {
+//     flexDirection: 'row',
+//     justifyContent: 'space-between',
+//     alignItems: 'center',
+//     marginTop: 20,
+//   },
+//   headerRight: {
+//     flexDirection: 'row',
+//     alignItems: 'center',
+//   },
+//   starIcon: {
+//     width: 18,
+//     height: 18,
+//     marginRight: 8,
+//     resizeMode: 'contain',
+//   },
+//   welcome: {
+//     fontSize: 16,
+//     fontWeight: '600',
+//     color: '#333',
+//   },
+//   subtitle: {
+//     color: '#000',
+//     fontSize: 12,
+//   },
+//   card: {
+//     marginBottom: 20,
+//     height: 160,
+//     borderRadius: 12,
+//     overflow: 'hidden',
+//   },
+
+//   image: {
+//     flex: 1,
+//     justifyContent: 'flex-end',
+//     alignItems: 'center',
+//     paddingBottom: 16, // Space from bottom
+//   },
+
+//   buttonContainer: {
+//     width: 400,
+//     height: 46,
+//     backgroundColor: '#D00000',
+//     borderRadius: 8,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//   },
+
+//   cardText: {
+//     color: '#fff',
+//     fontSize: 14,
+//     fontWeight: '700',
+//   },
+// });
+
+// responsive ui
 import React from 'react';
 import {
   View,
@@ -271,13 +412,15 @@ import {
   Image,
   ImageBackground,
   FlatList,
+  Dimensions,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 
+const {width} = Dimensions.get('window');
 
-export default function HomeScreen()  {
+export default function HomeScreen() {
   const navigation = useNavigation();
 
   const productCards = [
@@ -299,12 +442,12 @@ export default function HomeScreen()  {
     },
   ];
 
-const renderCard = ({ item }) => (
+  const renderCard = ({item}) => (
     <View style={styles.card}>
       <ImageBackground
         source={item.image}
         style={styles.image}
-        imageStyle={{ borderRadius: 12 }}>
+        imageStyle={{borderRadius: 12}}>
         <TouchableOpacity
           style={styles.buttonContainer}
           onPress={() => navigation.navigate('Order')}>
@@ -324,7 +467,7 @@ const renderCard = ({ item }) => (
         </TouchableOpacity>
         <View style={styles.headerRight}>
           <Image
-            source={require('../assets/images/star.png')} // Replace with your uploaded asset
+            source={require('../assets/images/star.png')}
             style={styles.starIcon}
           />
           <Text style={styles.welcome}>Welcome to Master Impex</Text>
@@ -337,7 +480,7 @@ const renderCard = ({ item }) => (
         keyExtractor={(item, index) => index.toString()}
         renderItem={renderCard}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{paddingTop: 20, paddingBottom: 30}}
+        contentContainerStyle={{paddingTop: 20, paddingBottom: 100}}
       />
     </SafeAreaView>
   );
@@ -348,16 +491,20 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     paddingHorizontal: 16,
+        paddingLeft: 20,
+    paddingRight: 20,
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 20,
+    gap: 10,
+    justifyContent: 'space-between',
   },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginLeft: 16,
   },
   starIcon: {
     width: 18,
@@ -368,35 +515,30 @@ const styles = StyleSheet.create({
   welcome: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
-  },
-  subtitle: {
     color: '#000',
-    fontSize: 12,
   },
   card: {
     marginBottom: 20,
     height: 160,
+    width: '100%',
     borderRadius: 12,
     overflow: 'hidden',
   },
-
   image: {
     flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
-    paddingBottom: 16, // Space from bottom
+    paddingBottom: 16,
   },
-
   buttonContainer: {
-    width: 400, 
-    height: 46, 
-    backgroundColor: '#E40000',
+    width: width - 64, // Responsive button
+    maxWidth: 360,
+    height: 46,
+    backgroundColor: '#D00000',
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
   },
-
   cardText: {
     color: '#fff',
     fontSize: 14,

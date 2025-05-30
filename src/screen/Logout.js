@@ -7,12 +7,15 @@ import {
   StyleSheet,
   ScrollView,
   SafeAreaView,
+  Modal,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
 
 export default function MyOrderScreen({navigation}) {
   const [activeTab, setActiveTab] = useState('today');
+  const [isFilterModalVisible, setFilterModalVisible] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState('Pending');
 
   const todayOrders = [
     {id: 'MI0001', date: '05/05/2025', qty: 250, status: 'Pending'},
@@ -45,7 +48,9 @@ export default function MyOrderScreen({navigation}) {
           <Icon name="arrow-back" size={20} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>My Order</Text>
-        <TouchableOpacity style={styles.iconButton} onPress={() => {}}>
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={() => setFilterModalVisible(true)}>
           <Icon name="filter-list" size={20} color="#fff" />
         </TouchableOpacity>
       </View>
@@ -141,6 +146,52 @@ export default function MyOrderScreen({navigation}) {
           </TouchableOpacity>
         ))}
       </ScrollView>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isFilterModalVisible}
+        onRequestClose={() => setFilterModalVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Filter</Text>
+            <View style={styles.modalDivider} />
+
+            <Text style={styles.filterLabel}>FILTER BY ORDER STATUS</Text>
+
+            {['Pending', 'Completed', 'Cancel'].map(status => (
+              <TouchableOpacity
+                key={status}
+                style={styles.radioRow}
+                onPress={() => setSelectedStatus(status)}>
+                <View
+                  style={[
+                    styles.radioOuter,
+                    selectedStatus === status && styles.radioOuterSelected,
+                  ]}>
+                  {selectedStatus === status && (
+                    <View style={styles.radioInner} />
+                  )}
+                </View>
+                <Text style={styles.radioLabel}>{status}</Text>
+              </TouchableOpacity>
+            ))}
+
+            <Text style={styles.filterLabel}>FILTER BY DATE</Text>
+
+            <TouchableOpacity style={styles.dateDropdown}>
+              <Text style={styles.dateText}>Select Date</Text>
+              <Feather name="chevron-down" size={18} color="#999" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.applyButton}
+              onPress={() => setFilterModalVisible(false)}>
+              <Text style={styles.applyButtonText}>Apply Filters</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -155,7 +206,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 40,
+    marginTop: 10,
     marginBottom: 16,
   },
   iconButton: {
@@ -171,8 +222,8 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F3F3F3',
-    borderRadius: 12,
+    backgroundColor: '#F3F4F5',
+    borderRadius: 50,
     paddingHorizontal: 12,
     paddingVertical: 10,
     marginBottom: 16,
@@ -281,5 +332,89 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     fontWeight: '600',
+  },
+
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 10,
+    marginTop: 10,
+    textAlign: 'center',
+  },
+  radioRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  radioOuter: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    borderColor: '#D00000',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+  radioOuterSelected: {
+    borderColor: '#D00000',
+  },
+  radioInner: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#D00000',
+  },
+  radioLabel: {
+    fontSize: 16,
+    color: '#000',
+  },
+  filterLabel: {
+    marginTop: 5,
+    marginBottom: 10,
+    fontWeight: '600',
+    color: '#000',
+  },
+  dateDropdown: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    padding: 12,
+  },
+  dateText: {
+    color: '#999',
+  },
+  applyButton: {
+    backgroundColor: '#D00000',
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 30,
+  },
+  applyButtonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+
+  modalDivider: {
+    height: 1,
+    backgroundColor: '#ccc',
+    width: '100%',
+    marginBottom: 8,
   },
 });

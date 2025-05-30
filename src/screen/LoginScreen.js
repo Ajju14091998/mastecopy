@@ -1,4 +1,5 @@
-import React, {useRef, useState} from 'react';
+// responsive css use in all screen
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -6,29 +7,34 @@ import {
   Pressable,
   StyleSheet,
   Image,
-  StatusBar,
+  
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import Textstyle from '../assets/style/Textstyle';
+import { StatusBar } from 'react-native';
 
-const LoginScreen = ({ navigation }) => {
+
+const {width, height} = Dimensions.get('window');
+
+const LoginScreen = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isEmailValid, setIsEmailValid] = useState(true);
-  const [showPassword, setShowPassword] = useState(false); 
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = () => {
     if (!email || !password) {
       setError('Both email and password are required!');
-      return;  
+      return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setIsEmailValid(false);  
+      setIsEmailValid(false);
       setError('Please enter a valid email address.');
       return;
     }
@@ -45,22 +51,25 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+
       <Image
         style={styles.logo}
-        source={require('../assets/images/icon.png')}
+        source={require('../assets/images/logo.png')}
         resizeMode="contain"
       />
 
       <View style={styles.welcomeContainer}>
         <Text style={[Textstyle.psb, styles.welcomeText]}>Welcome!</Text>
         <Text style={[Textstyle.pr, styles.subtitle]}>
-          Please login or sign up to continue our app
+          please login or sign up to continue our app
         </Text>
       </View>
 
       <View style={styles.inputContainer}>
-        <Text style={[Textstyle.psb, styles.inputLabel]}>Email</Text>
+        <Text style={[Textstyle.psb, styles.inputLabel]}>
+          Email Address<Text style={{color: 'red'}}> *</Text>
+        </Text>
         <View style={styles.inputWrapper}>
           <TextInput
             style={styles.input}
@@ -68,18 +77,26 @@ const LoginScreen = ({ navigation }) => {
             placeholderTextColor="#666"
             keyboardType="email-address"
             value={email}
-            onChangeText={(text) => setEmail(text)}
+            onChangeText={text => {
+              setEmail(text);
+              const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text);
+              setIsEmailValid(isValid || text === '');
+            }}
           />
-          {/* {email && (isEmailValid ? (
-            <Icon name="checkcircle" size={20} color="green" />
-          ) : (
-            <Icon name="closecircle" size={20} color="red" />
-          ))} */}
+          {email ? (
+            isEmailValid ? (
+              <Icon name="checkcircle" size={20} color="green" />
+            ) : (
+              <Icon name="closecircle" size={20} color="red" />
+            )
+          ) : null}
         </View>
       </View>
 
       <View style={styles.inputContainer}>
-        <Text style={[Textstyle.psb, styles.inputLabel]}>Password</Text>
+        <Text style={[Textstyle.psb, styles.inputLabel]}>
+          Password<Text style={{color: 'red'}}> *</Text>
+        </Text>
         <View style={styles.inputWrapper}>
           <TextInput
             style={styles.input}
@@ -87,14 +104,14 @@ const LoginScreen = ({ navigation }) => {
             placeholderTextColor="#666"
             secureTextEntry={!showPassword}
             value={password}
-            onChangeText={(text) => setPassword(text)}
+            onChangeText={setPassword}
           />
           <Pressable onPress={() => setShowPassword(!showPassword)}>
             <Icon
               name={showPassword ? 'eye' : 'eyeo'}
               size={20}
               color="#999"
-              style={{ marginRight: 6 }}
+              style={{marginRight: 6}}
             />
           </Pressable>
         </View>
@@ -104,7 +121,10 @@ const LoginScreen = ({ navigation }) => {
         <Text style={[Textstyle.pr, styles.errorText]}>{error}</Text>
       ) : null}
 
-      <Pressable style={styles.loginButton} onPress={handleLogin} disabled={loading}>
+      <Pressable
+        style={styles.loginButton}
+        onPress={handleLogin}
+        disabled={loading}>
         {loading ? (
           <ActivityIndicator size="small" color="#fff" />
         ) : (
@@ -119,71 +139,67 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingHorizontal: 20,
+    paddingHorizontal: width * 0.06,
     justifyContent: 'center',
   },
   logo: {
-    width: 300,
-    height: 60,
+    width: width * 0.7,
+    height: height * 0.08,
     alignSelf: 'center',
-    marginBottom: 40,
+    marginBottom: height * 0.04,
   },
   welcomeContainer: {
-    alignItems: 'flex-start',
-    marginBottom: 30,
+    alignItems: 'center',
+    marginBottom: height * 0.03,
   },
   welcomeText: {
-    fontSize: 22,
+    fontSize: width * 0.06,
     color: '#333',
-    marginBottom: 0,
-    paddingLeft: 6,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: width * 0.035,
     color: '#666666',
-    textAlign: 'left',
-    paddingLeft: 6,
+    textAlign: 'center',
+    marginTop: 4,
   },
   inputContainer: {
-    marginBottom: 20,
+    marginBottom: height * 0.02,
   },
   inputLabel: {
-    fontSize: 16,
-    marginBottom: -6,
+    fontSize: width * 0.042,
+    marginBottom: 4,
     color: '#333',
-    paddingLeft: 6,
   },
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 0,
     borderBottomWidth: 1,
-    borderBottomColor: '#EEEEEE',
+    borderColor: '#EEEEEE',
+    paddingRight: 6,
   },
   input: {
     flex: 1,
-    fontSize: 14,
+    fontSize: width * 0.038,
     paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderColor: '#EEEEEE',
+    color: '#333',
   },
   loginButton: {
-    backgroundColor: '#F58731',
-    paddingVertical: 15,
+    backgroundColor: '#000',
+    paddingVertical: height * 0.02,
     borderRadius: 14,
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: height * 0.02,
   },
   loginButtonText: {
-    fontSize: 16,
+    fontSize: width * 0.045,
     color: '#fff',
-    textAlignVertical: 'center',
-    marginTop: 2,
+    textAlign: 'center',
   },
   errorText: {
     color: 'red',
-    fontSize: 14,
+    fontSize: width * 0.035,
     textAlign: 'center',
+    marginTop: -10,
     marginBottom: 10,
   },
 });

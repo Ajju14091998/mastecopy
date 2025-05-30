@@ -1186,7 +1186,8 @@
 //   },
 // });
 
-import React, {useRef, useState} from 'react';
+// 29-05-25 code
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -1199,6 +1200,8 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import DropDownPicker from 'react-native-dropdown-picker';
+// import {SafeAreaView} from 'react-native-safe-area-context';
+import Feather from 'react-native-vector-icons/Feather';
 
 const TABS = ['All', 'Plain', 'Wooden/Marble', 'Matt', 'Glossy'];
 
@@ -1339,6 +1342,7 @@ export default function ProductScreen() {
   );
 
   return (
+    // <SafeAreaView style={styles.safeArea}>
     <View style={styles.container}>
       <View
         style={{
@@ -1367,7 +1371,17 @@ export default function ProductScreen() {
       </View>
 
       <View style={styles.searchContainer}>
-        <TextInput placeholder="Search" style={styles.searchInput} />
+        <Feather
+          name="search"
+          size={18}
+          color="#999"
+          style={styles.searchIcon}
+        />
+        <TextInput
+          placeholder="Search"
+          style={styles.searchInput}
+          placeholderTextColor="#999"
+        />
         <TouchableOpacity
           style={styles.filterButton}
           onPress={() => setIsFilterModalVisible(true)}>
@@ -1437,6 +1451,9 @@ export default function ProductScreen() {
                 </Text>
 
                 {/* Sizes */}
+                <Text style={{fontSize: 12, fontWeight: 600, marginTop: 6}}>
+                  Thickness
+                </Text>
                 <View
                   style={{
                     flexDirection: 'row',
@@ -1469,13 +1486,86 @@ export default function ProductScreen() {
                     );
                   })}
                 </View>
+                <Text style={{fontSize: 12, fontWeight: 600, marginTop: 6}}>
+                  Size
+                </Text>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    gap: 8,
+                    marginTop: 12,
+                  }}>
+                  {['8X4', '7X3', '8X3', '10X4', '12X4'].map((size, index) => {
+                    const isSelected = selectedSize === size;
+                    return (
+                      <TouchableOpacity
+                        key={index}
+                        onPress={() => setSelectedSize(size)}
+                        style={{
+                          paddingHorizontal: 16,
+                          paddingVertical: 6,
+                          borderRadius: 12,
+                          backgroundColor: isSelected ? '#D00000' : '#fff',
+                          borderColor: '#ccc',
+                          borderWidth: 1,
+                        }}>
+                        <Text
+                          style={{
+                            fontWeight: '600',
+                            color: isSelected ? '#fff' : '#000',
+                          }}>
+                          {size}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+                <Text style={{fontSize: 12, fontWeight: 600, marginTop: 6}}>
+                  Coil
+                </Text>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    gap: 8,
+                    marginTop: 12,
+                  }}>
+                  {['8X4', '7X3'].map((size, index) => {
+                    const isSelected = selectedSize === size;
+                    return (
+                      <TouchableOpacity
+                        key={index}
+                        onPress={() => setSelectedSize(size)}
+                        style={{
+                          paddingHorizontal: 16,
+                          paddingVertical: 6,
+                          borderRadius: 12,
+                          backgroundColor: isSelected ? '#D00000' : '#fff',
+                          borderColor: '#ccc',
+                          borderWidth: 1,
+                        }}>
+                        <Text
+                          style={{
+                            fontWeight: '600',
+                            color: isSelected ? '#fff' : '#000',
+                          }}>
+                          {size}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
 
                 {/* Quantity and Add to Cart */}
                 <View
                   style={{
+                    display: 'flex',
                     flexDirection: 'row',
-                    alignItems: 'center',
                     justifyContent: 'space-between',
+                    gap: 10,
+                    alignContent: 'center',
+                    alignItems: 'center',
                     marginTop: 20,
                   }}>
                   {/* Quantity Selector */}
@@ -1486,34 +1576,52 @@ export default function ProductScreen() {
                       borderWidth: 1,
                       borderColor: '#ccc',
                       borderRadius: 20,
-                      paddingHorizontal: 12,
+                      paddingHorizontal: 8,
+                      height: 40,
                     }}>
+                    {/* - Button */}
                     <TouchableOpacity
-                      onPress={() => {
-                        setQuantity(prevQuantity => {
-                          if (prevQuantity === 1) {
-                            setIsProductModalVisible(false); 
-                            if (cartCount > 0) setCartCount(cartCount - 1); 
-                            return 1; 
-                          } else {
-                            return prevQuantity - 1;
-                          }
-                        });
+                      onPress={() => setQuantity(prev => Math.max(prev - 1, 1))}
+                      style={{
+                        paddingHorizontal: 10,
+                        paddingVertical: 4,
                       }}>
                       <Text style={{fontSize: 20, fontWeight: 'bold'}}>-</Text>
                     </TouchableOpacity>
 
-                    <Text style={{marginHorizontal: 10, fontSize: 16}}>
-                      {quantity}
-                    </Text>
+                    {/* Input Box */}
+                    <TextInput
+                      style={{
+                        width: 50,
+                        textAlign: 'center',
+                        fontSize: 16,
+                        paddingVertical: 0,
+                        marginHorizontal: 4,
+                      }}
+                      keyboardType="numeric"
+                      value={quantity.toString()}
+                      onChangeText={text => {
+                        const num = parseInt(text.replace(/[^0-9]/g, ''), 10);
+                        if (!isNaN(num)) {
+                          setQuantity(num);
+                        } else if (text === '') {
+                          setQuantity(0);
+                        }
+                      }}
+                    />
+
+                    {/* + Button */}
                     <TouchableOpacity
-                      onPress={() => setQuantity(prev => prev + 1)}>
-                      <Text style={{fontSize: 18, padding: 6}}>+</Text>
+                      onPress={() => setQuantity(prev => prev + 1)}
+                      style={{
+                        paddingHorizontal: 10,
+                        paddingVertical: 4,
+                      }}>
+                      <Text style={{fontSize: 20, fontWeight: 'bold'}}>+</Text>
                     </TouchableOpacity>
                   </View>
 
                   {/* Add to Cart */}
-
                   <TouchableOpacity
                     style={{
                       flexDirection: 'row',
@@ -1522,11 +1630,10 @@ export default function ProductScreen() {
                       paddingVertical: 12,
                       paddingHorizontal: 20,
                       borderRadius: 8,
-                      marginTop: 20,
                     }}
                     onPress={() => {
-                      setCartCount(cartCount + 1); // Cart count वाढवा
-                      setIsProductModalVisible(false); // Modal बंद करा
+                      setCartCount(cartCount + 1);
+                      setIsProductModalVisible(false);
                     }}>
                     <Icon name="shopping-cart" size={20} color="#fff" />
                     <Text
@@ -1622,28 +1729,46 @@ export default function ProductScreen() {
         </View>
       </Modal>
     </View>
+    // </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  //   safeArea: {
+  //   flex: 1,
+  //   backgroundColor: '#fff',
+  //   paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+  // },
+
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingTop: 40,
     paddingHorizontal: 10,
+    paddingLeft: 20,
+    paddingRight: 20,
   },
   searchContainer: {
     flexDirection: 'row',
-    marginBottom: 12,
     alignItems: 'center',
+    marginBottom: 12,
+    position: 'relative',
   },
+
   searchInput: {
     flex: 1,
     backgroundColor: '#F3F3F3',
     borderRadius: 24,
-    paddingHorizontal: 16,
-    height: 40,
+    paddingLeft: 40, // Add space for the icon
+    paddingRight: 16,
+    height: 50,
   },
+
+  searchIcon: {
+    position: 'absolute',
+    left: 16,
+    zIndex: 1,
+  },
+
   filterButton: {
     backgroundColor: '#D00000',
     width: 40,

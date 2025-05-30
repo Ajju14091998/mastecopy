@@ -330,8 +330,8 @@
 // },
 
 // });
-
 // export default Addtocart;
+
 
 import React, {useState} from 'react';
 import {
@@ -342,12 +342,12 @@ import {
   TouchableOpacity,
   StyleSheet,
   Modal,
-  Dimensions,
+  TextInput,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation} from '@react-navigation/native';
 
-const cartItems = [
+const initialCartItems = [
   {
     id: 1,
     name: 'EMERALD GREEN',
@@ -361,7 +361,7 @@ const cartItems = [
     name: 'Breccia Brown',
     code: 'SPLP 310',
     size: '8X4',
-    quantity: 100,
+    quantity: 200,
     image: require('../assets/images/cermic.png'),
   },
   {
@@ -376,7 +376,47 @@ const cartItems = [
 
 const MyCartScreen = ({navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const [cartData, setCartData] = useState(initialCartItems);
+  const totalQuantity = cartData.reduce((sum, item) => sum + item.quantity, 0);
+
+  const handleQuantityChange = (value, itemId) => {
+    const updatedCart = cartData.map(item => {
+      if (item.id === itemId) {
+        const numericValue = parseInt(value, 10);
+        return {
+          ...item,
+          quantity: isNaN(numericValue) || numericValue < 1 ? 1 : numericValue,
+        };
+      }
+      return item;
+    });
+    setCartData(updatedCart);
+  };
+
+  const handleIncrement = itemId => {
+    const updatedCart = cartData.map(item => {
+      if (item.id === itemId) {
+        return {...item, quantity: item.quantity + 1};
+      }
+      return item;
+    });
+    setCartData(updatedCart);
+  };
+
+  const handleDecrement = itemId => {
+    const updatedCart = cartData.map(item => {
+      if (item.id === itemId && item.quantity > 1) {
+        return {...item, quantity: item.quantity - 1};
+      }
+      return item;
+    });
+    setCartData(updatedCart);
+  };
+
+  const handleDeleteItem = itemId => {
+    const updatedCart = cartData.filter(item => item.id !== itemId);
+    setCartData(updatedCart);
+  };
 
   const renderItem = ({item}) => (
     <View style={styles.card}>
@@ -387,7 +427,9 @@ const MyCartScreen = ({navigation}) => {
             <Text style={styles.name}>{item.name}</Text>
             <Text style={styles.code}>{item.code}</Text>
           </View>
-          <TouchableOpacity style={styles.deleteButton}>
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={() => handleDeleteItem(item.id)}>
             <Icon name="delete" size={22} color="#D00000" />
           </TouchableOpacity>
         </View>
@@ -396,11 +438,22 @@ const MyCartScreen = ({navigation}) => {
             <Text style={styles.sizeText}>{item.size}</Text>
           </View>
           <View style={styles.actionSection}>
-            <TouchableOpacity style={styles.iconButton}>
+            <TouchableOpacity
+              onPress={() => handleDecrement(item.id)}
+              style={styles.iconButton}>
               <Icon name="remove-circle-outline" size={22} color="#333" />
             </TouchableOpacity>
-            <Text style={styles.quantity}>{item.quantity}</Text>
-            <TouchableOpacity style={styles.iconButton}>
+
+            <TextInput
+              style={styles.quantity}
+              keyboardType="numeric"
+              value={item.quantity.toString()}
+              onChangeText={text => handleQuantityChange(text, item.id)}
+            />
+
+            <TouchableOpacity
+              onPress={() => handleIncrement(item.id)}
+              style={styles.iconButton}>
               <Icon name="add-circle-outline" size={22} color="#333" />
             </TouchableOpacity>
           </View>
@@ -414,31 +467,33 @@ const MyCartScreen = ({navigation}) => {
       <Text style={styles.title}>My Cart</Text>
 
       <FlatList
-        data={cartItems}
+        data={cartData}
         renderItem={renderItem}
         keyExtractor={item => item.id.toString()}
         contentContainerStyle={{paddingHorizontal: 16, paddingBottom: 16}}
       />
 
       <View style={styles.footer}>
-        <Text style={styles.totalQuantity}>
-          Total (Quantity) :{' '}
+        <View style={styles.quantityContainer}>
+          <Text style={styles.totalQuantity}>Total (Quantity): </Text>
           <Text style={{fontWeight: '700'}}>{totalQuantity}</Text>
-        </Text>
-        <TouchableOpacity
-          style={styles.checkoutButton}
-          onPress={() => setModalVisible(true)}>
-          <Text style={styles.checkoutText}>Proceed to Checkout</Text>
-          <Icon
-            name="arrow-forward-ios"
-            size={16}
-            color="#fff"
-            style={{marginLeft: 4}}
-          />
-        </TouchableOpacity>
+        </View>
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.checkoutButton}
+            onPress={() => setModalVisible(true)}>
+            <Text style={styles.checkoutText}>Proceed to Checkout</Text>
+            <Image
+              source={require('../assets/images/checkout.png')}
+              style={styles.checkoutImage}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
-      {/* ✅ Modal  successful order*/}
+      {/* ✅ Modal */}
       <Modal
         transparent
         visible={modalVisible}
@@ -465,6 +520,7 @@ const MyCartScreen = ({navigation}) => {
     </View>
   );
 };
+
 export default MyCartScreen;
 
 const styles = StyleSheet.create({
@@ -475,7 +531,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '700',
-    marginTop: 45,
+    marginTop: 10,
     marginBottom: 12,
     alignSelf: 'center',
   },
@@ -495,70 +551,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginRight: 12,
   },
-  infoSection: {
-    flex: 1,
-  },
-  name: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#000',
-  },
-  code: {
-    fontSize: 14,
-    color: '#000',
-    marginTop: 2,
-    fontWeight: '500',
-  },
-  sizeTag: {
-    backgroundColor: '#eee',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 2,
-    borderRadius: 8,
-    marginTop: 6,
-  },
-  sizeText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#000',
-  },
-  actionSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  quantity: {
-    marginHorizontal: 8,
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#000',
-    minWidth: 28,
-    textAlign: 'center',
-  },
-  footer: {
-    borderTopWidth: 1,
-    borderColor: '#eee',
-    padding: 16,
-    backgroundColor: '#fff',
-  },
-  totalQuantity: {
-    fontSize: 14,
-    color: '#000',
-    marginBottom: 12,
-  },
-  checkoutButton: {
-    backgroundColor: '#D00000',
-    paddingVertical: 12,
-    borderRadius: 8,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkoutText: {
-    color: '#fff',
-    fontWeight: '700',
-    fontSize: 15,
-  },
-
   infoSection: {
     flex: 1,
     justifyContent: 'space-between',
@@ -611,10 +603,48 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: '#000',
-    minWidth: 28,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    width: 50,
     textAlign: 'center',
   },
-
+  footer: {
+    borderTopWidth: 1,
+    borderColor: '#eee',
+    paddingLeft: 20,
+    paddingRight: 20,
+    flexDirection: 'column',
+    gap: 8,
+    backgroundColor: '#fff',
+  },
+  totalQuantity: {
+    fontSize: 14,
+    color: '#000',
+    marginBottom: 5,
+    fontWeight: '600',
+  },
+  checkoutButton: {
+    backgroundColor: '#D00000',
+    paddingVertical: 12,
+    borderRadius: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 20,
+  },
+  checkoutText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 15,
+  },
+  checkoutImage: {
+    width: 25,
+    height: 25,
+    marginLeft: 8,
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.4)',
@@ -627,9 +657,6 @@ const styles = StyleSheet.create({
     padding: 24,
     borderRadius: 16,
     alignItems: 'center',
-  },
-  successIcon: {
-    marginBottom: 16,
   },
   modalTitle: {
     fontSize: 18,
@@ -648,5 +675,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 15,
     fontWeight: '700',
+  },
+  quantityContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 5,
+  },
+  buttonContainer: {
+    justifyContent: 'space-between',
   },
 });

@@ -188,7 +188,7 @@ const IndividualOrder = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {flex: 1, backgroundColor: '#fff', paddingHorizontal: 16},
   header: {
-    marginTop: 40,
+    marginTop: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
