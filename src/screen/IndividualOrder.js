@@ -7,11 +7,12 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
-  SafeAreaView,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const IndividualOrder = ({navigation}) => {
+  const insets = useSafeAreaInsets();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
@@ -74,7 +75,7 @@ const IndividualOrder = ({navigation}) => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, {paddingTop: insets.top + 20,}]}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -181,7 +182,7 @@ const IndividualOrder = ({navigation}) => {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 };
 

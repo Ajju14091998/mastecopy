@@ -11,8 +11,10 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function MyOrderScreen({navigation}) {
+  const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState('today');
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState('Pending');
@@ -39,12 +41,12 @@ export default function MyOrderScreen({navigation}) {
   const orders = activeTab === 'today' ? todayOrders : totalOrders;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, {paddingTop: insets.top + 20,}]}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.iconButton}
-          onPress={() => navigation.navigate('HomeScreen')}>
+          onPress={() => navigation.goBack()}>
           <Icon name="arrow-back" size={20} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>My Order</Text>
@@ -192,7 +194,7 @@ export default function MyOrderScreen({navigation}) {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
 

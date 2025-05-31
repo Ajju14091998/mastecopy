@@ -1202,6 +1202,7 @@ import Icon from 'react-native-vector-icons/Feather';
 import DropDownPicker from 'react-native-dropdown-picker';
 // import {SafeAreaView} from 'react-native-safe-area-context';
 import Feather from 'react-native-vector-icons/Feather';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const TABS = ['All', 'Plain', 'Wooden/Marble', 'Matt', 'Glossy'];
 
@@ -1279,6 +1280,7 @@ const PRODUCTS = {
 };
 
 export default function ProductScreen() {
+  const insets = useSafeAreaInsets();
   const [selectedTab, setSelectedTab] = useState('All');
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isProductModalVisible, setIsProductModalVisible] = useState(false);
@@ -1316,14 +1318,14 @@ export default function ProductScreen() {
   const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
 
-  const renderTab = tab => (
+  const renderTab = ({item}) => (
     <TouchableOpacity
-      key={tab}
-      style={[styles.tab, selectedTab === tab && styles.activeTab]}
-      onPress={() => setSelectedTab(tab)}>
+      key={item}
+      style={[styles.tab, selectedTab === item && styles.activeTab]}
+      onPress={() => setSelectedTab(item)}>
       <Text
-        style={[styles.tabText, selectedTab === tab && styles.activeTabText]}>
-        {tab}
+        style={[styles.tabText, selectedTab === item && styles.activeTabText]}>
+        {item}
       </Text>
     </TouchableOpacity>
   );
@@ -1344,32 +1346,7 @@ export default function ProductScreen() {
   return (
     // <SafeAreaView style={styles.safeArea}>
     <View style={styles.container}>
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          padding: 16,
-        }}>
-        <Text style={{fontSize: 18, fontWeight: 'bold'}}>Product List</Text>
-        <View style={{position: 'relative', marginRight: 10}}>
-          <Icon name="shopping-cart" size={24} color="#000" />
-          {cartCount > 0 && (
-            <View
-              style={{
-                position: 'absolute',
-                top: -5,
-                right: -5,
-                backgroundColor: 'red',
-                borderRadius: 10,
-                paddingHorizontal: 5,
-                paddingVertical: 2,
-              }}>
-              <Text style={{color: '#fff', fontSize: 10}}>{cartCount}</Text>
-            </View>
-          )}
-        </View>
-      </View>
-
+      <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: insets.top + 20, marginBottom: 12,}}> 
       <View style={styles.searchContainer}>
         <Feather
           name="search"
@@ -1382,14 +1359,22 @@ export default function ProductScreen() {
           style={styles.searchInput}
           placeholderTextColor="#999"
         />
+      </View>
         <TouchableOpacity
           style={styles.filterButton}
           onPress={() => setIsFilterModalVisible(true)}>
           <Icon name="filter" size={20} color="#fff" />
         </TouchableOpacity>
-      </View>
-
-      <View style={styles.tabContainer}>{TABS.map(renderTab)}</View>
+        </View>
+        <FlatList 
+          data={TABS}
+          renderItem={renderTab}
+          horizontal
+          extraData={TABS}
+          showsHorizontalScrollIndicator={false}
+          style={{maxHeight: 50, marginBottom: 10,}}
+        />
+      {/* <View style={styles.tabContainer}>{TABS.map(renderTab)}</View> */}
 
       <FlatList
         data={PRODUCTS[selectedTab]}
@@ -1750,31 +1735,31 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    backgroundColor: '#F3F3F3',
+    borderRadius: 24,
     position: 'relative',
+    paddingLeft: 16, // Add space for the icon
+    paddingRight: 16,
+    height: 50,
+    flex: 1,
   },
 
   searchInput: {
     flex: 1,
-    backgroundColor: '#F3F3F3',
-    borderRadius: 24,
-    paddingLeft: 40, // Add space for the icon
-    paddingRight: 16,
-    height: 50,
   },
 
   searchIcon: {
-    position: 'absolute',
-    left: 16,
+    // position: 'absolute',
+    // left: 16,
     zIndex: 1,
   },
 
   filterButton: {
     backgroundColor: '#D00000',
-    width: 40,
-    height: 40,
+    width: 48,
+    height: 48,
     marginLeft: 10,
-    borderRadius: 20,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1786,11 +1771,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   tab: {
+    flex: 1,
     paddingHorizontal: 16,
     paddingVertical: 6,
-    borderRadius: 20,
+    borderRadius: 25,
     borderWidth: 1,
     borderColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
   },
   activeTab: {
     backgroundColor: '#D00000',

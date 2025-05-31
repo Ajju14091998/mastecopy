@@ -423,6 +423,14 @@ const {width} = Dimensions.get('window');
 export default function HomeScreen() {
   const navigation = useNavigation();
 
+  const openDrawer = () => {
+    const parent = navigation.getParent('Drawer');
+    if (parent) {
+      parent.openDrawer();
+    } else {
+      console.warn('Drawer not found');
+    }
+  };
   const productCards = [
     {
       title: 'Super Strong Partition',
@@ -462,7 +470,7 @@ export default function HomeScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => navigation.getParent('Drawer')?.openDrawer()}>
+          onPress={openDrawer}>
           <Feather name="menu" size={24} color="#333" />
         </TouchableOpacity>
         <View style={styles.headerRight}>

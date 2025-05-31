@@ -13,9 +13,9 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
 } from 'react-native';
-import HomeScreen from '../screen/HomeScreen';
-import Order from '../screen/Order';
-import Logout from '../screen/Logout.js';
+import HomeScreen from './HomeScreen.js';
+import Order from './Order.js';
+import Logout from './MyOrder.js';
 import Cart from '../assets/svg/cart1.js';
 import Cart1 from '../assets/svg/cart1.js';
 import Shopping from '../assets/svg/shopping.js';

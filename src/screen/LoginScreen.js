@@ -18,7 +18,7 @@ import { StatusBar } from 'react-native';
 
 const {width, height} = Dimensions.get('window');
 
-const LoginScreen = ({navigation}) => {
+const LoginScreen = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -42,11 +42,12 @@ const LoginScreen = ({navigation}) => {
     setIsEmailValid(true);
     setLoading(true);
     setError('');
-
-    setTimeout(() => {
-      setLoading(false);
-      navigation.navigate('Main1');
-    }, 2000);
+    const userDetails = {
+      name: 'John Doe',
+      number: '+123456789',
+      email,
+    };
+    onLogin({...userDetails});
   };
 
   return (

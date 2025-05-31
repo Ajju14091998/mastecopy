@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Succesful from '../assets/svg/Succesful';
+import Succesful from '../assets/svg/Succesful.js';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Home from '../assets/svg/home.js';
 import Shopping from '../assets/svg/shopping.js';

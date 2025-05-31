@@ -346,6 +346,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation} from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const initialCartItems = [
   {
@@ -375,6 +376,7 @@ const initialCartItems = [
 ];
 
 const MyCartScreen = ({navigation}) => {
+  const insets = useSafeAreaInsets();
   const [modalVisible, setModalVisible] = useState(false);
   const [cartData, setCartData] = useState(initialCartItems);
   const totalQuantity = cartData.reduce((sum, item) => sum + item.quantity, 0);
@@ -463,7 +465,7 @@ const MyCartScreen = ({navigation}) => {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {paddingTop: insets.top + 20,}]}>
       <Text style={styles.title}>My Cart</Text>
 
       <FlatList
