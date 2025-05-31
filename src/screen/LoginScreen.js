@@ -14,13 +14,15 @@ import {
 import Icon from 'react-native-vector-icons/AntDesign';
 import Textstyle from '../assets/style/Textstyle';
 import { StatusBar } from 'react-native';
+import { useAuth } from '../../AuthContext';
 
 
 const {width, height} = Dimensions.get('window');
 
-const LoginScreen = ({ onLogin }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+const LoginScreen = () => {
+  const { login } = useAuth();
+  const [email, setEmail] = useState('hoarway@admin.com');
+  const [password, setPassword] = useState('Hoarway@123');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isEmailValid, setIsEmailValid] = useState(true);
@@ -42,12 +44,15 @@ const LoginScreen = ({ onLogin }) => {
     setIsEmailValid(true);
     setLoading(true);
     setError('');
-    const userDetails = {
-      name: 'John Doe',
-      number: '+123456789',
-      email,
-    };
-    onLogin({...userDetails});
+    handleLoginUser();
+  };
+  const handleLoginUser = async () => {
+    console.log('Calling login from component...');
+    
+    const result = await login(email, password);
+    if (!result.success) {
+      console.log(result.message);
+    }
   };
 
   return (

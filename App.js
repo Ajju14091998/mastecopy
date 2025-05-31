@@ -20,9 +20,9 @@ import SplashScreen from './src/screen/SplashScreen';
 import { AuthProvider, useAuth } from './AuthContext';
 import Textstyle from './src/assets/style/Textstyle.js';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LogBox } from 'react-native';
+// import { LogBox } from 'react-native';
 
-LogBox.ignoreAllLogs(true); // hides all yellow boxes
+// LogBox.ignoreAllLogs(true); // hides all yellow boxes
 
 const styles = StyleSheet.create({
   navText: {
