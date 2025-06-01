@@ -403,7 +403,9 @@
 // });
 
 // responsive ui
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+const { width } = Dimensions.get('window');
+
 import {
   View,
   Text,
@@ -413,64 +415,68 @@ import {
   ImageBackground,
   FlatList,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {useNavigation} from '@react-navigation/native';
-
-const {width} = Dimensions.get('window');
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import api from '../config/axiosInstance'; // axios instance
 
 export default function HomeScreen() {
   const navigation = useNavigation();
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const openDrawer = () => {
     const parent = navigation.getParent('Drawer');
-    if (parent) {
-      parent.openDrawer();
-    } else {
-      console.warn('Drawer not found');
+    if (parent) parent.openDrawer();
+    else console.warn('Drawer not found');
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await api.post('dashboard/getcategorylist', {});
+      console.log('Dashboard Response -', response);
+      setCategories(response.data);
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+    } finally {
+      setLoading(false);
     }
   };
-  const productCards = [
-    {
-      title: 'Super Strong Partition',
-      image: require('../assets/images/Category1.png'),
-    },
-    {
-      title: 'SS Bond',
-      image: require('../assets/images/Category2.png'),
-    },
-    {
-      title: 'Shera Bond',
-      image: require('../assets/images/Category3.png'),
-    },
-    {
-      title: 'SS Partition',
-      image: require('../assets/images/Category4.png'),
-    },
-  ];
 
-  const renderCard = ({item}) => (
+  const renderCard = ({ item }) => (
     <View style={styles.card}>
       <ImageBackground
-        source={item.image}
+        source={{ uri: item.option2 }}
         style={styles.image}
-        imageStyle={{borderRadius: 12}}>
+        imageStyle={{ borderRadius: 12 }}>
         <TouchableOpacity
           style={styles.buttonContainer}
           onPress={() => navigation.navigate('Order')}>
-          <Text style={styles.cardText}>{item.title}</Text>
+          <Text style={styles.cardText}>{item.value}</Text>
         </TouchableOpacity>
       </ImageBackground>
     </View>
   );
 
+  if (loading) {
+    return (
+      <View style={[styles.container, styles.loader]}>
+        <ActivityIndicator size="large" color="#D00000" />
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={openDrawer}>
+        <TouchableOpacity onPress={openDrawer}>
           <Feather name="menu" size={24} color="#333" />
         </TouchableOpacity>
         <View style={styles.headerRight}>
@@ -484,23 +490,27 @@ export default function HomeScreen() {
 
       {/* Product Cards */}
       <FlatList
-        data={productCards}
-        keyExtractor={(item, index) => index.toString()}
+        data={categories}
+        extraData={categories}
+        keyExtractor={(item, index) => item.key || index.toString()}
         renderItem={renderCard}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{paddingTop: 20, paddingBottom: 100}}
+        contentContainerStyle={{ paddingTop: 20, paddingBottom: 100 }}
       />
     </SafeAreaView>
   );
 }
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingHorizontal: 16,
-        paddingLeft: 20,
-    paddingRight: 20,
+    paddingHorizontal: 20,
+  },
+  loader: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     flexDirection: 'row',
@@ -539,7 +549,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   buttonContainer: {
-    width: width - 64, // Responsive button
+    width: width - 64,
     maxWidth: 360,
     height: 46,
     backgroundColor: '#D00000',
