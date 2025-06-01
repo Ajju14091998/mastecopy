@@ -618,6 +618,7 @@ const styles = StyleSheet.create({
     borderColor: '#eee',
     paddingLeft: 20,
     paddingRight: 20,
+    paddingBottom: 25,
     flexDirection: 'column',
     gap: 8,
     backgroundColor: '#fff',
@@ -641,6 +642,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '700',
     fontSize: 15,
+
   },
   checkoutImage: {
     width: 25,

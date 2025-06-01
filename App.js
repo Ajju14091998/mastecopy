@@ -1,9 +1,16 @@
-import React, { useEffect } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createStackNavigator } from '@react-navigation/stack';
-import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
-import { View, Text, StyleSheet } from 'react-native';
+import React, {useEffect} from 'react';
+import {NavigationContainer} from '@react-navigation/native';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {createStackNavigator} from '@react-navigation/stack';
+import {
+  createDrawerNavigator,
+  DrawerContentScrollView,
+  DrawerItemList,
+  DrawerItem,
+} from '@react-navigation/drawer';
+import {View, Text, StyleSheet} from 'react-native';
+import {Image, TouchableOpacity} from 'react-native';
+import {Ionicons, MaterialIcons} from '@expo/vector-icons';
 
 // Screens
 import LoginScreen from './src/screen/LoginScreen';
@@ -17,10 +24,16 @@ import Home from './src/assets/svg/home';
 import Shopping from './src/assets/svg/shopping';
 import Cart1 from './src/assets/svg/cart1.js';
 import SplashScreen from './src/screen/SplashScreen';
-import { AuthProvider, useAuth } from './AuthContext';
+import {AuthProvider, useAuth} from './AuthContext';
 import Textstyle from './src/assets/style/Textstyle.js';
-import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LogBox } from 'react-native';
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
+import {LogBox} from 'react-native';
+import HomeIcon from './src/assets/svg/home';
+import ShoppingIcon from './src/assets/svg/shopping';
+import LogoutIcon from './src/assets/svg/logout';
 
 LogBox.ignoreAllLogs(true); // hides all yellow boxes
 
@@ -70,18 +83,25 @@ const styles = StyleSheet.create({
   i: {
     margin: 'auto',
   },
+  underline: {
+    height: 2,
+    backgroundColor: '#A6A6A6',
+    width: 260,
+    alignSelf: 'center',
+    marginVertical: 10,
+  },
 });
 
 const AuthStack = createStackNavigator();
 function AuthNavigator() {
   const Stack = createStackNavigator();
-  const { login } = useAuth();
+  const {login} = useAuth();
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={{headerShown: false}}>
       <AuthStack.Screen name="Splash" component={SplashScreen} />
       <Stack.Screen name="Login">
-        {(props) => <LoginScreen {...props} onLogin={login} />}
+        {props => <LoginScreen {...props} onLogin={login} />}
       </Stack.Screen>
     </Stack.Navigator>
   );
@@ -108,25 +128,24 @@ function TabNavigator() {
           borderTopLeftRadius: 25,
           borderTopRightRadius: 25,
           borderWidth: 1,
-          flexDirection: "row",
-          alignItems: "center",
+          flexDirection: 'row',
+          alignItems: 'center',
           borderColor: '#EEEEEE',
           // elevation: 10,
           // position: 'absolute',
           paddingBottom: insets.bottom + 20, // Adds dynamic bottom padding
         },
-      }}
-    >
+      }}>
       <Tab.Screen
         name="Home"
         component={HomeScreen}
         options={{
           tabBarLabel: '',
-          tabBarIcon: ({ focused }) => (
+          tabBarIcon: ({focused}) => (
             <View style={focused ? styles.iconc : styles.iconc1}>
               <View style={focused ? styles.box : styles.box1}>
                 <Home
-                  style={{ width: 16, height: 16 }}
+                  style={{width: 16, height: 16}}
                   color={focused ? '#fff' : '#000'}
                 />
               </View>
@@ -134,22 +153,24 @@ function TabNavigator() {
                 <Text
                   style={[Textstyle.psb, styles.navText]}
                   numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
+                  ellipsizeMode="tail">
                   Home
                 </Text>
               )}
             </View>
           ),
-        }} />
-      <Tab.Screen name="Order" component={Order}
+        }}
+      />
+      <Tab.Screen
+        name="Order"
+        component={Order}
         options={{
           tabBarLabel: '',
-          tabBarIcon: ({ focused }) => (
+          tabBarIcon: ({focused}) => (
             <View style={focused ? styles.iconc : styles.iconc1}>
               <View style={focused ? styles.box : styles.box1}>
                 <Shopping
-                  style={{ width: 20, height: 20, }}
+                  style={{width: 20, height: 20}}
                   color={focused ? '#fff' : '#000'}
                 />
               </View>
@@ -157,24 +178,24 @@ function TabNavigator() {
                 <Text
                   style={[Textstyle.psb, styles.navText]}
                   numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
+                  ellipsizeMode="tail">
                   Product
                 </Text>
               )}
             </View>
           ),
-        }} />
+        }}
+      />
       <Tab.Screen
         name="Addtocart"
         component={Addtocart}
         options={{
           tabBarLabel: '',
-          tabBarIcon: ({ focused }) => (
+          tabBarIcon: ({focused}) => (
             <View style={focused ? styles.iconc : styles.iconc1}>
               <View style={focused ? styles.box : styles.box1}>
                 <Cart1
-                  style={{ width: 20, height: 20, }}
+                  style={{width: 20, height: 20}}
                   color={focused ? '#fff' : '#000'}
                 />
               </View>
@@ -182,8 +203,7 @@ function TabNavigator() {
                 <Text
                   style={[Textstyle.psb, styles.navText]}
                   numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
+                  ellipsizeMode="tail">
                   Cart
                 </Text>
               )}
@@ -199,7 +219,7 @@ function TabNavigator() {
 const OrderStack = createStackNavigator();
 function OrderDetailsStack() {
   return (
-    <OrderStack.Navigator screenOptions={{ headerShown: false }}>
+    <OrderStack.Navigator screenOptions={{headerShown: false}}>
       <OrderStack.Screen name="Orderdetails" component={MyOrder} />
       <OrderStack.Screen name="IndividualOrder" component={IndividualOrder} />
     </OrderStack.Navigator>
@@ -207,19 +227,150 @@ function OrderDetailsStack() {
 }
 
 // Custom Drawer Content
+// function CustomDrawerContent(props) {
+//   return (
+//     <DrawerContentScrollView
+//       {...props}
+//       contentContainerStyle={{ flex: 1, paddingTop: 40 }}
+//     >
+//       <View style={{ paddingHorizontal: 20 }}>
+//         <Image
+//           source={require('./src/assets/images/logo.png')}
+//           style={{ width: 140, height: 40, resizeMode: 'contain', marginBottom: 20 }}
+//         />
+//         <Text style={{ fontSize: 16, fontWeight: 'bold' }}>John Doe</Text>
+//         <Text style={{ color: '#666' }}>john@example.com</Text>
+//         <Text style={{ color: '#666', marginBottom: 20 }}>+123456789</Text>
+//       </View>
+
+//       <DrawerItemList {...props} />
+
+//       <View style={{ flex: 1, justifyContent: 'flex-end', paddingHorizontal: 20 }}>
+//         <TouchableOpacity
+//           onPress={() => props.navigation.replace('Auth')}
+//           style={{ paddingVertical: 10 }}
+//         >
+//           <Text style={{ color: '#888', fontSize: 16 }}>Logout</Text>
+//         </TouchableOpacity>
+//       </View>
+//     </DrawerContentScrollView>
+//   );
+// }
 function CustomDrawerContent(props) {
+  const {state} = props;
+
+  const getLabelBg = focused => (focused ? '#E6F0FF' : 'transparent');
+
+  const renderIcon = routeName => {
+    switch (routeName) {
+      case 'MainTabs':
+        return <HomeIcon width={20} height={20} color="#000" />;
+      case 'OrderDetailsStack':
+        return <ShoppingIcon width={20} height={20} color="#000" />;
+      default:
+        return null;
+    }
+  };
+
+  const drawerItems = state.routes.map((route, index) => {
+    const focused = state.index === index;
+    const label =
+      route.name === 'MainTabs'
+        ? 'Home'
+        : route.name === 'OrderDetailsStack'
+        ? 'My Order'
+        : route.name;
+
+    return (
+      <TouchableOpacity
+        key={route.key}
+        onPress={() => props.navigation.navigate(route.name)}
+        style={{
+          backgroundColor: getLabelBg(focused),
+          borderRadius: 40,
+          paddingVertical: 12,
+          paddingHorizontal: 20,
+          marginBottom: 10,
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}>
+        {renderIcon(route.name)}
+        <Text
+          style={{
+            fontSize: 14,
+            fontWeight: '600',
+            color: '#000',
+            marginLeft: 15,
+          }}>
+          {label}
+        </Text>
+      </TouchableOpacity>
+    );
+  });
+
   return (
-    <DrawerContentScrollView {...props}>
-      <View style={{ padding: 20 }}>
-        <Text style={{ fontWeight: 'bold' }}>John Doe</Text>
-        <Text>john@example.com</Text>
-        <Text>+123456789</Text>
+    <DrawerContentScrollView
+      contentContainerStyle={{paddingTop: 40, flexGrow: 1}}>
+      {/* Logo */}
+      <View style={{alignItems: 'center', paddingBottom: 20}}>
+        <Image
+          source={require('./src/assets/images/logo.png')}
+          style={{width: 250, height: 30}}
+        />
       </View>
-      <DrawerItemList {...props} />
-      <DrawerItem
-        label="Logout"
-        onPress={() => props.navigation.replace('Auth')}
-      />
+
+      {/* User Info */}
+      <View style={{paddingHorizontal: 20, marginBottom: 20}}>
+        <Text
+          style={{
+            fontSize: 14,
+            fontWeight: '600',
+            color: '#000',
+            marginBottom: 5,
+          }}>
+          John Doe
+        </Text>
+        <Text
+          style={{
+            fontSize: 14,
+            fontWeight: '600',
+            color: '#000',
+            marginBottom: 5,
+          }}>
+          +123456787879
+        </Text>
+        <Text style={{fontSize: 14, fontWeight: '600', color: '#000'}}>
+          john@example.com
+        </Text>
+        <View style={styles.underline} />
+      </View>
+
+      {/* Drawer Links + Logout in unified section */}
+      <View style={{paddingHorizontal: 10, gap: 10}}>
+        {drawerItems}
+
+        <TouchableOpacity
+          onPress={() => props.navigation.replace('Auth')}
+          style={{
+            borderRadius: 40,
+            paddingVertical: 12,
+            paddingHorizontal: 20,
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: 'transparent',
+          }}>
+          <LogoutIcon width={20} height={20} color="#000" />
+          <Text
+            style={{
+              fontSize: 14,
+              fontWeight: '600',
+              color: '#000',
+              marginLeft: 15,
+            }}>
+            Log Out
+          </Text>
+        </TouchableOpacity>
+      </View>
     </DrawerContentScrollView>
   );
 }
@@ -230,11 +381,18 @@ function AppDrawer() {
   return (
     <Drawer.Navigator
       id="Drawer"
-      screenOptions={{ headerShown: false }}
-      drawerContent={(props) => <CustomDrawerContent {...props} />}
-    >
-      <Drawer.Screen name="MainTabs" component={TabNavigator} options={{ title: 'Home' }} />
-      <Drawer.Screen name="OrderDetailsStack" component={OrderDetailsStack} options={{ title: 'Order Details' }} />
+      screenOptions={{headerShown: false}}
+      drawerContent={props => <CustomDrawerContent {...props} />}>
+      <Drawer.Screen
+        name="MainTabs"
+        component={TabNavigator}
+        options={{title: 'Home'}}
+      />
+      <Drawer.Screen
+        name="OrderDetailsStack"
+        component={OrderDetailsStack}
+        options={{title: 'My Order'}}
+      />
     </Drawer.Navigator>
   );
 }
@@ -242,11 +400,11 @@ function AppDrawer() {
 // Root Navigator
 const RootStack = createStackNavigator();
 function RootNavigation() {
-  const { user } = useAuth();
+  const {user} = useAuth();
 
   return (
     <NavigationContainer>
-      <RootStack.Navigator screenOptions={{ headerShown: false }}>
+      <RootStack.Navigator screenOptions={{headerShown: false}}>
         {user ? (
           <RootStack.Screen name="App" component={AppDrawer} />
         ) : (
