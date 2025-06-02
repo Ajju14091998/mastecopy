@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
       if (storagedUser && storagedToken) {
         setUser(JSON.parse(storagedUser));
         setToken(storagedToken);
-        api.defaults.headers.common['Authorization'] = `${storagedToken}`;
+        api.defaults.headers.common['Authorization'] = `Bearer ${storagedToken}`;
       }
 
       setLoading(false);
@@ -38,7 +38,7 @@ const login = async (email, password) => {
     setUser(details);
     setToken(token);
 
-    api.defaults.headers.common['Authorization'] = `${token}`;
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
     await AsyncStorage.setItem('user', JSON.stringify(details));
     await AsyncStorage.setItem('token', token);
@@ -75,7 +75,7 @@ const login = async (email, password) => {
 
   setToken(newAccessToken);
   await AsyncStorage.setItem('token', newAccessToken);
-  api.defaults.headers.common['Authorization'] = `${newAccessToken}`;
+  api.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
 
   return newAccessToken;
 };
