@@ -1187,7 +1187,7 @@
 // });
 
 // 29-05-25 code
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -1203,6 +1203,7 @@ import DropDownPicker from 'react-native-dropdown-picker';
 // import {SafeAreaView} from 'react-native-safe-area-context';
 import Feather from 'react-native-vector-icons/Feather';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { fetchProductList } from '../services/common-services';
 
 const TABS = ['All', 'Plain', 'Wooden/Marble', 'Matt', 'Glossy'];
 
@@ -1286,7 +1287,10 @@ export default function ProductScreen() {
   const [isProductModalVisible, setIsProductModalVisible] = useState(false);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [cartCount, setCartCount] = useState(0);
-
+  // const [products, setProducts] = useState([]);
+  const [category, setCategory] = useState(0);
+  const [subCategory, setSubCategory] = useState(0);
+  // const [products, setProducts] = useState([]);
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [categoryValue, setCategoryValue] = useState(null);
   const [categoryItems, setCategoryItems] = useState([
@@ -1317,6 +1321,29 @@ export default function ProductScreen() {
 
   const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    getAllProductsList();
+  }, [category, subCategory]);
+
+  const getAllProductsList = async() => {
+    try {
+      const response = await fetchProductList({
+        'catId': category,
+        'subCatId': subCategory,
+        'size': '',
+        'thickness': '',
+        'term': '',
+      });
+      console.log('Fetch products response in component -', response);
+      if(response.length) {
+        // setProducts(response);
+      }
+      //set to the state
+    } catch (e) {
+      console.log('Error fetching product list');
+    }
+  };
 
   const renderTab = ({item}) => (
     <TouchableOpacity
