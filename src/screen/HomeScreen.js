@@ -457,7 +457,7 @@ export default function HomeScreen() {
         imageStyle={{ borderRadius: 12 }}>
         <TouchableOpacity
           style={styles.buttonContainer}
-          onPress={() => navigation.navigate('Order')}>
+          onPress={() => navigation.navigate('Order', {catId: item.key})}>
           <Text style={styles.cardText}>{item.value}</Text>
         </TouchableOpacity>
       </ImageBackground>
