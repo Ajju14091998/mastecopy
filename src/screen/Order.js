@@ -13,123 +13,404 @@ import isEmpty from 'lodash/isEmpty';
 import Icon from 'react-native-vector-icons/Feather';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Feather from 'react-native-vector-icons/Feather';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { fetchProductList, fetchSubCategories } from '../services/common-services';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {
+  fetchProductList,
+  fetchSubCategories,
+} from '../services/common-services';
 
 const PRODUCTS = {
   All: [
-    {
-      id: '1',
-      name: 'NAVY BLUE',
-      code: 'AP-903',
-      image: require('../assets/images/blue.png'),
-    },
-    {
-      id: '2',
-      name: 'SIGNAL RED',
-      code: 'AP-899',
-      image: require('../assets/images/red.png'),
-    },
-    {
-      id: '3',
-      name: 'PURE WHITE',
-      code: 'AP-901',
-      image: require('../assets/images/purewhite.png'),
-    },
-    {
-      id: '4',
-      name: 'IVORY WHITE',
-      code: 'AP-902',
-      image: require('../assets/images/ivory.png'),
-    },
-  ],
-  Plain: [
-    {
-      id: '1',
-      name: 'PLAIN WHITE',
-      code: 'PL-101',
-      image: require('../assets/images/purewhite.png'),
-    },
-    {
-      id: '2',
-      name: 'PLAIN GREY',
-      code: 'PL-102',
-      image: require('../assets/images/cermic.png'),
-    },
-  ],
-  'Wooden/Marble': [
-    {
-      id: '1',
-      name: 'WOOD BROWN',
-      code: 'WD-201',
-      image: require('../assets/images/cermic2.png'),
-    },
-    {
-      id: '2',
-      name: 'MARBLE WHITE',
-      code: 'WD-202',
-      image: require('../assets/images/red.png'),
-    },
-  ],
-  Matt: [
-    {
-      id: '1',
-      name: 'MATT GREY',
-      code: 'MT-301',
-      image: require('../assets/images/cermic2.png'),
-    },
-  ],
-  Glossy: [
-    {
-      id: '1',
-      name: 'GLOSSY BLACK',
-      code: 'GL-401',
-      image: require('../assets/images/cermic2.png'),
-    },
+    { id: '1', name: 'BRECCIA BROWN', code: '310', image: { uri: 'https://opticalerp.in:82/Images/AppCategory/category1.png' } },
+    { id: '2', name: 'SHADOW SAND', code: '321', image: { uri: 'https://opticalerp.in:82/Images/AppCategory/category1.png' } },
+    { id: '3', name: 'NOVECENTO PINE', code: '251', image: { uri: 'https://opticalerp.in:82/Images/AppCategory/category1.png' } },
+    { id: '4', name: 'METALIC SILVER', code: '202', image: { uri: 'https://opticalerp.in:82/Images/AppCategory/category1.png' } },
+    { id: '5', name: 'GLOSSY RED', code: '216', image: { uri: 'https://opticalerp.in:82/Images/AppCategory/category1.png' } },
+    { id: '6', name: 'SATWARIO', code: '285', image: { uri: 'https://opticalerp.in:82/Images/AppCategory/category1.png' } },
+    { id: '7', name: 'SPARKLE WHITE', code: '291', image: { uri: 'https://opticalerp.in:82/Images/AppCategory/category1.png' } },
+    { id: '8', name: 'MIRROR SILVER', code: '263', image: { uri: 'https://opticalerp.in:82/Images/AppCategory/category1.png' } },
+    { id: '9', name: 'PURE WHITE', code: '521', image: { uri: 'https://opticalerp.in:82/Images/AppCategory/category1.png' } },
+    { id: '10', name: 'GLOSSY WHITE', code: '531', image: { uri: 'https://opticalerp.in:82/Images/AppCategory/category1.png' } },   
   ],
 };
 
+
+const filterdata = [
+  [
+    {
+      key: 1,
+      value: 'Super Strong Partition',
+      option1: 0,
+      option2: 'https://opticalerp.in:82/Images/AppCategory/category1.png',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 2,
+      value: 'SS Partition',
+      option1: 0,
+      option2: 'https://opticalerp.in:82/Images/AppCategory/category2.png',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 3,
+      value: 'Shera Bond',
+      option1: 0,
+      option2: 'https://opticalerp.in:82/Images/AppCategory/category3.png',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 4,
+      value: 'SS Bond',
+      option1: 0,
+      option2: 'https://opticalerp.in:82/Images/AppCategory/category4.png',
+      option3: 0,
+      option4: '',
+    },
+  ],
+  [
+    {
+      key: 1,
+      value: 'Plain',
+      option1: 1,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 2,
+      value: 'Wooden',
+      option1: 1,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 3,
+      value: 'Marbel',
+      option1: 1,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 4,
+      value: 'Design',
+      option1: 1,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 5,
+      value: 'Plain',
+      option1: 2,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 6,
+      value: 'Wooden',
+      option1: 2,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 7,
+      value: 'Marbel',
+      option1: 2,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 8,
+      value: 'Design',
+      option1: 2,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 9,
+      value: 'Solid',
+      option1: 3,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 10,
+      value: 'Metallic',
+      option1: 3,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 11,
+      value: 'Glossy',
+      option1: 3,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 12,
+      value: 'Wooden',
+      option1: 3,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 13,
+      value: 'Marbel',
+      option1: 3,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 14,
+      value: 'Mirror',
+      option1: 3,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 15,
+      value: 'Sparkle',
+      option1: 3,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 16,
+      value: 'Stone',
+      option1: 3,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 17,
+      value: 'Sand',
+      option1: 3,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 21,
+      value: 'Solid',
+      option1: 4,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 22,
+      value: 'Metallic',
+      option1: 4,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 23,
+      value: 'Glossy',
+      option1: 4,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 24,
+      value: 'Mirror',
+      option1: 4,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 25,
+      value: 'Wooden',
+      option1: 4,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 26,
+      value: 'Marbel',
+      option1: 4,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+  ],
+  [
+    {
+      key: 189,
+      value: '7X3',
+      option1: 0,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 190,
+      value: '8X3',
+      option1: 0,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 191,
+      value: '8X4',
+      option1: 0,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 192,
+      value: '10X4',
+      option1: 0,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 193,
+      value: '12X4',
+      option1: 0,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+  ],
+  [
+    {
+      key: 194,
+      value: '2MM',
+      option1: 0,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 195,
+      value: '3MM',
+      option1: 0,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 196,
+      value: '4MM',
+      option1: 0,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+    {
+      key: 197,
+      value: '5MM',
+      option1: 0,
+      option2: '',
+      option3: 0,
+      option4: '',
+    },
+  ],
+];
+
 export default function ProductScreen(props) {
   const insets = useSafeAreaInsets();
+
   const [selectedTab, setSelectedTab] = useState('All');
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isProductModalVisible, setIsProductModalVisible] = useState(false);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   // const [products, setProducts] = useState([]);
-  const [category, setCategory] = useState(!isEmpty(props.route.params) ? props.route.params.catId : 1);
+  const [category, setCategory] = useState(
+    !isEmpty(props.route.params) ? props.route.params.catId : 1,
+  );
   const [subCategory, setSubCategory] = useState(0);
-  const [subCategoryTabList, setSubCategoryTabList] = useState([{key: 0, value: 'All'}]);
-  const [categoryOpen, setCategoryOpen] = useState(false);
-  const [categoryValue, setCategoryValue] = useState(null);
-  const [categoryItems, setCategoryItems] = useState([
-    {label: 'Category 1', value: 'cat1'},
-    {label: 'Category 2', value: 'cat2'},
+  const [subCategoryTabList, setSubCategoryTabList] = useState([
+    {key: 0, value: 'All'},
   ]);
 
-  const [subCategoryOpen, setSubCategoryOpen] = useState(false);
-  const [subCategoryValue, setSubCategoryValue] = useState(null);
-  const [subCategoryItems, setSubCategoryItems] = useState([
-    {label: 'Subcat 1', value: 'sub1'},
-    {label: 'Subcat 2', value: 'sub2'},
-  ]);
+  // Assuming filterdata is available and structured correctly
 
-  const [sizeOpen, setSizeOpen] = useState(false);
-  const [sizeValue, setSizeValue] = useState(null);
-  const [sizeItems, setSizeItems] = useState([
-    {label: '12x12', value: '12x12'},
-    {label: '24x24', value: '24x24'},
-  ]);
+// Extract arrays from filterdata
+const categoryData = filterdata[0];
+const subCategoryData = filterdata[1];
+const sizeData = filterdata[2];
+const thicknessData = filterdata[3];
 
-  const [thickOpen, setThickOpen] = useState(false);
-  const [thickValue, setThickValue] = useState(null);
-  const [thickItems, setThickItems] = useState([
-    {label: '5mm', value: '5mm'},
-    {label: '8mm', value: '8mm'},
-  ]);
+// Convert them into dropdown-compatible format
+const formattedCategories = categoryData.map(item => ({
+  label: item.value,
+  value: item.key.toString(),
+}));
+
+const formattedSubCategories = subCategoryData.map(item => ({
+  label: item.value,
+  value: item.key.toString(),
+}));
+
+const formattedSizes = sizeData.map(item => ({
+  label: item.value,
+  value: item.key.toString(),
+}));
+
+const formattedThicknesses = thicknessData.map(item => ({
+  label: item.value,
+  value: item.key.toString(),
+}));
+
+// Set these in useState
+const [categoryOpen, setCategoryOpen] = useState(false);
+const [categoryValue, setCategoryValue] = useState(null);
+const [categoryItems, setCategoryItems] = useState(formattedCategories);
+
+const [subCategoryOpen, setSubCategoryOpen] = useState(false);
+const [subCategoryValue, setSubCategoryValue] = useState(null);
+const [subCategoryItems, setSubCategoryItems] = useState(formattedSubCategories);
+
+const [sizeOpen, setSizeOpen] = useState(false);
+const [sizeValue, setSizeValue] = useState(null);
+const [sizeItems, setSizeItems] = useState(formattedSizes);
+
+const [thickOpen, setThickOpen] = useState(false);
+const [thickValue, setThickValue] = useState(null);
+const [thickItems, setThickItems] = useState(formattedThicknesses);
 
   const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
+
+
+  useEffect(() => {
+  if (filterdata.length === 4) {
+    setCategoryItems(filterdata[0].map(item => ({ label: item.value, value: item.key.toString() })));
+    setSubCategoryItems(filterdata[1].map(item => ({ label: item.value, value: item.key.toString() })));
+    setSizeItems(filterdata[2].map(item => ({ label: item.value, value: item.key.toString() })));
+    setThickItems(filterdata[3].map(item => ({ label: item.value, value: item.key.toString() })));
+  }
+}, [filterdata]);
+
+
 
   useEffect(() => {
     getAllProductsList();
@@ -137,21 +418,21 @@ export default function ProductScreen(props) {
   }, [category, subCategory]);
 
   useEffect(() => {
-   getAllSubCategory(category);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    getAllSubCategory(category);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category]);
 
-  const getAllProductsList = async() => {
+  const getAllProductsList = async () => {
     try {
       const response = await fetchProductList({
-        'catId': category,
-        'subCatId': subCategory,
-        'size': '',
-        'thickness': '',
-        'term': '',
+        catId: category,
+        subCatId: subCategory,
+        size: '',
+        thickness: '',
+        term: '',
       });
       console.log('Fetch products response in component -', response);
-      if(response.length) {
+      if (response.length) {
         // setProducts(response);
       }
       //set to the state
@@ -160,10 +441,10 @@ export default function ProductScreen(props) {
     }
   };
 
-  const getAllSubCategory = async(catId) => {
+  const getAllSubCategory = async catId => {
     try {
       const response = await fetchSubCategories(catId);
-      if(response.length > 0) {
+      if (response.length > 0) {
         setSubCategoryTabList([...subCategoryTabList, ...response]);
       }
     } catch (e) {
@@ -171,13 +452,18 @@ export default function ProductScreen(props) {
     }
   };
 
+  
+
   const renderTab = ({item, index}) => (
     <TouchableOpacity
       key={index}
       style={[styles.tab, selectedTab === item.value && styles.activeTab]}
       onPress={() => setSelectedTab(item.value)}>
       <Text
-        style={[styles.tabText, selectedTab === item.value && styles.activeTabText]}>
+        style={[
+          styles.tabText,
+          selectedTab === item.value && styles.activeTabText,
+        ]}>
         {item.value}
       </Text>
     </TouchableOpacity>
@@ -197,36 +483,42 @@ export default function ProductScreen(props) {
   );
 
   return (
-    // <SafeAreaView style={styles.safeArea}>
     <View style={styles.container}>
-      <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: insets.top + 20, marginBottom: 12,}}> 
-      <View style={styles.searchContainer}>
-        <Feather
-          name="search"
-          size={18}
-          color="#999"
-          style={styles.searchIcon}
-        />
-        <TextInput
-          placeholder="Search"
-          style={styles.searchInput}
-          placeholderTextColor="#999"
-        />
-      </View>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginTop: insets.top + 20,
+          marginBottom: 12,
+        }}>
+        <View style={styles.searchContainer}>
+          <Feather
+            name="search"
+            size={18}
+            color="#999"
+            style={styles.searchIcon}
+          />
+          <TextInput
+            placeholder="Search"
+            style={styles.searchInput}
+            placeholderTextColor="#999"
+          />
+        </View>
         <TouchableOpacity
           style={styles.filterButton}
           onPress={() => setIsFilterModalVisible(true)}>
           <Icon name="filter" size={20} color="#fff" />
         </TouchableOpacity>
-        </View>
-        <FlatList
-          data={subCategoryTabList}
-          renderItem={renderTab}
-          horizontal
-          extraData={subCategoryTabList}
-          showsHorizontalScrollIndicator={false}
-          style={{maxHeight: 50, marginBottom: 10,}}
-        />
+      </View>
+      <FlatList
+        data={subCategoryTabList}
+        renderItem={renderTab}
+        horizontal
+        extraData={subCategoryTabList}
+        showsHorizontalScrollIndicator={false}
+        style={{maxHeight: 50, marginBottom: 10}}
+      />
       {/* <View style={styles.tabContainer}>{TABS.map(renderTab)}</View> */}
 
       <FlatList
@@ -567,17 +859,10 @@ export default function ProductScreen(props) {
         </View>
       </Modal>
     </View>
-    // </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  //   safeArea: {
-  //   flex: 1,
-  //   backgroundColor: '#fff',
-  //   paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-  // },
-
   container: {
     flex: 1,
     backgroundColor: '#fff',
@@ -591,7 +876,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F3F3',
     borderRadius: 24,
     position: 'relative',
-    paddingLeft: 16, // Add space for the icon
+    paddingLeft: 16,
     paddingRight: 16,
     height: 50,
     flex: 1,
