@@ -19,26 +19,96 @@ export default function MyOrderScreen({navigation}) {
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState('Pending');
 
-  const todayOrders = [
-    {id: 'MI0001', date: '05/05/2025', qty: 250, status: 'Pending'},
-    {id: 'MI0002', date: '05/05/2025', qty: 175, status: 'Pending'},
-  ];
 
-  const totalOrders = [
-    {id: 'MI0003', date: '04/05/2025', qty: 116, status: 'Pending'},
-    {id: 'MI0004', date: '03/05/2025', qty: 223, status: 'Pending'},
-    {id: 'MI0005', date: '01/05/2025', qty: 189, status: 'Pending'},
-    {id: 'MI0006', date: '02/05/2025', qty: 189, status: 'Pending'},
-    {id: 'MI0007', date: '19/05/2025', qty: 189, status: 'Pending'},
-    {id: 'MI0008', date: '18/05/2025', qty: 189, status: 'Pending'},
-    {id: 'MI0009', date: '17/05/2025', qty: 189, status: 'Pending'},
-    {id: 'MI0010', date: '16/05/2025', qty: 189, status: 'Pending'},
-    {id: 'MI0011', date: '15/05/2025', qty: 189, status: 'Pending'},
-    {id: 'MI0012', date: '14/05/2025', qty: 189, status: 'Pending'},
-    {id: 'MI0013', date: '13/05/2025', qty: 189, status: 'Pending'},
-  ];
+  const apiResponse = {
+    todayOrdersCount: 1,
+    totalOrdersCount: 7,
+    todayOrdersList: [
+      {
+        id: 9,
+        salesOrderDate: '07/06/2025',
+        salesOrderNumber: 'SO/000008',
+        quantity: 12,
+        customerName: 'TODAY CUSTOMER XYZ',
+        salesOrderStatus: 'Pending',
+      },
+    ],
+    totalOrdersList: [
+      {
+        id: 1,
+        salesOrderDate: '28/05/2025',
+        salesOrderNumber: 'SO/000001',
+        quantity: 4,
+        customerName: 'demo',
+        salesOrderStatus: 'Pending',
+      },
+      {
+        id: 2,
+        salesOrderDate: '27/05/2025',
+        salesOrderNumber: 'SO/000002',
+        quantity: 250,
+        customerName: 'demo',
+        salesOrderStatus: 'Pending',
+      },
+      {
+        id: 3,
+        salesOrderDate: '25/05/2025',
+        salesOrderNumber: 'SO/000003',
+        quantity: 25,
+        customerName: 'RAJASTHAN GLASS AND PLYWOOD LONAVALA',
+        salesOrderStatus: 'Pending',
+      },
+      {
+        id: 4,
+        salesOrderDate: '28/05/2025',
+        salesOrderNumber: 'SO/000004',
+        quantity: 38,
+        customerName: 'RAJASTHAN GLASS AND PLYWOOD LONAVALA',
+        salesOrderStatus: 'Pending',
+      },
+      {
+        id: 6,
+        salesOrderDate: '03/06/2025',
+        salesOrderNumber: 'SO/000005',
+        quantity: 50,
+        customerName: 'M S SAINATH PLYWOOD CENTRE BHIWANDI',
+        salesOrderStatus: 'Pending',
+      },
+      {
+        id: 7,
+        salesOrderDate: '03/06/2025',
+        salesOrderNumber: 'SO/000006',
+        quantity: 45,
+        customerName: 'POOJA ALUMINIUM AND HARDWARE X',
+        salesOrderStatus: 'Pending',
+      },
+      {
+        id: 8,
+        salesOrderDate: '03/06/2025',
+        salesOrderNumber: 'SO/000007',
+        quantity: 45,
+        customerName: 'POOJA ALUMINIUM AND HARDWARE X',
+        salesOrderStatus: 'Pending',
+      },
+    ],
+  };
 
-  const orders = activeTab === 'today' ? todayOrders : totalOrders;
+  const orders =
+    activeTab === 'today'
+      ? apiResponse.todayOrdersList.map(order => ({
+          id: order.salesOrderNumber,
+          date: order.salesOrderDate,
+          qty: order.quantity,
+          status: order.salesOrderStatus,
+        }))
+      : apiResponse.totalOrdersList.map(order => ({
+          id: order.salesOrderNumber,
+          date: order.salesOrderDate,
+          qty: order.quantity,
+          status: order.salesOrderStatus,
+        }));
+
+  // const orders = activeTab === 'today' ? todayOrders : totalOrders;
 
   return (
     <View style={[styles.container, {paddingTop: insets.top + 20,}]}>
