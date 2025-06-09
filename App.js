@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useCallback, useState} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -8,8 +8,8 @@ import {
   DrawerItemList,
   DrawerItem,
 } from '@react-navigation/drawer';
-import {View, Text, StyleSheet} from 'react-native';
-import {Image, TouchableOpacity} from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import {View, Text, StyleSheet, Image, TouchableOpacity, } from 'react-native';
 import {Ionicons, MaterialIcons} from '@expo/vector-icons';
 
 // Screens
@@ -92,6 +92,22 @@ const styles = StyleSheet.create({
   },
 });
 
+function WithReset(WrappedComponent) {
+  return function ResettableWrapper(props) {
+    const [key, setKey] = useState(Date.now());
+
+    useFocusEffect(
+      useCallback(() => {
+        // Update key every time the screen is focused to force a remount
+        setKey(Date.now());
+      }, [])
+    );
+
+    return <WrappedComponent key={key} {...props} />;
+  };
+}
+
+
 const AuthStack = createStackNavigator();
 function AuthNavigator() {
   const Stack = createStackNavigator();
@@ -138,7 +154,7 @@ function TabNavigator() {
       }}>
       <Tab.Screen
         name="Home"
-        component={HomeScreen}
+        component={WithReset(HomeScreen)}
         options={{
           tabBarLabel: '',
           tabBarIcon: ({focused}) => (
@@ -163,7 +179,7 @@ function TabNavigator() {
       />
       <Tab.Screen
         name="Order"
-        component={Order}
+        component={WithReset(Order)}
         options={{
           tabBarLabel: '',
           tabBarIcon: ({focused}) => (
@@ -188,7 +204,7 @@ function TabNavigator() {
       />
       <Tab.Screen
         name="Addtocart"
-        component={Addtocart}
+        component={WithReset(Addtocart)}
         options={{
           tabBarLabel: '',
           tabBarIcon: ({focused}) => (

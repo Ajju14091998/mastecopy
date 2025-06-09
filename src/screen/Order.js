@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -13,326 +13,12 @@ import isEmpty from 'lodash/isEmpty';
 import Icon from 'react-native-vector-icons/Feather';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Feather from 'react-native-vector-icons/Feather';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   fetchProductList,
   fetchSubCategories,
+  fetchFilterList,
 } from '../services/common-services';
-
-const PRODUCTS = {
-  All: [
-    { id: '1', name: 'BRECCIA BROWN', code: '310', image: { uri: 'https://opticalerp.in:82/Images/AppCategory/category1.png' } },
-    { id: '2', name: 'SHADOW SAND', code: '321', image: { uri: 'https://opticalerp.in:82/Images/AppCategory/category1.png' } },
-    { id: '3', name: 'NOVECENTO PINE', code: '251', image: { uri: 'https://opticalerp.in:82/Images/AppCategory/category1.png' } },
-    { id: '4', name: 'METALIC SILVER', code: '202', image: { uri: 'https://opticalerp.in:82/Images/AppCategory/category1.png' } },
-    { id: '5', name: 'GLOSSY RED', code: '216', image: { uri: 'https://opticalerp.in:82/Images/AppCategory/category1.png' } },
-    { id: '6', name: 'SATWARIO', code: '285', image: { uri: 'https://opticalerp.in:82/Images/AppCategory/category1.png' } },
-    { id: '7', name: 'SPARKLE WHITE', code: '291', image: { uri: 'https://opticalerp.in:82/Images/AppCategory/category1.png' } },
-    { id: '8', name: 'MIRROR SILVER', code: '263', image: { uri: 'https://opticalerp.in:82/Images/AppCategory/category1.png' } },
-    { id: '9', name: 'PURE WHITE', code: '521', image: { uri: 'https://opticalerp.in:82/Images/AppCategory/category1.png' } },
-    { id: '10', name: 'GLOSSY WHITE', code: '531', image: { uri: 'https://opticalerp.in:82/Images/AppCategory/category1.png' } },   
-  ],
-};
-
-
-const filterdata = [
-  [
-    {
-      key: 1,
-      value: 'Super Strong Partition',
-      option1: 0,
-      option2: 'https://opticalerp.in:82/Images/AppCategory/category1.png',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 2,
-      value: 'SS Partition',
-      option1: 0,
-      option2: 'https://opticalerp.in:82/Images/AppCategory/category2.png',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 3,
-      value: 'Shera Bond',
-      option1: 0,
-      option2: 'https://opticalerp.in:82/Images/AppCategory/category3.png',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 4,
-      value: 'SS Bond',
-      option1: 0,
-      option2: 'https://opticalerp.in:82/Images/AppCategory/category4.png',
-      option3: 0,
-      option4: '',
-    },
-  ],
-  [
-    {
-      key: 1,
-      value: 'Plain',
-      option1: 1,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 2,
-      value: 'Wooden',
-      option1: 1,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 3,
-      value: 'Marbel',
-      option1: 1,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 4,
-      value: 'Design',
-      option1: 1,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 5,
-      value: 'Plain',
-      option1: 2,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 6,
-      value: 'Wooden',
-      option1: 2,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 7,
-      value: 'Marbel',
-      option1: 2,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 8,
-      value: 'Design',
-      option1: 2,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 9,
-      value: 'Solid',
-      option1: 3,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 10,
-      value: 'Metallic',
-      option1: 3,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 11,
-      value: 'Glossy',
-      option1: 3,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 12,
-      value: 'Wooden',
-      option1: 3,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 13,
-      value: 'Marbel',
-      option1: 3,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 14,
-      value: 'Mirror',
-      option1: 3,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 15,
-      value: 'Sparkle',
-      option1: 3,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 16,
-      value: 'Stone',
-      option1: 3,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 17,
-      value: 'Sand',
-      option1: 3,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 21,
-      value: 'Solid',
-      option1: 4,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 22,
-      value: 'Metallic',
-      option1: 4,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 23,
-      value: 'Glossy',
-      option1: 4,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 24,
-      value: 'Mirror',
-      option1: 4,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 25,
-      value: 'Wooden',
-      option1: 4,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 26,
-      value: 'Marbel',
-      option1: 4,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-  ],
-  [
-    {
-      key: 189,
-      value: '7X3',
-      option1: 0,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 190,
-      value: '8X3',
-      option1: 0,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 191,
-      value: '8X4',
-      option1: 0,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 192,
-      value: '10X4',
-      option1: 0,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 193,
-      value: '12X4',
-      option1: 0,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-  ],
-  [
-    {
-      key: 194,
-      value: '2MM',
-      option1: 0,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 195,
-      value: '3MM',
-      option1: 0,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 196,
-      value: '4MM',
-      option1: 0,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-    {
-      key: 197,
-      value: '5MM',
-      option1: 0,
-      option2: '',
-      option3: 0,
-      option4: '',
-    },
-  ],
-];
 
 export default function ProductScreen(props) {
   const insets = useSafeAreaInsets();
@@ -342,78 +28,81 @@ export default function ProductScreen(props) {
   const [isProductModalVisible, setIsProductModalVisible] = useState(false);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
   const [cartCount, setCartCount] = useState(0);
-  // const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [filterdata, setFilterData] = useState([]);
+  const [search, setSearch] = useState('');
   const [category, setCategory] = useState(
     !isEmpty(props.route.params) ? props.route.params.catId : 1,
   );
   const [subCategory, setSubCategory] = useState(0);
   const [subCategoryTabList, setSubCategoryTabList] = useState([
-    {key: 0, value: 'All'},
+    { key: 0, value: 'All' },
   ]);
 
   // Assuming filterdata is available and structured correctly
 
-// Extract arrays from filterdata
-const categoryData = filterdata[0];
-const subCategoryData = filterdata[1];
-const sizeData = filterdata[2];
-const thicknessData = filterdata[3];
+  // Extract arrays from filterdata
+  const categoryData = filterdata[0] || [];
+  const subCategoryData = filterdata[1] || [];
+  const sizeData = filterdata[2] || [];
+  const thicknessData = filterdata[3] || [];
 
-// Convert them into dropdown-compatible format
-const formattedCategories = categoryData.map(item => ({
-  label: item.value,
-  value: item.key.toString(),
-}));
+  // Convert them into dropdown-compatible format
+  const formattedCategories = categoryData.map(item => ({
+    label: item.value,
+    value: item.key.toString(),
+  }));
 
-const formattedSubCategories = subCategoryData.map(item => ({
-  label: item.value,
-  value: item.key.toString(),
-}));
+  const formattedSubCategories = subCategoryData.map(item => ({
+    label: item.value,
+    value: item.key.toString(),
+  }));
 
-const formattedSizes = sizeData.map(item => ({
-  label: item.value,
-  value: item.key.toString(),
-}));
+  const formattedSizes = sizeData.map(item => ({
+    label: item.value,
+    value: item.key.toString(),
+  }));
 
-const formattedThicknesses = thicknessData.map(item => ({
-  label: item.value,
-  value: item.key.toString(),
-}));
+  const formattedThicknesses = thicknessData.map(item => ({
+    label: item.value,
+    value: item.key.toString(),
+  }));
 
-// Set these in useState
-const [categoryOpen, setCategoryOpen] = useState(false);
-const [categoryValue, setCategoryValue] = useState(null);
-const [categoryItems, setCategoryItems] = useState(formattedCategories);
+  // Set these in useState
+  const [categoryOpen, setCategoryOpen] = useState(false);
+  const [categoryValue, setCategoryValue] = useState(null);
+  const [categoryItems, setCategoryItems] = useState(formattedCategories);
 
-const [subCategoryOpen, setSubCategoryOpen] = useState(false);
-const [subCategoryValue, setSubCategoryValue] = useState(null);
-const [subCategoryItems, setSubCategoryItems] = useState(formattedSubCategories);
+  const [subCategoryOpen, setSubCategoryOpen] = useState(false);
+  const [subCategoryValue, setSubCategoryValue] = useState(null);
+  const [subCategoryItems, setSubCategoryItems] = useState(formattedSubCategories);
 
-const [sizeOpen, setSizeOpen] = useState(false);
-const [sizeValue, setSizeValue] = useState(null);
-const [sizeItems, setSizeItems] = useState(formattedSizes);
+  const [sizeOpen, setSizeOpen] = useState(false);
+  const [sizeValue, setSizeValue] = useState(null);
+  const [sizeItems, setSizeItems] = useState(formattedSizes);
 
-const [thickOpen, setThickOpen] = useState(false);
-const [thickValue, setThickValue] = useState(null);
-const [thickItems, setThickItems] = useState(formattedThicknesses);
+  const [thickOpen, setThickOpen] = useState(false);
+  const [thickValue, setThickValue] = useState(null);
+  const [thickItems, setThickItems] = useState(formattedThicknesses);
 
   const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
 
 
   useEffect(() => {
-  if (filterdata.length === 4) {
-    setCategoryItems(filterdata[0].map(item => ({ label: item.value, value: item.key.toString() })));
-    setSubCategoryItems(filterdata[1].map(item => ({ label: item.value, value: item.key.toString() })));
-    setSizeItems(filterdata[2].map(item => ({ label: item.value, value: item.key.toString() })));
-    setThickItems(filterdata[3].map(item => ({ label: item.value, value: item.key.toString() })));
-  }
-}, [filterdata]);
+    if (filterdata.length === 4) {
+      setCategoryItems(filterdata[0].map(item => ({ label: item.value, value: item.key.toString() })));
+      setSubCategoryItems(filterdata[1].map(item => ({ label: item.value, value: item.key.toString() })));
+      setSizeItems(filterdata[2].map(item => ({ label: item.value, value: item.key.toString() })));
+      setThickItems(filterdata[3].map(item => ({ label: item.value, value: item.key.toString() })));
+    }
+  }, [filterdata]);
 
 
 
   useEffect(() => {
     getAllProductsList();
+    getAllFilterList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category, subCategory]);
 
@@ -422,18 +111,18 @@ const [thickItems, setThickItems] = useState(formattedThicknesses);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category]);
 
-  const getAllProductsList = async () => {
+  const getAllProductsList = async (term = '') => {
     try {
       const response = await fetchProductList({
         catId: category,
         subCatId: subCategory,
         size: '',
         thickness: '',
-        term: '',
+        term: term,
       });
       console.log('Fetch products response in component -', response);
       if (response.length) {
-        // setProducts(response);
+        setProducts(response);
       }
       //set to the state
     } catch (e) {
@@ -452,9 +141,28 @@ const [thickItems, setThickItems] = useState(formattedThicknesses);
     }
   };
 
-  
+  const getAllFilterList = async () => {
+    try {
+      const response = await fetchFilterList();
+      console.log('Fetch filter response in component -', response);
+      if (response.length) {
+        setFilterData(response);
+      }
+      //set to the state
+    } catch (e) {
+      console.log('Error fetching filter list');
+    }
+  };
 
-  const renderTab = ({item, index}) => (
+  const onSearch = (text) => {
+    setSearch(text);
+    setTimeout(() => {
+      getAllProductsList(text);
+    }, 300);
+  };
+
+
+  const renderTab = ({ item, index }) => (
     <TouchableOpacity
       key={index}
       style={[styles.tab, selectedTab === item.value && styles.activeTab]}
@@ -469,16 +177,16 @@ const [thickItems, setThickItems] = useState(formattedThicknesses);
     </TouchableOpacity>
   );
 
-  const renderCard = ({item}) => (
+  const renderCard = ({ item }) => (
     <TouchableOpacity
       style={styles.card}
       onPress={() => {
         setSelectedProduct(item);
         setIsProductModalVisible(true);
       }}>
-      <Image source={item.image} style={styles.cardImage} />
-      <Text style={styles.cardName}>{item.name}</Text>
-      <Text style={styles.cardCode}>{item.code}</Text>
+      <Image source={{ uri: item.appProductImageUrl }} style={styles.cardImage} />
+      <Text style={styles.cardName}>{item.productName}</Text>
+      <Text style={styles.cardCode}>{item.productCode}</Text>
     </TouchableOpacity>
   );
 
@@ -500,6 +208,8 @@ const [thickItems, setThickItems] = useState(formattedThicknesses);
             style={styles.searchIcon}
           />
           <TextInput
+            value={search}
+            onChangeText={onSearch}
             placeholder="Search"
             style={styles.searchInput}
             placeholderTextColor="#999"
@@ -517,24 +227,24 @@ const [thickItems, setThickItems] = useState(formattedThicknesses);
         horizontal
         extraData={subCategoryTabList}
         showsHorizontalScrollIndicator={false}
-        style={{maxHeight: 50, marginBottom: 10}}
+        style={{ height: 50, maxHeight: 50, marginBottom: 10 }}
       />
       {/* <View style={styles.tabContainer}>{TABS.map(renderTab)}</View> */}
 
       <FlatList
-        data={PRODUCTS[selectedTab]}
+        data={products}
         keyExtractor={item => item.id}
         renderItem={renderCard}
         numColumns={2}
         columnWrapperStyle={styles.row}
-        contentContainerStyle={{paddingBottom: 80}}
+        contentContainerStyle={{ paddingBottom: 80 }}
         showsVerticalScrollIndicator={false}
       />
 
       {/* Product Detail Bottom Sheet */}
       <Modal visible={isProductModalVisible} animationType="slide" transparent>
         <View style={styles.modalBackground}>
-          <View style={[styles.modalContainer, {paddingBottom: 30}]}>
+          <View style={[styles.modalContainer, { paddingBottom: 30 }]}>
             {selectedProduct && (
               <>
                 <Image
@@ -554,16 +264,16 @@ const [thickItems, setThickItems] = useState(formattedThicknesses);
                     justifyContent: 'space-between',
                   }}>
                   <Text
-                    style={{fontSize: 16, fontWeight: '700', color: '#000'}}>
+                    style={{ fontSize: 16, fontWeight: '700', color: '#000' }}>
                     {selectedProduct.name}
                   </Text>
                   <Text
-                    style={{fontSize: 14, fontWeight: '700', color: '#000'}}>
+                    style={{ fontSize: 14, fontWeight: '700', color: '#000' }}>
                     {selectedProduct.code}
                   </Text>
                 </View>
 
-                <Text style={{marginTop: 8, fontWeight: '600', color: '#555'}}>
+                <Text style={{ marginTop: 8, fontWeight: '600', color: '#555' }}>
                   THICKNESS : 2MM, 3MM, 4MM , 5MM
                 </Text>
 
@@ -581,7 +291,7 @@ const [thickItems, setThickItems] = useState(formattedThicknesses);
                 </Text>
 
                 {/* Sizes */}
-                <Text style={{fontSize: 12, fontWeight: 600, marginTop: 6}}>
+                <Text style={{ fontSize: 12, fontWeight: 600, marginTop: 6 }}>
                   Thickness
                 </Text>
                 <View
@@ -616,7 +326,7 @@ const [thickItems, setThickItems] = useState(formattedThicknesses);
                     );
                   })}
                 </View>
-                <Text style={{fontSize: 12, fontWeight: 600, marginTop: 6}}>
+                <Text style={{ fontSize: 12, fontWeight: 600, marginTop: 6 }}>
                   Size
                 </Text>
                 <View
@@ -651,7 +361,7 @@ const [thickItems, setThickItems] = useState(formattedThicknesses);
                     );
                   })}
                 </View>
-                <Text style={{fontSize: 12, fontWeight: 600, marginTop: 6}}>
+                <Text style={{ fontSize: 12, fontWeight: 600, marginTop: 6 }}>
                   Coil
                 </Text>
                 <View
@@ -716,7 +426,7 @@ const [thickItems, setThickItems] = useState(formattedThicknesses);
                         paddingHorizontal: 10,
                         paddingVertical: 4,
                       }}>
-                      <Text style={{fontSize: 20, fontWeight: 'bold'}}>-</Text>
+                      <Text style={{ fontSize: 20, fontWeight: 'bold' }}>-</Text>
                     </TouchableOpacity>
 
                     {/* Input Box */}
@@ -747,7 +457,7 @@ const [thickItems, setThickItems] = useState(formattedThicknesses);
                         paddingHorizontal: 10,
                         paddingVertical: 4,
                       }}>
-                      <Text style={{fontSize: 20, fontWeight: 'bold'}}>+</Text>
+                      <Text style={{ fontSize: 20, fontWeight: 'bold' }}>+</Text>
                     </TouchableOpacity>
                   </View>
 
@@ -970,7 +680,7 @@ const styles = StyleSheet.create({
     padding: 20,
     width: '100%',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: -2},
+    shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 10,
