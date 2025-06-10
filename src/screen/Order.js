@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -13,7 +13,7 @@ import isEmpty from 'lodash/isEmpty';
 import Icon from 'react-native-vector-icons/Feather';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Feather from 'react-native-vector-icons/Feather';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {
   fetchProductList,
   fetchSubCategories,
@@ -21,6 +21,8 @@ import {
 } from '../services/common-services';
 
 export default function ProductScreen(props) {
+
+  
   const insets = useSafeAreaInsets();
 
   const [selectedTab, setSelectedTab] = useState('All');
@@ -36,7 +38,7 @@ export default function ProductScreen(props) {
   );
   const [subCategory, setSubCategory] = useState(0);
   const [subCategoryTabList, setSubCategoryTabList] = useState([
-    { key: 0, value: 'All' },
+    {key: 0, value: 'All'},
   ]);
 
   // Assuming filterdata is available and structured correctly
@@ -75,7 +77,9 @@ export default function ProductScreen(props) {
 
   const [subCategoryOpen, setSubCategoryOpen] = useState(false);
   const [subCategoryValue, setSubCategoryValue] = useState(null);
-  const [subCategoryItems, setSubCategoryItems] = useState(formattedSubCategories);
+  const [subCategoryItems, setSubCategoryItems] = useState(
+    formattedSubCategories,
+  );
 
   const [sizeOpen, setSizeOpen] = useState(false);
   const [sizeValue, setSizeValue] = useState(null);
@@ -85,20 +89,46 @@ export default function ProductScreen(props) {
   const [thickValue, setThickValue] = useState(null);
   const [thickItems, setThickItems] = useState(formattedThicknesses);
 
+  const [selectedThickness, setSelectedThickness] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
 
+  const sizeOptions = selectedProduct?.size
+    ? selectedProduct.size.split(',').map(s => s.trim())
+    : [];
+
+  const thicknessOptions = selectedProduct?.thickness
+    ? selectedProduct.thickness.split(',').map(t => t.trim())
+    : [];
 
   useEffect(() => {
     if (filterdata.length === 4) {
-      setCategoryItems(filterdata[0].map(item => ({ label: item.value, value: item.key.toString() })));
-      setSubCategoryItems(filterdata[1].map(item => ({ label: item.value, value: item.key.toString() })));
-      setSizeItems(filterdata[2].map(item => ({ label: item.value, value: item.key.toString() })));
-      setThickItems(filterdata[3].map(item => ({ label: item.value, value: item.key.toString() })));
+      setCategoryItems(
+        filterdata[0].map(item => ({
+          label: item.value,
+          value: item.key.toString(),
+        })),
+      );
+      setSubCategoryItems(
+        filterdata[1].map(item => ({
+          label: item.value,
+          value: item.key.toString(),
+        })),
+      );
+      setSizeItems(
+        filterdata[2].map(item => ({
+          label: item.value,
+          value: item.key.toString(),
+        })),
+      );
+      setThickItems(
+        filterdata[3].map(item => ({
+          label: item.value,
+          value: item.key.toString(),
+        })),
+      );
     }
   }, [filterdata]);
-
-
 
   useEffect(() => {
     getAllProductsList();
@@ -111,22 +141,26 @@ export default function ProductScreen(props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category]);
 
-  const getAllProductsList = async (term = '') => {
+  const getAllProductsList = async (term = '', selectedFilters = {}) => {
+    const {
+      selectedCategory = category,
+      selectedSubCategory = subCategory,
+      selectedSize = '',
+      selectedThickness = '',
+    } = selectedFilters;
+
     try {
       const response = await fetchProductList({
-        catId: category,
-        subCatId: subCategory,
-        size: '',
-        thickness: '',
-        term: term,
+        catId: selectedCategory,
+        subCatId: selectedSubCategory,
+        size: selectedSize,
+        thickness: selectedThickness,
+        term,
       });
-      console.log('Fetch products response in component -', response);
-      if (response.length) {
-        setProducts(response);
-      }
-      //set to the state
+      console.log('Filtered Products:', response);
+      setProducts(response);
     } catch (e) {
-      console.log('Error fetching product list');
+      console.log('Error fetching product list', e);
     }
   };
 
@@ -154,19 +188,22 @@ export default function ProductScreen(props) {
     }
   };
 
-  const onSearch = (text) => {
+  const onSearch = text => {
     setSearch(text);
     setTimeout(() => {
       getAllProductsList(text);
     }, 300);
   };
 
-
-  const renderTab = ({ item, index }) => (
+  const renderTab = ({item, index}) => (
     <TouchableOpacity
       key={index}
       style={[styles.tab, selectedTab === item.value && styles.activeTab]}
-      onPress={() => setSelectedTab(item.value)}>
+      onPress={() => {
+        setSelectedTab(item.value);
+        setSubCategory(item.key);
+        getAllProductsList();
+      }}>
       <Text
         style={[
           styles.tabText,
@@ -177,14 +214,14 @@ export default function ProductScreen(props) {
     </TouchableOpacity>
   );
 
-  const renderCard = ({ item }) => (
+  const renderCard = ({item}) => (
     <TouchableOpacity
       style={styles.card}
       onPress={() => {
         setSelectedProduct(item);
         setIsProductModalVisible(true);
       }}>
-      <Image source={{ uri: item.appProductImageUrl }} style={styles.cardImage} />
+      <Image source={{uri: item.appProductImageUrl}} style={styles.cardImage} />
       <Text style={styles.cardName}>{item.productName}</Text>
       <Text style={styles.cardCode}>{item.productCode}</Text>
     </TouchableOpacity>
@@ -227,7 +264,7 @@ export default function ProductScreen(props) {
         horizontal
         extraData={subCategoryTabList}
         showsHorizontalScrollIndicator={false}
-        style={{ height: 50, maxHeight: 50, marginBottom: 10 }}
+        style={{height: 50, maxHeight: 50, marginBottom: 10}}
       />
       {/* <View style={styles.tabContainer}>{TABS.map(renderTab)}</View> */}
 
@@ -237,18 +274,18 @@ export default function ProductScreen(props) {
         renderItem={renderCard}
         numColumns={2}
         columnWrapperStyle={styles.row}
-        contentContainerStyle={{ paddingBottom: 80 }}
+        contentContainerStyle={{paddingBottom: 80}}
         showsVerticalScrollIndicator={false}
       />
 
       {/* Product Detail Bottom Sheet */}
       <Modal visible={isProductModalVisible} animationType="slide" transparent>
         <View style={styles.modalBackground}>
-          <View style={[styles.modalContainer, { paddingBottom: 30 }]}>
+          <View style={[styles.modalContainer, {paddingBottom: 30}]}>
             {selectedProduct && (
               <>
                 <Image
-                  source={selectedProduct.image}
+                  source={{uri: selectedProduct.appProductImageUrl}}
                   style={{
                     width: '100%',
                     height: 200,
@@ -264,34 +301,21 @@ export default function ProductScreen(props) {
                     justifyContent: 'space-between',
                   }}>
                   <Text
-                    style={{ fontSize: 16, fontWeight: '700', color: '#000' }}>
-                    {selectedProduct.name}
+                    style={{fontSize: 16, fontWeight: '700', color: '#000'}}>
+                    {selectedProduct.productName}
                   </Text>
                   <Text
-                    style={{ fontSize: 14, fontWeight: '700', color: '#000' }}>
-                    {selectedProduct.code}
+                    style={{fontSize: 14, fontWeight: '700', color: '#000'}}>
+                    {selectedProduct.productCode}
                   </Text>
                 </View>
 
-                <Text style={{ marginTop: 8, fontWeight: '600', color: '#555' }}>
-                  THICKNESS : 2MM, 3MM, 4MM , 5MM
+                <Text style={{marginTop: 8, fontWeight: '600', color: '#000'}}>
+                  {selectedProduct.productDesc}
                 </Text>
 
-                <Text
-                  style={{
-                    marginTop: 8,
-                    color: '#555',
-                    fontSize: 13,
-                    lineHeight: 18,
-                  }}
-                  numberOfLines={2}>
-                  Lorem Ipsum is simply dummy text of the printing and
-                  typesetting industry. Lorem Ipsum has been the industry's
-                  standard dummy text ever since...
-                </Text>
-
-                {/* Sizes */}
-                <Text style={{ fontSize: 12, fontWeight: 600, marginTop: 6 }}>
+                {/* Thickness */}
+                <Text style={{fontSize: 12, fontWeight: '600', marginTop: 12}}>
                   Thickness
                 </Text>
                 <View
@@ -299,34 +323,37 @@ export default function ProductScreen(props) {
                     flexDirection: 'row',
                     flexWrap: 'wrap',
                     gap: 8,
-                    marginTop: 12,
+                    marginTop: 8,
                   }}>
-                  {['8X4', '7X3', '8X3', '10X4', '12X4'].map((size, index) => {
-                    const isSelected = selectedSize === size;
+                  {selectedProduct.thickness?.split(',').map((item, index) => {
+                    const val = item.trim();
+                    const isSelected = selectedThickness === val;
                     return (
                       <TouchableOpacity
                         key={index}
-                        onPress={() => setSelectedSize(size)}
+                        onPress={() => setSelectedThickness(val)}
                         style={{
                           paddingHorizontal: 16,
                           paddingVertical: 6,
                           borderRadius: 12,
                           backgroundColor: isSelected ? '#D00000' : '#fff',
-                          borderColor: '#ccc',
                           borderWidth: 1,
+                          borderColor: isSelected ? '#D00000' : '#ccc',
                         }}>
                         <Text
                           style={{
                             fontWeight: '600',
                             color: isSelected ? '#fff' : '#000',
                           }}>
-                          {size}
+                          {val}
                         </Text>
                       </TouchableOpacity>
                     );
                   })}
                 </View>
-                <Text style={{ fontSize: 12, fontWeight: 600, marginTop: 6 }}>
+
+                {/* Size */}
+                <Text style={{fontSize: 12, fontWeight: '600', marginTop: 12}}>
                   Size
                 </Text>
                 <View
@@ -334,81 +361,45 @@ export default function ProductScreen(props) {
                     flexDirection: 'row',
                     flexWrap: 'wrap',
                     gap: 8,
-                    marginTop: 12,
+                    marginTop: 8,
                   }}>
-                  {['8X4', '7X3', '8X3', '10X4', '12X4'].map((size, index) => {
-                    const isSelected = selectedSize === size;
+                  {selectedProduct.size?.split(',').map((item, index) => {
+                    const val = item.trim();
+                    const isSelected = selectedSize === val;
                     return (
                       <TouchableOpacity
                         key={index}
-                        onPress={() => setSelectedSize(size)}
+                        onPress={() => setSelectedSize(val)}
                         style={{
                           paddingHorizontal: 16,
                           paddingVertical: 6,
                           borderRadius: 12,
                           backgroundColor: isSelected ? '#D00000' : '#fff',
-                          borderColor: '#ccc',
                           borderWidth: 1,
+                          borderColor: isSelected ? '#D00000' : '#ccc',
                         }}>
                         <Text
                           style={{
                             fontWeight: '600',
                             color: isSelected ? '#fff' : '#000',
                           }}>
-                          {size}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-                <Text style={{ fontSize: 12, fontWeight: 600, marginTop: 6 }}>
-                  Coil
-                </Text>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    flexWrap: 'wrap',
-                    gap: 8,
-                    marginTop: 12,
-                  }}>
-                  {['8X4', '7X3'].map((size, index) => {
-                    const isSelected = selectedSize === size;
-                    return (
-                      <TouchableOpacity
-                        key={index}
-                        onPress={() => setSelectedSize(size)}
-                        style={{
-                          paddingHorizontal: 16,
-                          paddingVertical: 6,
-                          borderRadius: 12,
-                          backgroundColor: isSelected ? '#D00000' : '#fff',
-                          borderColor: '#ccc',
-                          borderWidth: 1,
-                        }}>
-                        <Text
-                          style={{
-                            fontWeight: '600',
-                            color: isSelected ? '#fff' : '#000',
-                          }}>
-                          {size}
+                          {val}
                         </Text>
                       </TouchableOpacity>
                     );
                   })}
                 </View>
 
-                {/* Quantity and Add to Cart */}
+                {/* Quantity & Add to Cart */}
                 <View
                   style={{
-                    display: 'flex',
                     flexDirection: 'row',
                     justifyContent: 'space-between',
-                    gap: 10,
-                    alignContent: 'center',
                     alignItems: 'center',
                     marginTop: 20,
+                    gap: 10,
                   }}>
-                  {/* Quantity Selector */}
+                  {/* Quantity */}
                   <View
                     style={{
                       flexDirection: 'row',
@@ -419,17 +410,12 @@ export default function ProductScreen(props) {
                       paddingHorizontal: 8,
                       height: 40,
                     }}>
-                    {/* - Button */}
                     <TouchableOpacity
                       onPress={() => setQuantity(prev => Math.max(prev - 1, 1))}
-                      style={{
-                        paddingHorizontal: 10,
-                        paddingVertical: 4,
-                      }}>
-                      <Text style={{ fontSize: 20, fontWeight: 'bold' }}>-</Text>
+                      style={{paddingHorizontal: 10}}>
+                      <Text style={{fontSize: 20, fontWeight: 'bold'}}>-</Text>
                     </TouchableOpacity>
 
-                    {/* Input Box */}
                     <TextInput
                       style={{
                         width: 50,
@@ -442,27 +428,24 @@ export default function ProductScreen(props) {
                       value={quantity.toString()}
                       onChangeText={text => {
                         const num = parseInt(text.replace(/[^0-9]/g, ''), 10);
-                        if (!isNaN(num)) {
-                          setQuantity(num);
-                        } else if (text === '') {
-                          setQuantity(0);
-                        }
+                        if (!isNaN(num)) setQuantity(num);
+                        else if (text === '') setQuantity(0);
                       }}
                     />
 
-                    {/* + Button */}
                     <TouchableOpacity
                       onPress={() => setQuantity(prev => prev + 1)}
-                      style={{
-                        paddingHorizontal: 10,
-                        paddingVertical: 4,
-                      }}>
-                      <Text style={{ fontSize: 20, fontWeight: 'bold' }}>+</Text>
+                      style={{paddingHorizontal: 10}}>
+                      <Text style={{fontSize: 20, fontWeight: 'bold'}}>+</Text>
                     </TouchableOpacity>
                   </View>
 
                   {/* Add to Cart */}
                   <TouchableOpacity
+                    onPress={() => {
+                      setCartCount(cartCount + 1);
+                      setIsProductModalVisible(false);
+                    }}
                     style={{
                       flexDirection: 'row',
                       alignItems: 'center',
@@ -470,17 +453,12 @@ export default function ProductScreen(props) {
                       paddingVertical: 12,
                       paddingHorizontal: 20,
                       borderRadius: 8,
-                    }}
-                    onPress={() => {
-                      setCartCount(cartCount + 1);
-                      setIsProductModalVisible(false);
                     }}>
                     <Icon name="shopping-cart" size={20} color="#fff" />
                     <Text
                       style={{
                         color: '#fff',
                         fontWeight: 'bold',
-                        marginRight: 8,
                         marginLeft: 8,
                       }}>
                       Add to Cart
@@ -562,7 +540,20 @@ export default function ProductScreen(props) {
 
             <TouchableOpacity
               style={styles.submitButton}
-              onPress={() => setIsFilterModalVisible(false)}>
+              onPress={() => {
+                setCategory(categoryValue || category);
+                setSubCategory(subCategoryValue || 0);
+
+                const filters = {
+                  selectedCategory: categoryValue || category,
+                  selectedSubCategory: subCategoryValue || 0,
+                  selectedSize: sizeValue || '',
+                  selectedThickness: thickValue || '',
+                };
+
+                getAllProductsList('', filters);
+                setIsFilterModalVisible(false);
+              }}>
               <Text style={styles.submitButtonText}>Submit</Text>
             </TouchableOpacity>
           </View>
@@ -680,7 +671,7 @@ const styles = StyleSheet.create({
     padding: 20,
     width: '100%',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: -2 },
+    shadowOffset: {width: 0, height: -2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 10,
