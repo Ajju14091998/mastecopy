@@ -236,8 +236,8 @@ const OrderStack = createStackNavigator();
 function OrderDetailsStack() {
   return (
     <OrderStack.Navigator screenOptions={{headerShown: false}}>
-      <OrderStack.Screen name="Orderdetails" component={MyOrder} />
-      <OrderStack.Screen name="IndividualOrder" component={IndividualOrder} />
+      <OrderStack.Screen name="Orderdetails" component={WithReset(MyOrder)} />
+      <OrderStack.Screen name="IndividualOrder" component={WithReset(IndividualOrder)} />
     </OrderStack.Navigator>
   );
 }

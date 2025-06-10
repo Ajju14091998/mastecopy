@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,112 +6,90 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  SafeAreaView,
   Modal,
 } from 'react-native';
+import isEmpty from 'lodash/isEmpty';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Feather from 'react-native-vector-icons/Feather';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { fetchOrdersList } from '../services/common-services';
 
-export default function MyOrderScreen({navigation}) {
+export default function MyOrderScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState('today');
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState('Pending');
+  const [orderList, setOrderList] = useState({
+    todayOrdersList: [],
+    totalOrdersList: [],
+  });
+  const [orders, setOrders] = useState([]);
+  const [search, setSearch] = useState('');
 
+  useEffect(() => {
+    getOrderList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const getOrderList = async () => {
+    try {
+      const response = await fetchOrdersList({
+        'customerId': 0,
+        'fromDate': '',
+        'toDate': '',
+        'orderStatus': '',
+        'pageNumber': 0,
+        'pageSize': 0,
+      });
+      console.log('My Order List Response -', response);
 
-  const apiResponse = {
-    todayOrdersCount: 1,
-    totalOrdersCount: 7,
-    todayOrdersList: [
-      {
-        id: 9,
-        salesOrderDate: '07/06/2025',
-        salesOrderNumber: 'SO/000008',
-        quantity: 12,
-        customerName: 'TODAY CUSTOMER XYZ',
-        salesOrderStatus: 'Pending',
-      },
-    ],
-    totalOrdersList: [
-      {
-        id: 1,
-        salesOrderDate: '28/05/2025',
-        salesOrderNumber: 'SO/000001',
-        quantity: 4,
-        customerName: 'demo',
-        salesOrderStatus: 'Pending',
-      },
-      {
-        id: 2,
-        salesOrderDate: '27/05/2025',
-        salesOrderNumber: 'SO/000002',
-        quantity: 250,
-        customerName: 'demo',
-        salesOrderStatus: 'Pending',
-      },
-      {
-        id: 3,
-        salesOrderDate: '25/05/2025',
-        salesOrderNumber: 'SO/000003',
-        quantity: 25,
-        customerName: 'RAJASTHAN GLASS AND PLYWOOD LONAVALA',
-        salesOrderStatus: 'Pending',
-      },
-      {
-        id: 4,
-        salesOrderDate: '28/05/2025',
-        salesOrderNumber: 'SO/000004',
-        quantity: 38,
-        customerName: 'RAJASTHAN GLASS AND PLYWOOD LONAVALA',
-        salesOrderStatus: 'Pending',
-      },
-      {
-        id: 6,
-        salesOrderDate: '03/06/2025',
-        salesOrderNumber: 'SO/000005',
-        quantity: 50,
-        customerName: 'M S SAINATH PLYWOOD CENTRE BHIWANDI',
-        salesOrderStatus: 'Pending',
-      },
-      {
-        id: 7,
-        salesOrderDate: '03/06/2025',
-        salesOrderNumber: 'SO/000006',
-        quantity: 45,
-        customerName: 'POOJA ALUMINIUM AND HARDWARE X',
-        salesOrderStatus: 'Pending',
-      },
-      {
-        id: 8,
-        salesOrderDate: '03/06/2025',
-        salesOrderNumber: 'SO/000007',
-        quantity: 45,
-        customerName: 'POOJA ALUMINIUM AND HARDWARE X',
-        salesOrderStatus: 'Pending',
-      },
-    ],
+      if (!isEmpty(response)) {
+        setOrderList(response);
+        setTimeout(() => setOrdersOnActiveTab(), 100);
+      }
+    } catch (e) {
+      console.log('Error fetching my order list -', e);
+    }
   };
 
-  const orders =
-    activeTab === 'today'
-      ? apiResponse.todayOrdersList.map(order => ({
-          id: order.salesOrderNumber,
-          date: order.salesOrderDate,
-          qty: order.quantity,
-          status: order.salesOrderStatus,
-        }))
-      : apiResponse.totalOrdersList.map(order => ({
+  const setOrdersOnActiveTab = (tab = 'today', search = '') => {
+    let list = [];
+
+    if (tab === 'today') {
+      if (!orderList.todayOrdersList) {
+        list = [];
+      } else {
+        list = orderList.todayOrdersList.filter(val => String(val.salesOrderNumber).includes(search)).map(order => ({
           id: order.salesOrderNumber,
           date: order.salesOrderDate,
           qty: order.quantity,
           status: order.salesOrderStatus,
         }));
+      }
+    } else {
+      if (!orderList.totalOrdersList) {
+        list = [];
+      } else {
+        list = orderList.totalOrdersList.filter(val => String(val.salesOrderNumber).includes(search)).map(order => ({
+          id: order.salesOrderNumber,
+          date: order.salesOrderDate,
+          qty: order.quantity,
+          status: order.salesOrderStatus,
+        }));
+      }
+    }
+    console.log('Setting Orders list...', orders);
+    setOrders(list);
+  };
+
+  const onSearch = (text) => {
+    setSearch(text);
+    setOrdersOnActiveTab(activeTab, text);
+  }
 
   // const orders = activeTab === 'today' ? todayOrders : totalOrders;
 
   return (
-    <View style={[styles.container, {paddingTop: insets.top + 20,}]}>
+    <View style={[styles.container, { paddingTop: insets.top + 20 }]}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -132,6 +110,8 @@ export default function MyOrderScreen({navigation}) {
         <Feather name="search" size={18} color="#999" />
         <TextInput
           placeholder="Search"
+          value={search}
+          onChangeText={onSearch}
           placeholderTextColor="#999"
           style={styles.searchInput}
         />
@@ -144,7 +124,7 @@ export default function MyOrderScreen({navigation}) {
             <Icon name="today" size={20} color="#D00000" />
           </View>
           <View>
-            <Text style={styles.statValue}>12</Text>
+            <Text style={styles.statValue}>{orderList.todayOrdersList ? orderList.todayOrdersList.length : 0}</Text>
             <Text style={styles.statLabel}>Today Order</Text>
           </View>
         </View>
@@ -153,7 +133,7 @@ export default function MyOrderScreen({navigation}) {
             <Icon name="shopping-cart" size={20} color="#D00000" />
           </View>
           <View>
-            <Text style={styles.statValue}>1432</Text>
+            <Text style={styles.statValue}>{orderList.totalOrdersList ? orderList.totalOrdersList.length : 0}</Text>
             <Text style={styles.statLabel}>Total Order</Text>
           </View>
         </View>
@@ -166,7 +146,7 @@ export default function MyOrderScreen({navigation}) {
             styles.tab,
             activeTab === 'today' ? styles.activeTab : styles.inactiveTab,
           ]}
-          onPress={() => setActiveTab('today')}>
+          onPress={() => {setActiveTab('today'); setOrdersOnActiveTab('today');}}>
           <Text
             style={
               activeTab === 'today'
@@ -181,7 +161,7 @@ export default function MyOrderScreen({navigation}) {
             styles.tab,
             activeTab === 'total' ? styles.activeTab : styles.inactiveTab,
           ]}
-          onPress={() => setActiveTab('total')}>
+          onPress={() => {setActiveTab('total'); setOrdersOnActiveTab('total');}}>
           <Text
             style={
               activeTab === 'total'
@@ -194,11 +174,11 @@ export default function MyOrderScreen({navigation}) {
       </View>
 
       {/* Order List */}
-      <ScrollView contentContainerStyle={{paddingBottom: 20}}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
         {orders.map((order, index) => (
           <TouchableOpacity
             key={index}
-            onPress={() => navigation.navigate('IndividualOrder', {order})}
+            onPress={() => navigation.navigate('IndividualOrder', { order })}
             style={styles.orderCard}>
             <Text style={styles.orderLine}>
               <Text style={styles.label}>Order id : </Text>
