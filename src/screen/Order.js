@@ -19,10 +19,15 @@ import {
   fetchSubCategories,
   fetchFilterList,
 } from '../services/common-services';
+import {useRoute} from '@react-navigation/native';
 
 export default function ProductScreen(props) {
+  const route = useRoute();
+  const {catId, headingTitle} = route.params || {};
 
-  
+  const [selectedCategory, setSelectedCategory] = useState(catId);
+  const [heading, setHeading] = useState(headingTitle);
+
   const insets = useSafeAreaInsets();
 
   const [selectedTab, setSelectedTab] = useState('All');
@@ -258,6 +263,9 @@ export default function ProductScreen(props) {
           <Icon name="filter" size={20} color="#fff" />
         </TouchableOpacity>
       </View>
+      <Text style={{fontSize: 20, fontWeight: 'bold', marginBottom: 10}}>
+        {heading}
+      </Text>
       <FlatList
         data={subCategoryTabList}
         renderItem={renderTab}
@@ -485,7 +493,16 @@ export default function ProductScreen(props) {
               value={categoryValue}
               items={categoryItems}
               setOpen={setCategoryOpen}
-              setValue={setCategoryValue}
+              setValue={callback => {
+                const selectedValue = callback(categoryValue);
+                setCategoryValue(selectedValue);
+                const selectedItem = categoryItems.find(
+                  item => item.value === selectedValue,
+                );
+                if (selectedItem) {
+                  setHeading(selectedItem.label);
+                }
+              }}
               setItems={setCategoryItems}
               style={styles.dropdown}
               textStyle={styles.dropdownText}

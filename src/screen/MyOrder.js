@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -10,11 +10,37 @@ import {
 } from 'react-native';
 import isEmpty from 'lodash/isEmpty';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {fetchOrdersList} from '../services/common-services';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import Feather from 'react-native-vector-icons/Feather';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { fetchOrdersList } from '../services/common-services';
 
-export default function MyOrderScreen({ navigation }) {
+export default function MyOrderScreen({navigation}) {
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
+
+  const [showFromPicker, setShowFromPicker] = useState(false);
+  const [showToPicker, setShowToPicker] = useState(false);
+
+  const handleFromChange = (event, selectedDate) => {
+    setShowFromPicker(false);
+    if (selectedDate) {
+      setFromDate(selectedDate);
+    }
+  };
+
+  const handleToChange = (event, selectedDate) => {
+    setShowToPicker(false);
+    if (selectedDate) {
+      setToDate(selectedDate);
+    }
+  };
+
+  const formatDate = date => {
+    if (!date) return 'Select Date';
+    return new Date(date).toLocaleDateString();
+  };
+
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState('today');
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
@@ -33,12 +59,12 @@ export default function MyOrderScreen({ navigation }) {
   const getOrderList = async () => {
     try {
       const response = await fetchOrdersList({
-        'customerId': 0,
-        'fromDate': '',
-        'toDate': '',
-        'orderStatus': '',
-        'pageNumber': 0,
-        'pageSize': 0,
+        customerId: 0,
+        fromDate: '',
+        toDate: '',
+        orderStatus: '',
+        pageNumber: 0,
+        pageSize: 0,
       });
       console.log('My Order List Response -', response);
 
@@ -58,38 +84,42 @@ export default function MyOrderScreen({ navigation }) {
       if (!orderList.todayOrdersList) {
         list = [];
       } else {
-        list = orderList.todayOrdersList.filter(val => String(val.salesOrderNumber).includes(search)).map(order => ({
-          id: order.salesOrderNumber,
-          date: order.salesOrderDate,
-          qty: order.quantity,
-          status: order.salesOrderStatus,
-        }));
+        list = orderList.todayOrdersList
+          .filter(val => String(val.salesOrderNumber).includes(search))
+          .map(order => ({
+            id: order.salesOrderNumber,
+            date: order.salesOrderDate,
+            qty: order.quantity,
+            status: order.salesOrderStatus,
+          }));
       }
     } else {
       if (!orderList.totalOrdersList) {
         list = [];
       } else {
-        list = orderList.totalOrdersList.filter(val => String(val.salesOrderNumber).includes(search)).map(order => ({
-          id: order.salesOrderNumber,
-          date: order.salesOrderDate,
-          qty: order.quantity,
-          status: order.salesOrderStatus,
-        }));
+        list = orderList.totalOrdersList
+          .filter(val => String(val.salesOrderNumber).includes(search))
+          .map(order => ({
+            id: order.salesOrderNumber,
+            date: order.salesOrderDate,
+            qty: order.quantity,
+            status: order.salesOrderStatus,
+          }));
       }
     }
     console.log('Setting Orders list...', orders);
     setOrders(list);
   };
 
-  const onSearch = (text) => {
+  const onSearch = text => {
     setSearch(text);
     setOrdersOnActiveTab(activeTab, text);
-  }
+  };
 
   // const orders = activeTab === 'today' ? todayOrders : totalOrders;
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + 20 }]}>
+    <View style={[styles.container, {paddingTop: insets.top + 20}]}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -124,7 +154,9 @@ export default function MyOrderScreen({ navigation }) {
             <Icon name="today" size={20} color="#D00000" />
           </View>
           <View>
-            <Text style={styles.statValue}>{orderList.todayOrdersList ? orderList.todayOrdersList.length : 0}</Text>
+            <Text style={styles.statValue}>
+              {orderList.todayOrdersList ? orderList.todayOrdersList.length : 0}
+            </Text>
             <Text style={styles.statLabel}>Today Order</Text>
           </View>
         </View>
@@ -133,7 +165,9 @@ export default function MyOrderScreen({ navigation }) {
             <Icon name="shopping-cart" size={20} color="#D00000" />
           </View>
           <View>
-            <Text style={styles.statValue}>{orderList.totalOrdersList ? orderList.totalOrdersList.length : 0}</Text>
+            <Text style={styles.statValue}>
+              {orderList.totalOrdersList ? orderList.totalOrdersList.length : 0}
+            </Text>
             <Text style={styles.statLabel}>Total Order</Text>
           </View>
         </View>
@@ -146,7 +180,10 @@ export default function MyOrderScreen({ navigation }) {
             styles.tab,
             activeTab === 'today' ? styles.activeTab : styles.inactiveTab,
           ]}
-          onPress={() => {setActiveTab('today'); setOrdersOnActiveTab('today');}}>
+          onPress={() => {
+            setActiveTab('today');
+            setOrdersOnActiveTab('today');
+          }}>
           <Text
             style={
               activeTab === 'today'
@@ -161,7 +198,10 @@ export default function MyOrderScreen({ navigation }) {
             styles.tab,
             activeTab === 'total' ? styles.activeTab : styles.inactiveTab,
           ]}
-          onPress={() => {setActiveTab('total'); setOrdersOnActiveTab('total');}}>
+          onPress={() => {
+            setActiveTab('total');
+            setOrdersOnActiveTab('total');
+          }}>
           <Text
             style={
               activeTab === 'total'
@@ -174,11 +214,11 @@ export default function MyOrderScreen({ navigation }) {
       </View>
 
       {/* Order List */}
-      <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
+      <ScrollView contentContainerStyle={{paddingBottom: 20}}>
         {orders.map((order, index) => (
           <TouchableOpacity
             key={index}
-            onPress={() => navigation.navigate('IndividualOrder', { order })}
+            onPress={() => navigation.navigate('IndividualOrder', {order})}
             style={styles.orderCard}>
             <Text style={styles.orderLine}>
               <Text style={styles.label}>Order id : </Text>
@@ -231,14 +271,69 @@ export default function MyOrderScreen({ navigation }) {
 
             <Text style={styles.filterLabel}>FILTER BY DATE</Text>
 
-            <TouchableOpacity style={styles.dateDropdown}>
-              <Text style={styles.dateText}>Select Date</Text>
+            <TouchableOpacity
+              style={styles.dateDropdown}
+              onPress={() => setShowFromPicker(true)}>
+              <Text style={styles.dateText}>From: {formatDate(fromDate)}</Text>
               <Feather name="chevron-down" size={18} color="#999" />
             </TouchableOpacity>
 
+            {/* To Date */}
+            <TouchableOpacity
+              style={styles.dateDropdown}
+              onPress={() => setShowToPicker(true)}>
+              <Text style={styles.dateText}>To: {formatDate(toDate)}</Text>
+              <Feather name="chevron-down" size={18} color="#999" />
+            </TouchableOpacity>
+
+            {/* From Picker */}
+            {showFromPicker && (
+              <DateTimePicker
+                value={fromDate || new Date()}
+                mode="date"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                onChange={handleFromChange}
+              />
+            )}
+
+            {/* To Picker */}
+            {showToPicker && (
+              <DateTimePicker
+                value={toDate || new Date()}
+                mode="date"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                onChange={handleToChange}
+              />
+            )}
             <TouchableOpacity
               style={styles.applyButton}
-              onPress={() => setFilterModalVisible(false)}>
+              onPress={async () => {
+                try {
+                  const response = await fetchOrdersList({
+                    customerId: 0,
+                    fromDate: fromDate
+                      ? fromDate.toISOString().split('T')[0]
+                      : '',
+                    toDate: toDate ? toDate.toISOString().split('T')[0] : '',
+                    orderStatus: selectedStatus || '',
+                    pageNumber: 0,
+                    pageSize: 0,
+                  });
+
+                  if (!isEmpty(response)) {
+                    setOrderList(response);
+
+                    // Add this to update visible list:
+                    setTimeout(() => {
+                      setOrdersOnActiveTab(activeTab, search);
+                    }, 100);
+                  }
+
+                  setFilterModalVisible(false);
+                } catch (e) {
+                  console.log('Error applying filters -', e);
+                }
+              }}>
               <Text style={styles.applyButtonText}>Apply Filters</Text>
             </TouchableOpacity>
           </View>
@@ -468,5 +563,21 @@ const styles = StyleSheet.create({
     backgroundColor: '#ccc',
     width: '100%',
     marginBottom: 8,
+  },
+
+  dateDropdown: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  dateText: {
+    fontSize: 14,
+    color: '#333',
   },
 });
