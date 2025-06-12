@@ -284,7 +284,7 @@ export default function ProductScreen(props) {
         horizontal
         extraData={subCategoryTabList}
         showsHorizontalScrollIndicator={false}
-        style={{height: 50, maxHeight: 50, marginBottom: 10}}
+        style={{minHeight: 40, maxHeight: 40, marginBottom: 10}}
       />
       {/* <View style={styles.tabContainer}>{TABS.map(renderTab)}</View> */}
 

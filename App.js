@@ -1,7 +1,7 @@
-import React, {useCallback, useState} from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {createStackNavigator} from '@react-navigation/stack';
+import React, { useCallback, useState } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
@@ -9,8 +9,8 @@ import {
   DrawerItem,
 } from '@react-navigation/drawer';
 import { useFocusEffect } from '@react-navigation/native';
-import {View, Text, StyleSheet, Image, TouchableOpacity, } from 'react-native';
-import {Ionicons, MaterialIcons} from '@expo/vector-icons';
+import { View, Text, StyleSheet, Image, TouchableOpacity, } from 'react-native';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 // Screens
 import LoginScreen from './src/screen/LoginScreen';
@@ -24,13 +24,13 @@ import Home from './src/assets/svg/home';
 import Shopping from './src/assets/svg/shopping';
 import Cart1 from './src/assets/svg/cart1.js';
 import SplashScreen from './src/screen/SplashScreen';
-import {AuthProvider, useAuth} from './AuthContext';
+import { AuthProvider, useAuth } from './AuthContext';
 import Textstyle from './src/assets/style/Textstyle.js';
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
-import {LogBox} from 'react-native';
+import { LogBox } from 'react-native';
 import HomeIcon from './src/assets/svg/home';
 import ShoppingIcon from './src/assets/svg/shopping';
 import LogoutIcon from './src/assets/svg/logout';
@@ -111,10 +111,10 @@ function WithReset(WrappedComponent) {
 const AuthStack = createStackNavigator();
 function AuthNavigator() {
   const Stack = createStackNavigator();
-  const {login} = useAuth();
+  const { login } = useAuth();
 
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       <AuthStack.Screen name="Splash" component={SplashScreen} />
       <Stack.Screen name="Login">
         {props => <LoginScreen {...props} onLogin={login} />}
@@ -157,11 +157,11 @@ function TabNavigator() {
         component={WithReset(HomeScreen)}
         options={{
           tabBarLabel: '',
-          tabBarIcon: ({focused}) => (
+          tabBarIcon: ({ focused }) => (
             <View style={focused ? styles.iconc : styles.iconc1}>
               <View style={focused ? styles.box : styles.box1}>
                 <Home
-                  style={{width: 16, height: 16}}
+                  style={{ width: 16, height: 16 }}
                   color={focused ? '#fff' : '#000'}
                 />
               </View>
@@ -182,11 +182,11 @@ function TabNavigator() {
         component={WithReset(Order)}
         options={{
           tabBarLabel: '',
-          tabBarIcon: ({focused}) => (
+          tabBarIcon: ({ focused }) => (
             <View style={focused ? styles.iconc : styles.iconc1}>
               <View style={focused ? styles.box : styles.box1}>
                 <Shopping
-                  style={{width: 20, height: 20}}
+                  style={{ width: 20, height: 20 }}
                   color={focused ? '#fff' : '#000'}
                 />
               </View>
@@ -207,11 +207,11 @@ function TabNavigator() {
         component={WithReset(Addtocart)}
         options={{
           tabBarLabel: '',
-          tabBarIcon: ({focused}) => (
+          tabBarIcon: ({ focused }) => (
             <View style={focused ? styles.iconc : styles.iconc1}>
               <View style={focused ? styles.box : styles.box1}>
                 <Cart1
-                  style={{width: 20, height: 20}}
+                  style={{ width: 20, height: 20 }}
                   color={focused ? '#fff' : '#000'}
                 />
               </View>
@@ -235,7 +235,7 @@ function TabNavigator() {
 const OrderStack = createStackNavigator();
 function OrderDetailsStack() {
   return (
-    <OrderStack.Navigator screenOptions={{headerShown: false}}>
+    <OrderStack.Navigator screenOptions={{ headerShown: false }}>
       <OrderStack.Screen name="Orderdetails" component={WithReset(MyOrder)} />
       <OrderStack.Screen name="IndividualOrder" component={WithReset(IndividualOrder)} />
     </OrderStack.Navigator>
@@ -273,7 +273,8 @@ function OrderDetailsStack() {
 //   );
 // }
 function CustomDrawerContent(props) {
-  const {state} = props;
+  const { state, user } = props;
+  console.log('User -', user);
 
   const getLabelBg = focused => (focused ? '#E6F0FF' : 'transparent');
 
@@ -294,8 +295,8 @@ function CustomDrawerContent(props) {
       route.name === 'MainTabs'
         ? 'Home'
         : route.name === 'OrderDetailsStack'
-        ? 'My Order'
-        : route.name;
+          ? 'My Order'
+          : route.name;
 
     return (
       <TouchableOpacity
@@ -326,17 +327,17 @@ function CustomDrawerContent(props) {
 
   return (
     <DrawerContentScrollView
-      contentContainerStyle={{paddingTop: 40, flexGrow: 1}}>
+      contentContainerStyle={{ paddingTop: 40, flexGrow: 1 }}>
       {/* Logo */}
-      <View style={{alignItems: 'center', paddingBottom: 20}}>
+      <View style={{ alignItems: 'center', paddingBottom: 20 }}>
         <Image
           source={require('./src/assets/images/logo.png')}
-          style={{width: 250, height: 30}}
+          style={{ width: 250, height: 30 }}
         />
       </View>
 
       {/* User Info */}
-      <View style={{paddingHorizontal: 20, marginBottom: 20}}>
+      <View style={{ paddingHorizontal: 20, marginBottom: 20 }}>
         <Text
           style={{
             fontSize: 14,
@@ -344,7 +345,7 @@ function CustomDrawerContent(props) {
             color: '#000',
             marginBottom: 5,
           }}>
-          John Doe
+          {user.fullname}
         </Text>
         <Text
           style={{
@@ -353,23 +354,23 @@ function CustomDrawerContent(props) {
             color: '#000',
             marginBottom: 5,
           }}>
-          +123456787879
+          {user.mobilePhone}
         </Text>
-        <Text style={{fontSize: 14, fontWeight: '600', color: '#000'}}>
-          john@example.com
+        <Text style={{ fontSize: 14, fontWeight: '600', color: '#000' }}>
+          {user.email}
         </Text>
         <View style={styles.underline} />
       </View>
 
       {/* Drawer Links + Logout in unified section */}
-      <View style={{paddingHorizontal: 10, gap: 10}}>
+      <View style={{ paddingHorizontal: 10, gap: 10 }}>
         {drawerItems}
 
         <TouchableOpacity
           onPress={() => props.navigation.replace('Auth')}
           style={{
             borderRadius: 40,
-            paddingVertical: 12,
+            paddingVertical: 10,
             paddingHorizontal: 20,
             flexDirection: 'row',
             alignItems: 'center',
@@ -393,21 +394,21 @@ function CustomDrawerContent(props) {
 
 // Drawer Navigator
 const Drawer = createDrawerNavigator();
-function AppDrawer() {
+function AppDrawer(props) {
   return (
     <Drawer.Navigator
       id="Drawer"
-      screenOptions={{headerShown: false}}
-      drawerContent={props => <CustomDrawerContent {...props} />}>
+      screenOptions={{ headerShown: false }}
+      drawerContent={drawerProps => <CustomDrawerContent {...drawerProps} {...props} />}>
       <Drawer.Screen
         name="MainTabs"
         component={TabNavigator}
-        options={{title: 'Home'}}
+        options={{ title: 'Home' }}
       />
       <Drawer.Screen
         name="OrderDetailsStack"
         component={OrderDetailsStack}
-        options={{title: 'My Order'}}
+        options={{ title: 'My Order' }}
       />
     </Drawer.Navigator>
   );
@@ -416,13 +417,16 @@ function AppDrawer() {
 // Root Navigator
 const RootStack = createStackNavigator();
 function RootNavigation() {
-  const {user} = useAuth();
+  const { user } = useAuth();
 
   return (
     <NavigationContainer>
-      <RootStack.Navigator screenOptions={{headerShown: false}}>
+      <RootStack.Navigator screenOptions={{ headerShown: false }}>
         {user ? (
-          <RootStack.Screen name="App" component={AppDrawer} />
+          <RootStack.Screen name="App">
+            {() => <AppDrawer user={user} />}
+          </RootStack.Screen>
+
         ) : (
           <RootStack.Screen name="Auth" component={AuthNavigator} />
         )}
