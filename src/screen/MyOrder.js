@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ScrollView,
   Modal,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import isEmpty from 'lodash/isEmpty';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -18,27 +19,22 @@ import Feather from 'react-native-vector-icons/Feather';
 export default function MyOrderScreen({navigation}) {
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
-
   const [showFromPicker, setShowFromPicker] = useState(false);
   const [showToPicker, setShowToPicker] = useState(false);
-
-  const handleFromChange = (event, selectedDate) => {
-    setShowFromPicker(false);
-    if (selectedDate) {
-      setFromDate(selectedDate);
-    }
-  };
-
-  const handleToChange = (event, selectedDate) => {
-    setShowToPicker(false);
-    if (selectedDate) {
-      setToDate(selectedDate);
-    }
-  };
 
   const formatDate = date => {
     if (!date) return 'Select Date';
     return new Date(date).toLocaleDateString();
+  };
+
+  const handleFromChange = (event, selectedDate) => {
+    setShowFromPicker(false);
+    if (selectedDate) setFromDate(selectedDate);
+  };
+
+  const handleToChange = (event, selectedDate) => {
+    setShowToPicker(false);
+    if (selectedDate) setToDate(selectedDate);
   };
 
   const insets = useSafeAreaInsets();
@@ -54,8 +50,30 @@ export default function MyOrderScreen({navigation}) {
 
   useEffect(() => {
     getOrderList();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const tab = activeTab;
+    const listToUse =
+      tab === 'today' ? orderList.todayOrdersList : orderList.totalOrdersList;
+
+    if (!listToUse) {
+      setOrders([]);
+      return;
+    }
+
+    const filtered = listToUse
+      .filter(val => String(val.salesOrderNumber).includes(search))
+      .map(order => ({
+        id: order.salesOrderNumber,
+        date: order.salesOrderDate,
+        qty: order.quantity,
+        status: order.salesOrderStatus,
+      }));
+
+    setOrders(filtered);
+  }, [orderList, activeTab, search]);
+
   const getOrderList = async () => {
     try {
       const response = await fetchOrdersList({
@@ -66,57 +84,14 @@ export default function MyOrderScreen({navigation}) {
         pageNumber: 0,
         pageSize: 0,
       });
-      console.log('My Order List Response -', response);
 
       if (!isEmpty(response)) {
         setOrderList(response);
-        setTimeout(() => setOrdersOnActiveTab(), 100);
       }
     } catch (e) {
       console.log('Error fetching my order list -', e);
     }
   };
-
-  const setOrdersOnActiveTab = (tab = 'today', search = '') => {
-    let list = [];
-
-    if (tab === 'today') {
-      if (!orderList.todayOrdersList) {
-        list = [];
-      } else {
-        list = orderList.todayOrdersList
-          .filter(val => String(val.salesOrderNumber).includes(search))
-          .map(order => ({
-            id: order.salesOrderNumber,
-            date: order.salesOrderDate,
-            qty: order.quantity,
-            status: order.salesOrderStatus,
-          }));
-      }
-    } else {
-      if (!orderList.totalOrdersList) {
-        list = [];
-      } else {
-        list = orderList.totalOrdersList
-          .filter(val => String(val.salesOrderNumber).includes(search))
-          .map(order => ({
-            id: order.salesOrderNumber,
-            date: order.salesOrderDate,
-            qty: order.quantity,
-            status: order.salesOrderStatus,
-          }));
-      }
-    }
-    console.log('Setting Orders list...', orders);
-    setOrders(list);
-  };
-
-  const onSearch = text => {
-    setSearch(text);
-    setOrdersOnActiveTab(activeTab, text);
-  };
-
-  // const orders = activeTab === 'today' ? todayOrders : totalOrders;
 
   return (
     <View style={[styles.container, {paddingTop: insets.top + 20}]}>
@@ -141,7 +116,7 @@ export default function MyOrderScreen({navigation}) {
         <TextInput
           placeholder="Search"
           value={search}
-          onChangeText={onSearch}
+          onChangeText={setSearch}
           placeholderTextColor="#999"
           style={styles.searchInput}
         />
@@ -180,10 +155,7 @@ export default function MyOrderScreen({navigation}) {
             styles.tab,
             activeTab === 'today' ? styles.activeTab : styles.inactiveTab,
           ]}
-          onPress={() => {
-            setActiveTab('today');
-            setOrdersOnActiveTab('today');
-          }}>
+          onPress={() => setActiveTab('today')}>
           <Text
             style={
               activeTab === 'today'
@@ -198,10 +170,7 @@ export default function MyOrderScreen({navigation}) {
             styles.tab,
             activeTab === 'total' ? styles.activeTab : styles.inactiveTab,
           ]}
-          onPress={() => {
-            setActiveTab('total');
-            setOrdersOnActiveTab('total');
-          }}>
+          onPress={() => setActiveTab('total')}>
           <Text
             style={
               activeTab === 'total'
@@ -239,109 +208,111 @@ export default function MyOrderScreen({navigation}) {
         ))}
       </ScrollView>
 
+      {/* Filter Modal */}
       <Modal
         animationType="slide"
         transparent={true}
         visible={isFilterModalVisible}
         onRequestClose={() => setFilterModalVisible(false)}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Filter</Text>
-            <View style={styles.modalDivider} />
+        <TouchableWithoutFeedback onPress={() => setFilterModalVisible(false)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback onPress={() => {}}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Filter</Text>
+                <View style={styles.modalDivider} />
 
-            <Text style={styles.filterLabel}>FILTER BY ORDER STATUS</Text>
+                <Text style={styles.filterLabel}>FILTER BY ORDER STATUS</Text>
+                {['Pending', 'Completed', 'Cancel'].map(status => (
+                  <TouchableOpacity
+                    key={status}
+                    style={styles.radioRow}
+                    onPress={() => setSelectedStatus(status)}>
+                    <View
+                      style={[
+                        styles.radioOuter,
+                        selectedStatus === status && styles.radioOuterSelected,
+                      ]}>
+                      {selectedStatus === status && (
+                        <View style={styles.radioInner} />
+                      )}
+                    </View>
+                    <Text style={styles.radioLabel}>{status}</Text>
+                  </TouchableOpacity>
+                ))}
 
-            {['Pending', 'Completed', 'Cancel'].map(status => (
-              <TouchableOpacity
-                key={status}
-                style={styles.radioRow}
-                onPress={() => setSelectedStatus(status)}>
-                <View
-                  style={[
-                    styles.radioOuter,
-                    selectedStatus === status && styles.radioOuterSelected,
-                  ]}>
-                  {selectedStatus === status && (
-                    <View style={styles.radioInner} />
-                  )}
-                </View>
-                <Text style={styles.radioLabel}>{status}</Text>
-              </TouchableOpacity>
-            ))}
+                <Text style={styles.filterLabel}>FILTER BY DATE</Text>
+                <TouchableOpacity
+                  style={styles.dateDropdown}
+                  onPress={() => setShowFromPicker(true)}>
+                  <Text style={styles.dateText}>
+                    From: {formatDate(fromDate)}
+                  </Text>
+                  <Feather name="chevron-down" size={18} color="#999" />
+                </TouchableOpacity>
 
-            <Text style={styles.filterLabel}>FILTER BY DATE</Text>
+                <TouchableOpacity
+                  style={styles.dateDropdown}
+                  onPress={() => setShowToPicker(true)}>
+                  <Text style={styles.dateText}>
+                    To: {formatDate(toDate)}
+                  </Text>
+                  <Feather name="chevron-down" size={18} color="#999" />
+                </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.dateDropdown}
-              onPress={() => setShowFromPicker(true)}>
-              <Text style={styles.dateText}>From: {formatDate(fromDate)}</Text>
-              <Feather name="chevron-down" size={18} color="#999" />
-            </TouchableOpacity>
+                {showFromPicker && (
+                  <DateTimePicker
+                    value={fromDate || new Date()}
+                    mode="date"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    onChange={handleFromChange}
+                  />
+                )}
+                {showToPicker && (
+                  <DateTimePicker
+                    value={toDate || new Date()}
+                    mode="date"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    onChange={handleToChange}
+                  />
+                )}
 
-            {/* To Date */}
-            <TouchableOpacity
-              style={styles.dateDropdown}
-              onPress={() => setShowToPicker(true)}>
-              <Text style={styles.dateText}>To: {formatDate(toDate)}</Text>
-              <Feather name="chevron-down" size={18} color="#999" />
-            </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.applyButton}
+                  onPress={async () => {
+                    try {
+                      const response = await fetchOrdersList({
+                        customerId: 0,
+                        fromDate: fromDate
+                          ? fromDate.toISOString().split('T')[0]
+                          : '',
+                        toDate: toDate
+                          ? toDate.toISOString().split('T')[0]
+                          : '',
+                        orderStatus: selectedStatus || '',
+                        pageNumber: 0,
+                        pageSize: 0,
+                      });
 
-            {/* From Picker */}
-            {showFromPicker && (
-              <DateTimePicker
-                value={fromDate || new Date()}
-                mode="date"
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={handleFromChange}
-              />
-            )}
+                      if (!isEmpty(response)) {
+                        setOrderList(response);
+                      }
 
-            {/* To Picker */}
-            {showToPicker && (
-              <DateTimePicker
-                value={toDate || new Date()}
-                mode="date"
-                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                onChange={handleToChange}
-              />
-            )}
-            <TouchableOpacity
-              style={styles.applyButton}
-              onPress={async () => {
-                try {
-                  const response = await fetchOrdersList({
-                    customerId: 0,
-                    fromDate: fromDate
-                      ? fromDate.toISOString().split('T')[0]
-                      : '',
-                    toDate: toDate ? toDate.toISOString().split('T')[0] : '',
-                    orderStatus: selectedStatus || '',
-                    pageNumber: 0,
-                    pageSize: 0,
-                  });
-
-                  if (!isEmpty(response)) {
-                    setOrderList(response);
-
-                    // Add this to update visible list:
-                    setTimeout(() => {
-                      setOrdersOnActiveTab(activeTab, search);
-                    }, 100);
-                  }
-
-                  setFilterModalVisible(false);
-                } catch (e) {
-                  console.log('Error applying filters -', e);
-                }
-              }}>
-              <Text style={styles.applyButtonText}>Apply Filters</Text>
-            </TouchableOpacity>
+                      setFilterModalVisible(false);
+                    } catch (e) {
+                      console.log('Error applying filters -', e);
+                    }
+                  }}>
+                  <Text style={styles.applyButtonText}>Apply Filters</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
           </View>
-        </View>
+        </TouchableWithoutFeedback>
       </Modal>
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

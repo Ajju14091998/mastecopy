@@ -8,6 +8,8 @@ import {
   StyleSheet,
   TextInput,
   Modal,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import isEmpty from 'lodash/isEmpty';
 import Icon from 'react-native-vector-icons/Feather';
@@ -22,6 +24,16 @@ import {
 import {useRoute} from '@react-navigation/native';
 
 export default function ProductScreen(props) {
+  const [sizeValue, setSizeValue] = useState([]); // default empty array
+  const [thickValue, setThickValue] = useState([]);
+
+  const filters = {
+    selectedCategory: categoryValue || category,
+    selectedSubCategory: subCategoryValue || 0,
+    selectedSize: Array.isArray(sizeValue) ? sizeValue.join(',') : '',
+    selectedThickness: Array.isArray(thickValue) ? thickValue.join(',') : '',
+  };
+
   const route = useRoute();
   const {catId, headingTitle} = route.params || {};
 
@@ -87,11 +99,11 @@ export default function ProductScreen(props) {
   );
 
   const [sizeOpen, setSizeOpen] = useState(false);
-  const [sizeValue, setSizeValue] = useState(null);
+  // const [sizeValue, setSizeValue] = useState(null);
   const [sizeItems, setSizeItems] = useState(formattedSizes);
 
   const [thickOpen, setThickOpen] = useState(false);
-  const [thickValue, setThickValue] = useState(null);
+  // const [thickValue, setThickValue] = useState(null);
   const [thickItems, setThickItems] = useState(formattedThicknesses);
 
   const [selectedThickness, setSelectedThickness] = useState(null);
@@ -288,293 +300,331 @@ export default function ProductScreen(props) {
 
       {/* Product Detail Bottom Sheet */}
       <Modal visible={isProductModalVisible} animationType="slide" transparent>
-        <View style={styles.modalBackground}>
-          <View style={[styles.modalContainer, {paddingBottom: 30}]}>
-            {selectedProduct && (
-              <>
-                <Image
-                  source={{uri: selectedProduct.appProductImageUrl}}
-                  style={{
-                    width: '100%',
-                    height: 200,
-                    borderRadius: 12,
-                    marginBottom: 16,
-                  }}
-                  resizeMode="cover"
-                />
-
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                  }}>
-                  <Text
-                    style={{fontSize: 16, fontWeight: '700', color: '#000'}}>
-                    {selectedProduct.productName}
-                  </Text>
-                  <Text
-                    style={{fontSize: 14, fontWeight: '700', color: '#000'}}>
-                    {selectedProduct.productCode}
-                  </Text>
-                </View>
-
-                <Text style={{marginTop: 8, fontWeight: '600', color: '#000'}}>
-                  {selectedProduct.productDesc}
-                </Text>
-
-                {/* Thickness */}
-                <Text style={{fontSize: 12, fontWeight: '600', marginTop: 12}}>
-                  Thickness
-                </Text>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    flexWrap: 'wrap',
-                    gap: 8,
-                    marginTop: 8,
-                  }}>
-                  {selectedProduct.thickness?.split(',').map((item, index) => {
-                    const val = item.trim();
-                    const isSelected = selectedThickness === val;
-                    return (
-                      <TouchableOpacity
-                        key={index}
-                        onPress={() => setSelectedThickness(val)}
-                        style={{
-                          paddingHorizontal: 16,
-                          paddingVertical: 6,
-                          borderRadius: 12,
-                          backgroundColor: isSelected ? '#D00000' : '#fff',
-                          borderWidth: 1,
-                          borderColor: isSelected ? '#D00000' : '#ccc',
-                        }}>
-                        <Text
-                          style={{
-                            fontWeight: '600',
-                            color: isSelected ? '#fff' : '#000',
-                          }}>
-                          {val}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-
-                {/* Size */}
-                <Text style={{fontSize: 12, fontWeight: '600', marginTop: 12}}>
-                  Size
-                </Text>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    flexWrap: 'wrap',
-                    gap: 8,
-                    marginTop: 8,
-                  }}>
-                  {selectedProduct.size?.split(',').map((item, index) => {
-                    const val = item.trim();
-                    const isSelected = selectedSize === val;
-                    return (
-                      <TouchableOpacity
-                        key={index}
-                        onPress={() => setSelectedSize(val)}
-                        style={{
-                          paddingHorizontal: 16,
-                          paddingVertical: 6,
-                          borderRadius: 12,
-                          backgroundColor: isSelected ? '#D00000' : '#fff',
-                          borderWidth: 1,
-                          borderColor: isSelected ? '#D00000' : '#ccc',
-                        }}>
-                        <Text
-                          style={{
-                            fontWeight: '600',
-                            color: isSelected ? '#fff' : '#000',
-                          }}>
-                          {val}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-
-                {/* Quantity & Add to Cart */}
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginTop: 20,
-                    gap: 10,
-                  }}>
-                  {/* Quantity */}
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      borderWidth: 1,
-                      borderColor: '#ccc',
-                      borderRadius: 20,
-                      paddingHorizontal: 8,
-                      height: 40,
-                    }}>
-                    <TouchableOpacity
-                      onPress={() => setQuantity(prev => Math.max(prev - 1, 1))}
-                      style={{paddingHorizontal: 10}}>
-                      <Text style={{fontSize: 20, fontWeight: 'bold'}}>-</Text>
-                    </TouchableOpacity>
-
-                    <TextInput
+        <TouchableWithoutFeedback
+          onPress={() => setIsProductModalVisible(false)}>
+          <View style={styles.modalBackground}>
+            <TouchableWithoutFeedback onPress={() => {}}>
+              <View style={[styles.modalContainer, {paddingBottom: 30}]}>
+                {selectedProduct && (
+                  <>
+                    <Image
+                      source={{uri: selectedProduct.appProductImageUrl}}
                       style={{
-                        width: 50,
-                        textAlign: 'center',
-                        fontSize: 16,
-                        paddingVertical: 0,
-                        marginHorizontal: 4,
+                        width: '100%',
+                        height: 200,
+                        borderRadius: 12,
+                        marginBottom: 16,
                       }}
-                      keyboardType="numeric"
-                      value={quantity.toString()}
-                      onChangeText={text => {
-                        const num = parseInt(text.replace(/[^0-9]/g, ''), 10);
-                        if (!isNaN(num)) setQuantity(num);
-                        else if (text === '') setQuantity(0);
-                      }}
+                      resizeMode="cover"
                     />
 
-                    <TouchableOpacity
-                      onPress={() => setQuantity(prev => prev + 1)}
-                      style={{paddingHorizontal: 10}}>
-                      <Text style={{fontSize: 20, fontWeight: 'bold'}}>+</Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  {/* Add to Cart */}
-                  <TouchableOpacity
-                    onPress={() => {
-                      setCartCount(cartCount + 1);
-                      setIsProductModalVisible(false);
-                    }}
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      backgroundColor: '#D00000',
-                      paddingVertical: 12,
-                      paddingHorizontal: 20,
-                      borderRadius: 8,
-                    }}>
-                    <Icon name="shopping-cart" size={20} color="#fff" />
-                    <Text
+                    <View
                       style={{
-                        color: '#fff',
-                        fontWeight: 'bold',
-                        marginLeft: 8,
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
                       }}>
-                      Add to Cart
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontWeight: '700',
+                          color: '#000',
+                        }}>
+                        {selectedProduct.productName}
+                      </Text>
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          fontWeight: '700',
+                          color: '#000',
+                        }}>
+                        {selectedProduct.productCode}
+                      </Text>
+                    </View>
+
+                    <Text
+                      style={{marginTop: 8, fontWeight: '600', color: '#000'}}>
+                      {selectedProduct.productDesc}
                     </Text>
-                  </TouchableOpacity>
-                </View>
-              </>
-            )}
+
+                    {/* Thickness */}
+                    <Text
+                      style={{fontSize: 12, fontWeight: '600', marginTop: 12}}>
+                      Thickness
+                    </Text>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        flexWrap: 'wrap',
+                        gap: 8,
+                        marginTop: 8,
+                      }}>
+                      {selectedProduct.thickness
+                        ?.split(',')
+                        .map((item, index) => {
+                          const val = item.trim();
+                          const isSelected = selectedThickness === val;
+                          return (
+                            <TouchableOpacity
+                              key={index}
+                              onPress={() => setSelectedThickness(val)}
+                              style={{
+                                paddingHorizontal: 16,
+                                paddingVertical: 6,
+                                borderRadius: 12,
+                                backgroundColor: isSelected
+                                  ? '#D00000'
+                                  : '#fff',
+                                borderWidth: 1,
+                                borderColor: isSelected ? '#D00000' : '#ccc',
+                              }}>
+                              <Text
+                                style={{
+                                  fontWeight: '600',
+                                  color: isSelected ? '#fff' : '#000',
+                                }}>
+                                {val}
+                              </Text>
+                            </TouchableOpacity>
+                          );
+                        })}
+                    </View>
+
+                    {/* Size */}
+                    <Text
+                      style={{fontSize: 12, fontWeight: '600', marginTop: 12}}>
+                      Size
+                    </Text>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        flexWrap: 'wrap',
+                        gap: 8,
+                        marginTop: 8,
+                      }}>
+                      {selectedProduct.size?.split(',').map((item, index) => {
+                        const val = item.trim();
+                        const isSelected = selectedSize === val;
+                        return (
+                          <TouchableOpacity
+                            key={index}
+                            onPress={() => setSelectedSize(val)}
+                            style={{
+                              paddingHorizontal: 16,
+                              paddingVertical: 6,
+                              borderRadius: 12,
+                              backgroundColor: isSelected ? '#D00000' : '#fff',
+                              borderWidth: 1,
+                              borderColor: isSelected ? '#D00000' : '#ccc',
+                            }}>
+                            <Text
+                              style={{
+                                fontWeight: '600',
+                                color: isSelected ? '#fff' : '#000',
+                              }}>
+                              {val}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+
+                    {/* Quantity & Add to Cart */}
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginTop: 20,
+                        gap: 10,
+                      }}>
+                      {/* Quantity */}
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          borderWidth: 1,
+                          borderColor: '#ccc',
+                          borderRadius: 20,
+                          paddingHorizontal: 8,
+                          height: 40,
+                        }}>
+                        <TouchableOpacity
+                          onPress={() =>
+                            setQuantity(prev => Math.max(prev - 1, 1))
+                          }
+                          style={{paddingHorizontal: 10}}>
+                          <Text style={{fontSize: 20, fontWeight: 'bold'}}>
+                            -
+                          </Text>
+                        </TouchableOpacity>
+
+                        <TextInput
+                          style={{
+                            width: 50,
+                            textAlign: 'center',
+                            fontSize: 16,
+                            paddingVertical: 0,
+                            marginHorizontal: 4,
+                          }}
+                          keyboardType="numeric"
+                          value={quantity.toString()}
+                          onChangeText={text => {
+                            const num = parseInt(
+                              text.replace(/[^0-9]/g, ''),
+                              10,
+                            );
+                            if (!isNaN(num)) setQuantity(num);
+                            else if (text === '') setQuantity(0);
+                          }}
+                        />
+
+                        <TouchableOpacity
+                          onPress={() => setQuantity(prev => prev + 1)}
+                          style={{paddingHorizontal: 10}}>
+                          <Text style={{fontSize: 20, fontWeight: 'bold'}}>
+                            +
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+
+                      {/* Add to Cart */}
+                      <TouchableOpacity
+                        onPress={() => {
+                          setCartCount(cartCount + 1);
+                          setIsProductModalVisible(false);
+                        }}
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          backgroundColor: '#D00000',
+                          paddingVertical: 12,
+                          paddingHorizontal: 20,
+                          borderRadius: 8,
+                        }}>
+                        <Icon name="shopping-cart" size={20} color="#fff" />
+                        <Text
+                          style={{
+                            color: '#fff',
+                            fontWeight: 'bold',
+                            marginLeft: 8,
+                          }}>
+                          Add to Cart
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </>
+                )}
+              </View>
+            </TouchableWithoutFeedback>
           </View>
-        </View>
+        </TouchableWithoutFeedback>
       </Modal>
 
       {/* Filter Bottom Sheet */}
       <Modal visible={isFilterModalVisible} animationType="slide" transparent>
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Filter</Text>
-            <View style={styles.underline} />
+        <TouchableWithoutFeedback
+          onPress={() => setIsFilterModalVisible(false)}>
+          <View style={styles.modalBackground}>
+            <TouchableWithoutFeedback onPress={() => {}}>
+              <View style={styles.modalContainer}>
+                <Text style={styles.modalTitle}>Filter</Text>
+                <View style={styles.underline} />
 
-            <Text style={styles.dropdownLabel}>Category</Text>
-            <DropDownPicker
-              placeholder="Select Category"
-              open={categoryOpen}
-              value={categoryValue}
-              items={categoryItems}
-              setOpen={setCategoryOpen}
-              setValue={callback => {
-                const selectedValue = callback(categoryValue);
-                setCategoryValue(selectedValue);
-                const selectedItem = categoryItems.find(
-                  item => item.value === selectedValue,
-                );
-                if (selectedItem) {
-                  setHeading(selectedItem.label);
-                }
-              }}
-              setItems={setCategoryItems}
-              style={styles.dropdown}
-              textStyle={styles.dropdownText}
-              zIndex={3000}
-              zIndexInverse={1000}
-            />
+                <Text style={styles.dropdownLabel}>Category</Text>
+                <DropDownPicker
+                  placeholder="Select Category"
+                  open={categoryOpen}
+                  value={categoryValue}
+                  items={categoryItems}
+                  setOpen={setCategoryOpen}
+                  setValue={callback => {
+                    const selectedValue = callback(categoryValue);
+                    setCategoryValue(selectedValue);
+                    const selectedItem = categoryItems.find(
+                      item => item.value === selectedValue,
+                    );
+                    if (selectedItem) {
+                      setHeading(selectedItem.label);
+                    }
+                  }}
+                  setItems={setCategoryItems}
+                  style={styles.dropdown}
+                  textStyle={styles.dropdownText}
+                  zIndex={3000}
+                  zIndexInverse={1000}
+                />
 
-            <Text style={styles.dropdownLabel}>Sub Category</Text>
-            <DropDownPicker
-              placeholder="Select Sub Category"
-              open={subCategoryOpen}
-              value={subCategoryValue}
-              items={subCategoryItems}
-              setOpen={setSubCategoryOpen}
-              setValue={setSubCategoryValue}
-              setItems={setSubCategoryItems}
-              style={styles.dropdown}
-              textStyle={styles.dropdownText}
-              zIndex={2500}
-              zIndexInverse={1500}
-            />
+                <Text style={styles.dropdownLabel}>Sub Category</Text>
+                <DropDownPicker
+                  placeholder="Select Sub Category"
+                  open={subCategoryOpen}
+                  value={subCategoryValue}
+                  items={subCategoryItems}
+                  setOpen={setSubCategoryOpen}
+                  setValue={setSubCategoryValue}
+                  setItems={setSubCategoryItems}
+                  style={styles.dropdown}
+                  textStyle={styles.dropdownText}
+                  zIndex={2500}
+                  zIndexInverse={1500}
+                />
 
-            <Text style={styles.dropdownLabel}>Size</Text>
-            <DropDownPicker
-              placeholder="Select Size"
-              open={sizeOpen}
-              value={sizeValue}
-              items={sizeItems}
-              setOpen={setSizeOpen}
-              setValue={setSizeValue}
-              setItems={setSizeItems}
-              style={styles.dropdown}
-              textStyle={styles.dropdownText}
-              zIndex={2000}
-              zIndexInverse={2000}
-            />
+                <Text style={styles.dropdownLabel}>Size</Text>
+                <DropDownPicker
+                  placeholder="Select Size"
+                  multiple={true}
+                  mode="BADGE"
+                  open={sizeOpen}
+                  value={sizeValue}
+                  items={sizeItems}
+                  setOpen={setSizeOpen}
+                  setValue={setSizeValue}
+                  setItems={setSizeItems}
+                  style={styles.dropdown}
+                  textStyle={styles.dropdownText}
+                  zIndex={2000}
+                  zIndexInverse={2000}
+                />
 
-            <Text style={styles.dropdownLabel}>Thickness</Text>
-            <DropDownPicker
-              placeholder="Select Thickness"
-              open={thickOpen}
-              value={thickValue}
-              items={thickItems}
-              setOpen={setThickOpen}
-              setValue={setThickValue}
-              setItems={setThickItems}
-              style={styles.dropdown}
-              textStyle={styles.dropdownText}
-              zIndex={1500}
-              zIndexInverse={2500}
-            />
+                <Text style={styles.dropdownLabel}>Thickness</Text>
+                <DropDownPicker
+                  placeholder="Select Thickness"
+                  multiple={true}
+                  mode="BADGE"
+                  open={thickOpen}
+                  value={thickValue}
+                  items={thickItems}
+                  setOpen={setThickOpen}
+                  setValue={setThickValue}
+                  setItems={setThickItems}
+                  style={styles.dropdown}
+                  textStyle={styles.dropdownText}
+                  zIndex={1500}
+                  zIndexInverse={2500}
+                />
 
-            <TouchableOpacity
-              style={styles.submitButton}
-              onPress={() => {
-                setCategory(categoryValue || category);
-                setSubCategory(subCategoryValue || 0);
+                <TouchableOpacity
+                  style={styles.submitButton}
+                  onPress={() => {
+                    setCategory(categoryValue || category);
+                    setSubCategory(subCategoryValue || 0);
 
-                const filters = {
-                  selectedCategory: categoryValue || category,
-                  selectedSubCategory: subCategoryValue || 0,
-                  selectedSize: sizeValue || '',
-                  selectedThickness: thickValue || '',
-                };
+                    const filters = {
+                      selectedCategory: categoryValue || category,
+                      selectedSubCategory: subCategoryValue || 0,
+                      selectedSize: sizeValue || '',
+                      selectedThickness: thickValue || '',
+                    };
 
-                getAllProductsList('', filters);
-                setIsFilterModalVisible(false);
-              }}>
-              <Text style={styles.submitButtonText}>Submit</Text>
-            </TouchableOpacity>
+                    getAllProductsList('', filters);
+                    setIsFilterModalVisible(false);
+                  }}>
+                  <Text style={styles.submitButtonText}>Submit</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
           </View>
-        </View>
+        </TouchableWithoutFeedback>
       </Modal>
     </View>
   );
