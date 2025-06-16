@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Modal,
   View,
@@ -7,53 +7,64 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const IndividualOrder = ({navigation}) => {
+const IndividualOrder = ({ navigation }) => {
   const insets = useSafeAreaInsets();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [orderDetails, setOrderDetails] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const orderDetails = {
-    id: 'MI0001',
-    date: '05/05/2025',
-    qty: 300,
-    status: 'Pending',
-  };
+  useEffect(() => {
+    // Hardcoded response like API response
+    const dummyResponse = {
+      order: {
+        id: 'MI0001',
+        date: '2024-06-15',
+        qty: 5,
+        status: 'Pending',
+        products: [
+          {
+            id: 1,
+            name: 'EMERALD GREEN',
+            code: 'MI0001',
+            image: 'https://i.ibb.co/qWFkz38/p1.png',
+            size: '600 x 1200',
+            qty: 1,
+          },
+          {
+            id: 2,
+            name: 'ROSEWOOD',
+            code: 'MI0002',
+            image: 'https://i.ibb.co/6NYkkZy/p2.png',
+            size: '800 x 1600',
+            qty: 2,
+          },
+        ],
+      },
+    };
 
-  const products = [
-    {
-      id: '1',
-      name: 'EMERALD GREEN',
-      code: 'SSW-861',
-      size: '7X3',
-      qty: 100,
-      image: require('../assets/images/cermic.png'),
-    },
-    {
-      id: '2',
-      name: 'Breccia Brown',
-      code: 'SPLP 310',
-      size: '8X4',
-      qty: 100,
-      image: require('../assets/images/category6.png'),
-    },
-    {
-      id: '3',
-      name: 'SARARA GRAY',
-      code: 'SSW-862',
-      size: '10X4',
-      qty: 100,
-      image: require('../assets/images/cermic2.png'),
-    },
-  ];
+    // Simulate API delay
+    setTimeout(() => {
+      setOrderDetails(dummyResponse.order);
+      setProducts(dummyResponse.order.products);
+      setLoading(false);
+    }, 500);
+  }, []);
 
-  const renderProduct = ({item}) => (
+  const renderProduct = ({ item }) => (
     <View style={styles.productCard}>
-      <Image source={item.image} style={styles.productImage} />
-      <View style={{flex: 1}}>
+      <Image
+        source={{ uri: item.image }}
+        style={styles.productImage}
+        resizeMode="cover"
+      />
+      <View style={{ flex: 1 }}>
         <Text style={styles.productName}>{item.name}</Text>
         <Text style={styles.productCode}>{item.code}</Text>
         <View style={styles.detailsRow}>
@@ -74,8 +85,16 @@ const IndividualOrder = ({navigation}) => {
     </View>
   );
 
+  if (loading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color="#D00000" />
+      </View>
+    );
+  }
+
   return (
-    <View style={[styles.container, {paddingTop: insets.top + 20,}]}>
+    <View style={[styles.container, { paddingTop: insets.top + 20 }]}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -84,48 +103,46 @@ const IndividualOrder = ({navigation}) => {
           <Icon name="arrow-back" size={20} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Order Details</Text>
-        <View style={{width: 32}} />
+        <View style={{ width: 32 }} />
       </View>
 
       {/* Order Info */}
-      <View style={styles.orderInfo}>
-        <Text style={styles.infoText}>
-          <Text style={styles.label}>Order id : </Text>
-          <Text style={styles.bold}>{orderDetails.id}</Text>
-        </Text>
-        <Text style={styles.infoText}>
-          <Text style={styles.label}>Order Date : </Text>
-          <Text style={styles.bold}>{orderDetails.date}</Text>
-        </Text>
-        <Text style={styles.infoText}>
-          <Text style={styles.label}>Quantity : </Text>
-          <Text style={styles.bold}>{orderDetails.qty}</Text>
-        </Text>
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>{orderDetails.status}</Text>
+      {orderDetails && (
+        <View style={styles.orderInfo}>
+          <Text style={styles.infoText}>
+            <Text style={styles.label}>Order id : </Text>
+            <Text style={styles.bold}>{orderDetails.id}</Text>
+          </Text>
+          <Text style={styles.infoText}>
+            <Text style={styles.label}>Order Date : </Text>
+            <Text style={styles.bold}>{orderDetails.date}</Text>
+          </Text>
+          <Text style={styles.infoText}>
+            <Text style={styles.label}>Quantity : </Text>
+            <Text style={styles.bold}>{orderDetails.qty}</Text>
+          </Text>
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>{orderDetails.status}</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.cancelBtn}
+            onPress={() => setShowConfirmModal(true)}>
+            <Text style={styles.cancelText}>Cancel Order</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          style={styles.cancelBtn}
-          onPress={() => setShowConfirmModal(true)}>
-          <Text style={styles.cancelText}>Cancel Order</Text>
-        </TouchableOpacity>
-      </View>
+      )}
 
       {/* Product List */}
       <Text style={styles.sectionTitle}>Product Details</Text>
       <FlatList
         data={products}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item.id.toString()}
         renderItem={renderProduct}
-        contentContainerStyle={{paddingBottom: 20}}
+        contentContainerStyle={{ paddingBottom: 20 }}
       />
 
-      {/* Confirm Cancel Modal */}
-      <Modal
-        visible={showConfirmModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowConfirmModal(false)}>
+      {/* Confirm Modal */}
+      <Modal visible={showConfirmModal} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalBox}>
             <Image
@@ -139,18 +156,16 @@ const IndividualOrder = ({navigation}) => {
             </Text>
             <View style={styles.modalButtons}>
               <TouchableOpacity
-                style={[styles.modalBtn, {backgroundColor: '#000'}]}
+                style={[styles.modalBtn, { backgroundColor: '#000' }]}
                 onPress={() => setShowConfirmModal(false)}>
                 <Text style={styles.modalBtnText}>Keep Order</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalBtn, {backgroundColor: '#D00000'}]}
+                style={[styles.modalBtn, { backgroundColor: '#D00000' }]}
                 onPress={() => {
                   setShowConfirmModal(false);
                   setTimeout(() => {
                     setShowSuccessModal(true);
-
-                    // Auto-close success modal after 1.5 seconds
                     setTimeout(() => {
                       setShowSuccessModal(false);
                     }, 1500);
@@ -164,11 +179,7 @@ const IndividualOrder = ({navigation}) => {
       </Modal>
 
       {/* Success Modal */}
-      <Modal
-        visible={showSuccessModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowSuccessModal(false)}>
+      <Modal visible={showSuccessModal} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.successBox}>
             <Image
