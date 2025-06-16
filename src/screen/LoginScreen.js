@@ -21,8 +21,8 @@ const {width, height} = Dimensions.get('window');
 
 const LoginScreen = () => {
   const { login } = useAuth();
-  const [email, setEmail] = useState('hoarway@admin.com');
-  const [password, setPassword] = useState('Hoarway@123');
+  const [email, setEmail] = useState('pooja.alu@gmail.com');
+  const [password, setPassword] = useState('Pooja@123');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isEmailValid, setIsEmailValid] = useState(true);

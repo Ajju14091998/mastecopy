@@ -28,25 +28,31 @@ export const AuthProvider = ({ children }) => {
 
 const login = async (email, password) => {
   console.log('Calling login -', email, password);
-  
   try {
+    // 1. Get tokens
     const response = await api.post('tokens/gettoken', { email, password });
     console.log('Login Response -', response);
-    
-    const { details, token, refreshToken } = response.data;
 
-    setUser(details);
-    setToken(token);
+    const { token, refreshToken } = response.data;
 
+    // 2. Set token in header for subsequent API calls
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-    await AsyncStorage.setItem('user', JSON.stringify(details));
+    // 3. Fetch user profile using the new endpoint
+    const profileResponse = await api.get('currentuser/getprofile/profile');
+    const userDetails = profileResponse.data;
+
+    // 4. Save in state & storage
+    setUser(userDetails);
+    setToken(token);
+
+    await AsyncStorage.setItem('user', JSON.stringify(userDetails));
     await AsyncStorage.setItem('token', token);
     await AsyncStorage.setItem('refreshToken', refreshToken);
 
     return { success: true };
   } catch (error) {
-    console.log(error.message);
+    console.log('Login error:', error.message);
 
     return {
       success: false,
@@ -54,13 +60,15 @@ const login = async (email, password) => {
     };
   }
 };
-  const logout = async () => {
-    setUser(null);
-    setToken(null);
-    await AsyncStorage.removeItem('user');
-    await AsyncStorage.removeItem('token');
-    delete api.defaults.headers.common['Authorization'];
-  };
+
+const logout = async () => {
+  setUser(null);
+  setToken(null);
+  await AsyncStorage.removeItem('user');
+  await AsyncStorage.removeItem('token');
+  await AsyncStorage.removeItem('refreshToken');
+  delete api.defaults.headers.common['Authorization'];
+};
 
   const refreshAccessToken = async () => {
   const storedRefreshToken = await AsyncStorage.getItem('refreshToken');

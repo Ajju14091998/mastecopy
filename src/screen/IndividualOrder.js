@@ -9,61 +9,66 @@ import {
   Image,
   ActivityIndicator,
 } from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import isEmpty from 'lodash/isEmpty';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { deleteProductItemApi, fetchOrdersDetailByID } from '../services/common-services';
 
-const IndividualOrder = ({navigation}) => {
+const IndividualOrder = ({ navigation, route }) => {
   const insets = useSafeAreaInsets();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [orderDetails, setOrderDetails] = useState(null);
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const dummyResponse = {
-      id: 1,
-      salesOrderDate: '28/05/2025',
-      salesOrderNumber: 'SO/000001',
-      quantity: 1,
-      customerName: 'demo',
-      salesOrderStatus: 'Pending',
-      salesOrderItemList: [
-        {
-          id: 23,
-          productName: 'EMERALD GREEN',
-          productCode: 'SSW-861',
-          quantity: 90,
-          size: '600 x 1200',
-          thickness: '10mm',
-          coilThickness: 0,
-          image: 'https://i.ibb.co/qWFkz38/p1.png',
-        },
-        {
-          id: 24,
-          productName: 'ROSEWOOD',
-          productCode: 'SPLP 310',
-          quantity: 80,
-          size: '800 x 1600',
-          thickness: '12mm',
-          coilThickness: 0,
-          image: 'https://i.ibb.co/6NYkkZy/p2.png',
-        },
-      ],
-    };
-
-    // simulate API delay
-    setTimeout(() => {
-      setOrderDetails(dummyResponse);
-      setProducts(dummyResponse.salesOrderItemList);
-      setLoading(false);
-    }, 500);
+    console.log('Route params', route.params.order);
+    getOrderDetail(route.params.order.orderId);
   }, []);
 
-  const renderProduct = ({item}) => (
+  const getOrderDetail = async (id) => {
+    setLoading(true);
+    try {
+      const response = await fetchOrdersDetailByID(id);
+      if(!isEmpty(response)) {
+        setOrderDetails(response);
+        setProducts(response.salesOrderItemList);
+        setLoading(false);
+      }
+    } catch (e) {
+      console.log('Error fetching response -', e);
+    }
+  };
+
+  const onDeleteItem = async (item) => {
+    try {
+      const response = await deleteProductItemApi(orderDetails.id, item.id);
+      console.log('deleted item successfully -', response);
+      if(response === 200) {
+        getOrderDetail(orderDetails.id);
+      }
+    } catch (e) {
+      console.log('error deleting item -', e);
+    }
+  };
+
+  const onDeleteProductOrder = async() => {
+    try {
+      const response = await deleteProductItemApi(orderDetails.id, 0);
+      console.log('deleted product item successfully -', response);
+      if(response === 200) {
+        navigation.goBack();
+      }
+    } catch (e) {
+      console.log('error deleting product item -', e);
+    }
+  };
+
+  const renderProduct = ({ item }) => (
     <View style={styles.productCard}>
       <Image
-        source={{uri: item.image}}
+        source={{uri: item.productImageUrl}}
         style={styles.productImage}
         resizeMode="cover"
       />
@@ -77,7 +82,7 @@ const IndividualOrder = ({navigation}) => {
         </View>
       </View>
       <View style={styles.deleteCol}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => onDeleteItem(item)}>
           <Icon name="delete" size={22} color="#D00000" />
         </TouchableOpacity>
         <View style={styles.qtyInlineRow}>
@@ -169,15 +174,7 @@ const IndividualOrder = ({navigation}) => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modalBtn, {backgroundColor: '#D00000'}]}
-                onPress={() => {
-                  setShowConfirmModal(false);
-                  setTimeout(() => {
-                    setShowSuccessModal(true);
-                    setTimeout(() => {
-                      setShowSuccessModal(false);
-                    }, 1500);
-                  }, 300);
-                }}>
+                onPress={onDeleteProductOrder}>
                 <Text style={styles.modalBtnText}>Cancel Order</Text>
               </TouchableOpacity>
             </View>

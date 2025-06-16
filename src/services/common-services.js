@@ -36,9 +36,20 @@ const addOrderApi = async (data) => {
   try {
     const response = await api.post('myorders/addorder', {...data});
     console.log('add Order Response -', response);
-    return response.data;
+    return response.status;
   } catch (error) {
     console.error('Failed to add order:', error);
+    return [];
+  }
+};
+
+const deleteProductItemApi = async (salesOrderId, itemId) => {
+  try {
+    const response = await api.post(`myorders/deleteorderdetails?salesOrderId=${salesOrderId}&itemId=${itemId}&type=ITEM`);
+    console.log('delete order Response -', response);
+    return response.status;
+  } catch (error) {
+    console.error('Failed to delete order:', error);
     return [];
   }
 };
@@ -54,6 +65,17 @@ const fetchOrdersList = async (data) => {
   }
 };
 
+const fetchOrdersDetailByID = async (id) => {
+  try {
+    const response = await api.post(`myorders/getsalesorderdetailsbyid?Id=${id}`);
+    console.log('fetchOrdersDetailByID Response -', response);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch order detail by id:', error);
+    return [];
+  }
+};
+
 
 export {
   fetchSubCategories,
@@ -61,4 +83,6 @@ export {
   fetchProductList,
   fetchOrdersList,
   addOrderApi,
+  deleteProductItemApi,
+  fetchOrdersDetailByID,
 };

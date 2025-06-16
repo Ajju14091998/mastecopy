@@ -9,7 +9,6 @@ import {
   TextInput,
   Modal,
   TouchableWithoutFeedback,
-  Keyboard,
 } from 'react-native';
 import isEmpty from 'lodash/isEmpty';
 import Icon from 'react-native-vector-icons/Feather';
@@ -22,17 +21,12 @@ import {
   fetchFilterList,
 } from '../services/common-services';
 import {useRoute} from '@react-navigation/native';
+import FloatingCartButton from '../component/FloatingButton';
+import { useCart } from '../context/CartContext';
 
 export default function ProductScreen(props) {
   const [sizeValue, setSizeValue] = useState([]); // default empty array
   const [thickValue, setThickValue] = useState([]);
-
-  const filters = {
-    selectedCategory: categoryValue || category,
-    selectedSubCategory: subCategoryValue || 0,
-    selectedSize: Array.isArray(sizeValue) ? sizeValue.join(',') : '',
-    selectedThickness: Array.isArray(thickValue) ? thickValue.join(',') : '',
-  };
 
   const route = useRoute();
   const {catId, headingTitle} = route.params || {};
@@ -46,7 +40,7 @@ export default function ProductScreen(props) {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isProductModalVisible, setIsProductModalVisible] = useState(false);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
+  const {itemsArray, addItem} = useCart();
   const [products, setProducts] = useState([]);
   const [filterdata, setFilterData] = useState([]);
   const [search, setSearch] = useState('');
@@ -57,7 +51,6 @@ export default function ProductScreen(props) {
   const [subCategoryTabList, setSubCategoryTabList] = useState([
     {key: 0, value: 'All'},
   ]);
-
   // Assuming filterdata is available and structured correctly
 
   // Extract arrays from filterdata
@@ -211,6 +204,16 @@ export default function ProductScreen(props) {
       getAllProductsList(text);
     }, 300);
   };
+
+  const addProductToCart = item => {
+    addItem(item, selectedSize, selectedThickness, quantity);
+    setSelectedThickness(null);
+    setSelectedSize(null);
+    setQuantity(1);
+    setIsProductModalVisible(false);
+  };
+
+  const onCartPress = () => props.navigation.navigate('Addtocart');
 
   const renderTab = ({item, index}) => (
     <TouchableOpacity
@@ -489,10 +492,7 @@ export default function ProductScreen(props) {
 
                       {/* Add to Cart */}
                       <TouchableOpacity
-                        onPress={() => {
-                          setCartCount(cartCount + 1);
-                          setIsProductModalVisible(false);
-                        }}
+                        onPress={() => addProductToCart(selectedProduct)}
                         style={{
                           flexDirection: 'row',
                           alignItems: 'center',
@@ -626,6 +626,9 @@ export default function ProductScreen(props) {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
+      {itemsArray.length > 0 && (
+        <FloatingCartButton products={itemsArray} onPress={onCartPress} />
+      )}
     </View>
   );
 }

@@ -65,6 +65,7 @@ export default function MyOrderScreen({navigation}) {
     const filtered = listToUse
       .filter(val => String(val.salesOrderNumber).includes(search))
       .map(order => ({
+        orderId: order.id,
         id: order.salesOrderNumber,
         date: order.salesOrderDate,
         qty: order.quantity,

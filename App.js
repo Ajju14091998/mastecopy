@@ -34,6 +34,7 @@ import { LogBox } from 'react-native';
 import HomeIcon from './src/assets/svg/home';
 import ShoppingIcon from './src/assets/svg/shopping';
 import LogoutIcon from './src/assets/svg/logout';
+import { CartProvider } from './src/context/CartContext.js';
 
 LogBox.ignoreAllLogs(true); // hides all yellow boxes
 
@@ -274,6 +275,7 @@ function OrderDetailsStack() {
 // }
 function CustomDrawerContent(props) {
   const { state, user } = props;
+  const { logout } = useAuth(); // ✅ Add this
   console.log('User -', user);
 
   const getLabelBg = focused => (focused ? '#E6F0FF' : 'transparent');
@@ -367,7 +369,7 @@ function CustomDrawerContent(props) {
         {drawerItems}
 
         <TouchableOpacity
-          onPress={() => props.navigation.replace('Auth')}
+          onPress={logout}
           style={{
             borderRadius: 40,
             paddingVertical: 10,
@@ -439,7 +441,9 @@ function RootNavigation() {
 function AppNavigator() {
   return (
     <AuthProvider>
+      <CartProvider>
       <RootNavigation />
+      </CartProvider>
     </AuthProvider>
   );
 }
