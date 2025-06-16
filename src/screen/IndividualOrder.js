@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Modal,
   View,
@@ -9,10 +9,10 @@ import {
   Image,
   ActivityIndicator,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const IndividualOrder = ({ navigation }) => {
+const IndividualOrder = ({navigation}) => {
   const insets = useSafeAreaInsets();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -21,52 +21,55 @@ const IndividualOrder = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Hardcoded response like API response
     const dummyResponse = {
-      order: {
-        id: 'MI0001',
-        date: '2024-06-15',
-        qty: 5,
-        status: 'Pending',
-        products: [
-          {
-            id: 1,
-            name: 'EMERALD GREEN',
-            code: 'MI0001',
-            image: 'https://i.ibb.co/qWFkz38/p1.png',
-            size: '600 x 1200',
-            qty: 1,
-          },
-          {
-            id: 2,
-            name: 'ROSEWOOD',
-            code: 'MI0002',
-            image: 'https://i.ibb.co/6NYkkZy/p2.png',
-            size: '800 x 1600',
-            qty: 2,
-          },
-        ],
-      },
+      id: 1,
+      salesOrderDate: '28/05/2025',
+      salesOrderNumber: 'SO/000001',
+      quantity: 1,
+      customerName: 'demo',
+      salesOrderStatus: 'Pending',
+      salesOrderItemList: [
+        {
+          id: 23,
+          productName: 'EMERALD GREEN',
+          productCode: 'SSW-861',
+          quantity: 90,
+          size: '600 x 1200',
+          thickness: '10mm',
+          coilThickness: 0,
+          image: 'https://i.ibb.co/qWFkz38/p1.png',
+        },
+        {
+          id: 24,
+          productName: 'ROSEWOOD',
+          productCode: 'SPLP 310',
+          quantity: 80,
+          size: '800 x 1600',
+          thickness: '12mm',
+          coilThickness: 0,
+          image: 'https://i.ibb.co/6NYkkZy/p2.png',
+        },
+      ],
     };
 
-    // Simulate API delay
+    // simulate API delay
     setTimeout(() => {
-      setOrderDetails(dummyResponse.order);
-      setProducts(dummyResponse.order.products);
+      setOrderDetails(dummyResponse);
+      setProducts(dummyResponse.salesOrderItemList);
       setLoading(false);
     }, 500);
   }, []);
 
-  const renderProduct = ({ item }) => (
+  const renderProduct = ({item}) => (
     <View style={styles.productCard}>
       <Image
-        source={{ uri: item.image }}
+        source={{uri: item.image}}
         style={styles.productImage}
         resizeMode="cover"
       />
-      <View style={{ flex: 1 }}>
-        <Text style={styles.productName}>{item.name}</Text>
-        <Text style={styles.productCode}>{item.code}</Text>
+      <View style={{flex: 1}}>
+        <Text style={styles.productName}>{item.productName}</Text>
+        <Text style={styles.productCode}>{item.productCode}</Text>
         <View style={styles.detailsRow}>
           <View style={styles.sizeBox}>
             <Text style={styles.sizeText}>{item.size}</Text>
@@ -79,7 +82,7 @@ const IndividualOrder = ({ navigation }) => {
         </TouchableOpacity>
         <View style={styles.qtyInlineRow}>
           <Text style={styles.qtyLabel}>QTY</Text>
-          <Text style={styles.qtyValue}>{item.qty}</Text>
+          <Text style={styles.qtyValue}>{item.quantity}</Text>
         </View>
       </View>
     </View>
@@ -87,14 +90,18 @@ const IndividualOrder = ({ navigation }) => {
 
   if (loading) {
     return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+      <View
+        style={[
+          styles.container,
+          {justifyContent: 'center', alignItems: 'center'},
+        ]}>
         <ActivityIndicator size="large" color="#D00000" />
       </View>
     );
   }
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + 20 }]}>
+    <View style={[styles.container, {paddingTop: insets.top + 20}]}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -103,7 +110,7 @@ const IndividualOrder = ({ navigation }) => {
           <Icon name="arrow-back" size={20} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Order Details</Text>
-        <View style={{ width: 32 }} />
+        <View style={{width: 32}} />
       </View>
 
       {/* Order Info */}
@@ -115,14 +122,14 @@ const IndividualOrder = ({ navigation }) => {
           </Text>
           <Text style={styles.infoText}>
             <Text style={styles.label}>Order Date : </Text>
-            <Text style={styles.bold}>{orderDetails.date}</Text>
+            <Text style={styles.bold}>{orderDetails.salesOrderDate}</Text>
           </Text>
           <Text style={styles.infoText}>
             <Text style={styles.label}>Quantity : </Text>
-            <Text style={styles.bold}>{orderDetails.qty}</Text>
+            <Text style={styles.bold}>{orderDetails.quantity}</Text>
           </Text>
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>{orderDetails.status}</Text>
+            <Text style={styles.badgeText}>{orderDetails.salesOrderStatus}</Text>
           </View>
           <TouchableOpacity
             style={styles.cancelBtn}
@@ -138,7 +145,7 @@ const IndividualOrder = ({ navigation }) => {
         data={products}
         keyExtractor={item => item.id.toString()}
         renderItem={renderProduct}
-        contentContainerStyle={{ paddingBottom: 20 }}
+        contentContainerStyle={{paddingBottom: 20}}
       />
 
       {/* Confirm Modal */}
@@ -156,12 +163,12 @@ const IndividualOrder = ({ navigation }) => {
             </Text>
             <View style={styles.modalButtons}>
               <TouchableOpacity
-                style={[styles.modalBtn, { backgroundColor: '#000' }]}
+                style={[styles.modalBtn, {backgroundColor: '#000'}]}
                 onPress={() => setShowConfirmModal(false)}>
                 <Text style={styles.modalBtnText}>Keep Order</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalBtn, { backgroundColor: '#D00000' }]}
+                style={[styles.modalBtn, {backgroundColor: '#D00000'}]}
                 onPress={() => {
                   setShowConfirmModal(false);
                   setTimeout(() => {
