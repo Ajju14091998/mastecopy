@@ -86,7 +86,17 @@ export default function MyOrderScreen({navigation}) {
       });
 
       if (!isEmpty(response)) {
-        setOrderList(response);
+        const today = new Date().toLocaleDateString('en-GB'); // "dd/mm/yyyy" format
+        const allOrders = response.totalOrdersList || [];
+
+        const todayOrders = allOrders.filter(
+          order => order.salesOrderDate === today,
+        );
+
+        setOrderList({
+          todayOrdersList: todayOrders,
+          totalOrdersList: allOrders,
+        });
       }
     } catch (e) {
       console.log('Error fetching my order list -', e);
@@ -253,9 +263,7 @@ export default function MyOrderScreen({navigation}) {
                 <TouchableOpacity
                   style={styles.dateDropdown}
                   onPress={() => setShowToPicker(true)}>
-                  <Text style={styles.dateText}>
-                    To: {formatDate(toDate)}
-                  </Text>
+                  <Text style={styles.dateText}>To: {formatDate(toDate)}</Text>
                   <Feather name="chevron-down" size={18} color="#999" />
                 </TouchableOpacity>
 
@@ -294,7 +302,17 @@ export default function MyOrderScreen({navigation}) {
                       });
 
                       if (!isEmpty(response)) {
-                        setOrderList(response);
+                        const today = new Date().toLocaleDateString('en-GB'); // "dd/mm/yyyy"
+                        const allOrders = response.totalOrdersList || [];
+
+                        const todayOrders = allOrders.filter(
+                          order => order.salesOrderDate === today,
+                        );
+
+                        setOrderList({
+                          todayOrdersList: todayOrders,
+                          totalOrdersList: allOrders,
+                        });
                       }
 
                       setFilterModalVisible(false);
@@ -312,7 +330,6 @@ export default function MyOrderScreen({navigation}) {
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
