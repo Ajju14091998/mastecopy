@@ -9,12 +9,15 @@ import {
   Image,
   ActivityIndicator,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import isEmpty from 'lodash/isEmpty';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { deleteProductItemApi, fetchOrdersDetailByID } from '../services/common-services';
+import {
+  deleteProductItemApi,
+  fetchOrdersDetailByID,
+} from '../services/common-services';
 
-const IndividualOrder = ({ navigation, route }) => {
+const IndividualOrder = ({navigation, route}) => {
   const insets = useSafeAreaInsets();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -27,11 +30,11 @@ const IndividualOrder = ({ navigation, route }) => {
     getOrderDetail(route.params.order.orderId);
   }, []);
 
-  const getOrderDetail = async (id) => {
+  const getOrderDetail = async id => {
     setLoading(true);
     try {
       const response = await fetchOrdersDetailByID(id);
-      if(!isEmpty(response)) {
+      if (!isEmpty(response)) {
         setOrderDetails(response);
         setProducts(response.salesOrderItemList);
         setLoading(false);
@@ -41,11 +44,11 @@ const IndividualOrder = ({ navigation, route }) => {
     }
   };
 
-  const onDeleteItem = async (item) => {
+  const onDeleteItem = async item => {
     try {
       const response = await deleteProductItemApi(orderDetails.id, item.id);
       console.log('deleted item successfully -', response);
-      if(response === 200) {
+      if (response === 200) {
         getOrderDetail(orderDetails.id);
       }
     } catch (e) {
@@ -53,11 +56,11 @@ const IndividualOrder = ({ navigation, route }) => {
     }
   };
 
-  const onDeleteProductOrder = async() => {
+  const onDeleteProductOrder = async () => {
     try {
       const response = await deleteProductItemApi(orderDetails.id, 0);
       console.log('deleted product item successfully -', response);
-      if(response === 200) {
+      if (response === 200) {
         navigation.goBack();
       }
     } catch (e) {
@@ -65,7 +68,7 @@ const IndividualOrder = ({ navigation, route }) => {
     }
   };
 
-  const renderProduct = ({ item }) => (
+  const renderProduct = ({item}) => (
     <View style={styles.productCard}>
       <Image
         source={{uri: item.productImageUrl}}
@@ -77,14 +80,19 @@ const IndividualOrder = ({ navigation, route }) => {
         <Text style={styles.productCode}>{item.productCode}</Text>
         <View style={styles.detailsRow}>
           <View style={styles.sizeBox}>
-            <Text style={styles.sizeText}>{item.size}</Text>
+            <Text style={styles.sizeText}>
+              {item.size}
+              {item.thickness ? ` | ${item.thickness}` : ''}
+            </Text>
           </View>
         </View>
       </View>
       <View style={styles.deleteCol}>
-        <TouchableOpacity onPress={() => onDeleteItem(item)}>
-          <Icon name="delete" size={22} color="#D00000" />
-        </TouchableOpacity>
+        {orderDetails?.salesOrderStatus !== 'Fulfilled' && (
+          <TouchableOpacity onPress={() => onDeleteItem(item)}>
+            <Icon name="delete" size={22} color="#D00000" />
+          </TouchableOpacity>
+        )}
         <View style={styles.qtyInlineRow}>
           <Text style={styles.qtyLabel}>QTY</Text>
           <Text style={styles.qtyValue}>{item.quantity}</Text>
@@ -133,14 +141,29 @@ const IndividualOrder = ({ navigation, route }) => {
             <Text style={styles.label}>Quantity : </Text>
             <Text style={styles.bold}>{orderDetails.quantity}</Text>
           </Text>
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{orderDetails.salesOrderStatus}</Text>
+          <View
+            style={[
+              styles.badge,
+              orderDetails.salesOrderStatus === 'Fulfilled'
+                ? {backgroundColor: 'green'}
+                : orderDetails.salesOrderStatus === 'Partially'
+                ? {backgroundColor: 'red'}
+                : orderDetails.salesOrderStatus === 'Pending'
+                ? {backgroundColor: '#F58731'}
+                : {backgroundColor: '#999'}, // fallback
+            ]}>
+            <Text style={styles.badgeText}>
+              {orderDetails.salesOrderStatus}
+            </Text>
           </View>
-          <TouchableOpacity
-            style={styles.cancelBtn}
-            onPress={() => setShowConfirmModal(true)}>
-            <Text style={styles.cancelText}>Cancel Order</Text>
-          </TouchableOpacity>
+
+          {orderDetails.salesOrderStatus !== 'Fulfilled' && (
+            <TouchableOpacity
+              style={styles.cancelBtn}
+              onPress={() => setShowConfirmModal(true)}>
+              <Text style={styles.cancelText}>Cancel Order</Text>
+            </TouchableOpacity>
+          )}
         </View>
       )}
 

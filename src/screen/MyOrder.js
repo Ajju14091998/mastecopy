@@ -212,7 +212,17 @@ export default function MyOrderScreen({navigation}) {
               <Text style={styles.label}>Quantity : </Text>
               <Text style={styles.value}>{order.qty}</Text>
             </Text>
-            <View style={styles.badge}>
+            <View
+              style={[
+                styles.badge,
+                order.status === 'Fulfilled'
+                  ? {backgroundColor: 'green'}
+                  : order.status === 'Partially'
+                  ? {backgroundColor: 'red'}
+                  : order.status === 'Pending'
+                  ? {backgroundColor: '#F58731'}
+                  : {backgroundColor: '#999'}, // fallback
+              ]}>
               <Text style={styles.badgeText}>{order.status}</Text>
             </View>
           </TouchableOpacity>

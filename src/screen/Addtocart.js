@@ -19,7 +19,13 @@ const MyCartScreen = ({navigation}) => {
   const insets = useSafeAreaInsets();
 
   /* ────────────────  Cart context  ──────────────── */
-  const {itemsArray: cartData, totalQuantity, updateQty, removeItem, clearCart} = useCart();
+  const {
+    itemsArray: cartData,
+    totalQuantity,
+    updateQty,
+    removeItem,
+    clearCart,
+  } = useCart();
 
   /* ────────────────  Local ui state  ───────────── */
   const [modalVisible, setModalVisible] = React.useState(false);
@@ -92,12 +98,16 @@ const MyCartScreen = ({navigation}) => {
               <Icon name="delete" size={22} color="#D00000" />
             </TouchableOpacity>
           </View>
-
           <View style={styles.bottomRow}>
+            {/* Size and Thickness */}
             <View style={styles.sizeTag}>
-              <Text style={styles.sizeText}>{size}</Text>
+              <Text style={styles.sizeText}>
+                {size}
+                {item.thickness ? ` | ${item.thickness}` : ''}
+              </Text>
             </View>
 
+            {/* Quantity +/- buttons */}
             <View style={styles.actionSection}>
               <TouchableOpacity
                 onPress={() => handleDecrement(key, currentQty)}
@@ -212,12 +222,26 @@ const styles = StyleSheet.create({
   },
   image: {width: 70, height: 70, borderRadius: 8, marginRight: 12},
   infoSection: {flex: 1, justifyContent: 'space-between'},
-  topRow: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'},
-  bottomRow: {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8},
+  topRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  bottomRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 8,
+  },
   name: {fontSize: 14, fontWeight: '700', color: '#000'},
   code: {fontSize: 12, fontWeight: '500', color: '#555', marginTop: 2},
   deleteButton: {padding: 4},
-  sizeTag: {backgroundColor: '#eee', paddingHorizontal: 10, paddingVertical: 2, borderRadius: 8},
+  sizeTag: {
+    backgroundColor: '#eee',
+    paddingHorizontal: 10,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
   sizeText: {fontSize: 12, fontWeight: '600', color: '#000'},
   actionSection: {flexDirection: 'row', alignItems: 'center'},
   iconButton: {paddingHorizontal: 4},
@@ -244,7 +268,12 @@ const styles = StyleSheet.create({
     gap: 8,
     backgroundColor: '#fff',
   },
-  totalQuantity: {fontSize: 14, color: '#000', marginBottom: 5, fontWeight: '600'},
+  totalQuantity: {
+    fontSize: 14,
+    color: '#000',
+    marginBottom: 5,
+    fontWeight: '600',
+  },
   checkoutButton: {
     backgroundColor: '#D00000',
     paddingVertical: 12,
@@ -256,10 +285,36 @@ const styles = StyleSheet.create({
   },
   checkoutText: {color: '#fff', fontWeight: '700', fontSize: 15},
   checkoutImage: {width: 25, height: 25, marginLeft: 8},
-  modalOverlay: {flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'center', alignItems: 'center'},
-  modalBox: {width: '80%', backgroundColor: '#fff', padding: 24, borderRadius: 16, alignItems: 'center'},
-  modalTitle: {fontSize: 18, fontWeight: '700', marginBottom: 24, color: '#000', textAlign: 'center'},
-  modalButton: {backgroundColor: '#D00000', paddingVertical: 12, paddingHorizontal: 24, borderRadius: 8},
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalBox: {
+    width: '80%',
+    backgroundColor: '#fff',
+    padding: 24,
+    borderRadius: 16,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 24,
+    color: '#000',
+    textAlign: 'center',
+  },
+  modalButton: {
+    backgroundColor: '#D00000',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+  },
   modalButtonText: {color: '#fff', fontSize: 15, fontWeight: '700'},
-  quantityContainer: {flexDirection: 'row', justifyContent: 'space-between', padding: 5},
+  quantityContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 5,
+  },
 });
