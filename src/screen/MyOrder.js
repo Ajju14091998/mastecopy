@@ -299,6 +299,15 @@ export default function MyOrderScreen({navigation}) {
                   style={styles.applyButton}
                   onPress={async () => {
                     try {
+                      const apiStatus =
+                        selectedStatus === 'Completed'
+                          ? 'Fulfilled'
+                          : selectedStatus === 'Cancel'
+                          ? 'Cancel'
+                          : selectedStatus === 'Pending'
+                          ? 'Pending'
+                          : '';
+
                       const response = await fetchOrdersList({
                         customerId: 0,
                         fromDate: fromDate
@@ -307,7 +316,7 @@ export default function MyOrderScreen({navigation}) {
                         toDate: toDate
                           ? toDate.toISOString().split('T')[0]
                           : '',
-                        orderStatus: selectedStatus || '',
+                        orderStatus: apiStatus,
                         pageNumber: 0,
                         pageSize: 0,
                       });
@@ -316,13 +325,25 @@ export default function MyOrderScreen({navigation}) {
                         const today = new Date().toLocaleDateString('en-GB'); // "dd/mm/yyyy"
                         const allOrders = response.totalOrdersList || [];
 
-                        const todayOrders = allOrders.filter(
+                        // Filter those again based on selectedStatus
+                        const filteredOrders = allOrders.filter(order => {
+                          const status = order.salesOrderStatus;
+                          return (
+                            (selectedStatus === 'Completed' &&
+                              status === 'Fulfilled') ||
+                            (selectedStatus === 'Pending' &&
+                              status === 'Pending') ||
+                            (selectedStatus === 'Cancel' && status === 'Cancel')
+                          );
+                        });
+
+                        const todayOrders = filteredOrders.filter(
                           order => order.salesOrderDate === today,
                         );
 
                         setOrderList({
                           todayOrdersList: todayOrders,
-                          totalOrdersList: allOrders,
+                          totalOrdersList: filteredOrders,
                         });
                       }
 

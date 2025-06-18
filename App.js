@@ -23,6 +23,7 @@ import IndividualOrder from './src/screen/IndividualOrder';
 import Home from './src/assets/svg/home';
 import Shopping from './src/assets/svg/shopping';
 import Cart1 from './src/assets/svg/cart1.js';
+import Logout from './src/assets/svg/logout';
 import SplashScreen from './src/screen/SplashScreen';
 import {AuthProvider, useAuth} from './AuthContext';
 import Textstyle from './src/assets/style/Textstyle.js';
@@ -31,9 +32,6 @@ import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 import {LogBox} from 'react-native';
-import HomeIcon from './src/assets/svg/home';
-import ShoppingIcon from './src/assets/svg/shopping';
-import LogoutIcon from './src/assets/svg/logout';
 import {CartProvider} from './src/context/CartContext.js';
 
 LogBox.ignoreAllLogs(true); // hides all yellow boxes
@@ -161,7 +159,7 @@ function TabNavigator() {
             <View style={focused ? styles.iconc : styles.iconc1}>
               <View style={focused ? styles.box : styles.box1}>
                 <Home
-                  style={{width: 16, height: 16}}
+                  style={{width: 22, height: 22}}
                   color={focused ? '#fff' : '#000'}
                 />
               </View>
@@ -186,7 +184,7 @@ function TabNavigator() {
             <View style={focused ? styles.iconc : styles.iconc1}>
               <View style={focused ? styles.box : styles.box1}>
                 <Shopping
-                  style={{width: 20, height: 20}}
+                  style={{width: 22, height: 22}}
                   color={focused ? '#fff' : '#000'}
                 />
               </View>
@@ -211,7 +209,7 @@ function TabNavigator() {
             <View style={focused ? styles.iconc : styles.iconc1}>
               <View style={focused ? styles.box : styles.box1}>
                 <Cart1
-                  style={{width: 20, height: 20}}
+                  style={{width: 22, height: 22}}
                   color={focused ? '#fff' : '#000'}
                 />
               </View>
@@ -247,27 +245,25 @@ function OrderDetailsStack() {
 
 function CustomDrawerContent(props) {
   const {state, user} = props;
-  const {logout} = useAuth(); // ✅ Add this
+  const {logout} = useAuth();
   console.log('User -', user);
 
   const getLabelBg = focused => (focused ? '#E6F0FF' : 'transparent');
 
-  const renderIcon = routeName => {
+  const renderIcon = (routeName, focused) => {
     switch (routeName) {
       case 'MainTabs':
         return (
-          <Image
-            source={require('./src/assets/images/home.png')}
-            style={{width: 20, height: 20}}
-            resizeMode="contain"
+          <Home
+            style={{width: 22, height: 22}}
+            color={focused ? '#fff' : '#000'}
           />
         );
       case 'OrderDetailsStack':
         return (
-          <Image
-            source={require('./src/assets/images/order.png')}
-            style={{width: 20, height: 20}}
-            resizeMode="contain"
+          <Shopping
+            style={{width: 22, height: 22}}
+            color={focused ? '#fff' : '#000'}
           />
         );
       default:
@@ -313,23 +309,20 @@ function CustomDrawerContent(props) {
 
   return (
     <DrawerContentScrollView
-      contentContainerStyle={{paddingTop: 40, flexGrow: 1}}>
-      {/* Logo */}
-      <View style={{alignItems: 'center', paddingBottom: 20}}>
-        <Image
+      contentContainerStyle={{paddingTop: 50, flexGrow:1,}}>
+        <View style={{display:'flex', flexDirection:'column', gap:15, justifyContent:'flex-start',alignItems:'flex-start', paddingLeft:10,}}>
+           <Image
           source={require('./src/assets/images/logo.png')}
           style={{width: 250, height: 30}}
         />
-      </View>
-
-      {/* User Info */}
-      <View style={{marginBottom: 20}}>
-        <Text
+         <Text
           style={{
+            flexShrink: 1,
             fontSize: 14,
             fontWeight: '600',
             color: '#000',
-            marginBottom: 5,
+            padding:0,
+            margin:0,
           }}>
           {user.fullname}
         </Text>
@@ -338,24 +331,27 @@ function CustomDrawerContent(props) {
             fontSize: 14,
             fontWeight: '600',
             color: '#000',
-            marginBottom: 5,
           }}>
-          {user.mobilePhone}
+          {user.email}
         </Text>
+        
         <Text
           style={{
             fontSize: 14,
             fontWeight: '600',
             color: '#000',
-            marginLeft: 8,
+            padding:0,
+            margin:0,
+            lineHeight:0,
           }}>
-          {user.email}
+          {user.mobilePhone}
         </Text>
-        <View style={styles.underline} />
-      </View>
+         <View style={styles.underline} />
+        </View>
 
+     
       {/* Drawer Links + Logout in unified section */}
-      <View style={{paddingHorizontal: 10, gap: 10}}>
+      <View style={{paddingHorizontal: 10, marginTop:30, gap: 10}}>
         {drawerItems}
 
         <TouchableOpacity
@@ -368,11 +364,7 @@ function CustomDrawerContent(props) {
             alignItems: 'center',
             backgroundColor: 'transparent',
           }}>
-          <Image
-            source={require('./src/assets/images/logout.png')}
-            style={{width: 20, height: 20}}
-            resizeMode="contain"
-          />
+          <Logout style={{width: 22, height: 22}} color="#000" />
 
           <Text
             style={{

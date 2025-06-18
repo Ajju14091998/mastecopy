@@ -1,14 +1,16 @@
 import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import {View, Text, Pressable, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Cart from '../assets/svg/Cart';
 
-const FloatingCartButton = ({ products = [], onPress }) => {
+
+const FloatingCartButton = ({products = [], onPress}) => {
   const count = products.length;
 
   return (
     <Pressable style={styles.container} onPress={onPress}>
       {/* SVG Cart Icon */}
-      <Icon name="shopping-cart" size={28} color="red" />
+      <Cart style={{width: 28, height: 28}} color="#D00000" />
 
       {/* Count Badge */}
       {count > 0 && (
@@ -35,7 +37,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 5,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
+    shadowOffset: {width: 0, height: 3},
     shadowOpacity: 0.25,
     shadowRadius: 4,
   },
