@@ -8,6 +8,7 @@ import {
   ScrollView,
   Modal,
   TouchableWithoutFeedback,
+  Platform,
 } from 'react-native';
 import isEmpty from 'lodash/isEmpty';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -74,6 +75,12 @@ export default function MyOrderScreen({navigation}) {
 
     setOrders(filtered);
   }, [orderList, activeTab, search]);
+
+  const resetFilter = () => {
+    setSelectedStatus('Pending');
+    setFromDate(null);
+    setToDate(null);
+  };
 
   const getOrderList = async () => {
     try {
@@ -354,6 +361,9 @@ export default function MyOrderScreen({navigation}) {
                   }}>
                   <Text style={styles.applyButtonText}>Apply Filters</Text>
                 </TouchableOpacity>
+                <TouchableOpacity style={styles.resetButton} onPress={resetFilter}>
+                  <Text style={styles.applyButtonText}>Reset Filters</Text>
+                </TouchableOpacity>
               </View>
             </TouchableWithoutFeedback>
           </View>
@@ -571,6 +581,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     marginTop: 30,
+  },
+  resetButton: {
+    backgroundColor: '#D00000',
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 10,
   },
   applyButtonText: {
     color: '#fff',
