@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -14,13 +14,13 @@ import isEmpty from 'lodash/isEmpty';
 import Icon from 'react-native-vector-icons/Feather';
 import DropDownPicker from 'react-native-dropdown-picker';
 import Feather from 'react-native-vector-icons/Feather';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   fetchProductList,
   fetchSubCategories,
   fetchFilterList,
 } from '../services/common-services';
-import {useRoute} from '@react-navigation/native';
+import { useRoute } from '@react-navigation/native';
 import FloatingCartButton from '../component/FloatingButton';
 import { useCart } from '../context/CartContext';
 
@@ -29,7 +29,7 @@ export default function ProductScreen(props) {
   const [thickValue, setThickValue] = useState([]);
 
   const route = useRoute();
-  const {catId, headingTitle} = route.params || {};
+  const { catId, headingTitle } = route.params || {};
 
   const [selectedCategory, setSelectedCategory] = useState(catId);
   const [heading, setHeading] = useState(headingTitle);
@@ -40,7 +40,7 @@ export default function ProductScreen(props) {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isProductModalVisible, setIsProductModalVisible] = useState(false);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
-  const {itemsArray, addItem} = useCart();
+  const { itemsArray, addItem } = useCart();
   const [products, setProducts] = useState([]);
   const [filterdata, setFilterData] = useState([]);
   const [search, setSearch] = useState('');
@@ -49,7 +49,7 @@ export default function ProductScreen(props) {
   );
   const [subCategory, setSubCategory] = useState(0);
   const [subCategoryTabList, setSubCategoryTabList] = useState([
-    {key: 0, value: 'All'},
+    { key: 0, value: 'All' },
   ]);
   // Assuming filterdata is available and structured correctly
 
@@ -215,7 +215,20 @@ export default function ProductScreen(props) {
 
   const onCartPress = () => props.navigation.navigate('Addtocart');
 
-  const renderTab = ({item, index}) => (
+  const isFormInvalid = () => {
+    console.log('Selected thickness -', selectedThickness);
+    console.log('Selected size -', selectedSize);
+    let valid = false;
+    if(selectedThickness) {
+      if(selectedSize) {
+        valid = true;
+      }
+    }
+    console.log('valid -', valid);
+    return valid;
+  };
+
+  const renderTab = ({ item, index }) => (
     <TouchableOpacity
       key={index}
       style={[styles.tab, selectedTab === item.value && styles.activeTab]}
@@ -234,14 +247,14 @@ export default function ProductScreen(props) {
     </TouchableOpacity>
   );
 
-  const renderCard = ({item}) => (
+  const renderCard = ({ item }) => (
     <TouchableOpacity
       style={styles.card}
       onPress={() => {
         setSelectedProduct(item);
         setIsProductModalVisible(true);
       }}>
-      <Image source={{uri: item.appProductImageUrl}} style={styles.cardImage} />
+      <Image source={{ uri: item.appProductImageUrl }} style={styles.cardImage} />
       <Text style={styles.cardName}>{item.productName}</Text>
       <Text style={styles.cardCode}>{item.productCode}</Text>
     </TouchableOpacity>
@@ -278,7 +291,7 @@ export default function ProductScreen(props) {
           <Icon name="filter" size={20} color="#fff" />
         </TouchableOpacity>
       </View>
-      <Text style={{fontSize: 20, fontWeight: 'bold', marginBottom: 10}}>
+      <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 10 }}>
         {heading}
       </Text>
       <FlatList
@@ -287,7 +300,7 @@ export default function ProductScreen(props) {
         horizontal
         extraData={subCategoryTabList}
         showsHorizontalScrollIndicator={false}
-        style={{minHeight: 40, maxHeight: 40, marginBottom: 10}}
+        style={{ minHeight: 40, maxHeight: 40, marginBottom: 10 }}
       />
       {/* <View style={styles.tabContainer}>{TABS.map(renderTab)}</View> */}
 
@@ -297,7 +310,7 @@ export default function ProductScreen(props) {
         renderItem={renderCard}
         numColumns={2}
         columnWrapperStyle={styles.row}
-        contentContainerStyle={{paddingBottom: 80}}
+        contentContainerStyle={{ paddingBottom: 80 }}
         showsVerticalScrollIndicator={false}
       />
 
@@ -306,12 +319,12 @@ export default function ProductScreen(props) {
         <TouchableWithoutFeedback
           onPress={() => setIsProductModalVisible(false)}>
           <View style={styles.modalBackground}>
-            <TouchableWithoutFeedback onPress={() => {}}>
-              <View style={[styles.modalContainer, {paddingBottom: 30}]}>
+            <TouchableWithoutFeedback onPress={() => { }}>
+              <View style={[styles.modalContainer, { paddingBottom: 30 }]}>
                 {selectedProduct && (
                   <>
                     <Image
-                      source={{uri: selectedProduct.appProductImageUrl}}
+                      source={{ uri: selectedProduct.appProductImageUrl }}
                       style={{
                         width: '100%',
                         height: 200,
@@ -345,13 +358,13 @@ export default function ProductScreen(props) {
                     </View>
 
                     <Text
-                      style={{marginTop: 8, fontWeight: '600', color: '#000'}}>
+                      style={{ marginTop: 8, fontWeight: '600', color: '#000' }}>
                       {selectedProduct.productDesc}
                     </Text>
 
                     {/* Thickness */}
                     <Text
-                      style={{fontSize: 12, fontWeight: '600', marginTop: 12}}>
+                      style={{ fontSize: 12, fontWeight: '600', marginTop: 12 }}>
                       Thickness
                     </Text>
                     <View
@@ -394,7 +407,7 @@ export default function ProductScreen(props) {
 
                     {/* Size */}
                     <Text
-                      style={{fontSize: 12, fontWeight: '600', marginTop: 12}}>
+                      style={{ fontSize: 12, fontWeight: '600', marginTop: 12 }}>
                       Size
                     </Text>
                     <View
@@ -455,8 +468,8 @@ export default function ProductScreen(props) {
                           onPress={() =>
                             setQuantity(prev => Math.max(prev - 1, 1))
                           }
-                          style={{paddingHorizontal: 10}}>
-                          <Text style={{fontSize: 20, fontWeight: 'bold'}}>
+                          style={{ paddingHorizontal: 10 }}>
+                          <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
                             -
                           </Text>
                         </TouchableOpacity>
@@ -483,8 +496,8 @@ export default function ProductScreen(props) {
 
                         <TouchableOpacity
                           onPress={() => setQuantity(prev => prev + 1)}
-                          style={{paddingHorizontal: 10}}>
-                          <Text style={{fontSize: 20, fontWeight: 'bold'}}>
+                          style={{ paddingHorizontal: 10 }}>
+                          <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
                             +
                           </Text>
                         </TouchableOpacity>
@@ -493,6 +506,7 @@ export default function ProductScreen(props) {
                       {/* Add to Cart */}
                       <TouchableOpacity
                         onPress={() => addProductToCart(selectedProduct)}
+                        disabled={!isFormInvalid()}
                         style={{
                           flexDirection: 'row',
                           alignItems: 'center',
@@ -500,6 +514,7 @@ export default function ProductScreen(props) {
                           paddingVertical: 12,
                           paddingHorizontal: 20,
                           borderRadius: 8,
+                          opacity: !isFormInvalid() ? 0.6 : 1,
                         }}>
                         <Icon name="shopping-cart" size={20} color="#fff" />
                         <Text
@@ -525,7 +540,7 @@ export default function ProductScreen(props) {
         <TouchableWithoutFeedback
           onPress={() => setIsFilterModalVisible(false)}>
           <View style={styles.modalBackground}>
-            <TouchableWithoutFeedback onPress={() => {}}>
+            <TouchableWithoutFeedback onPress={() => { }}>
               <View style={styles.modalContainer}>
                 <Text style={styles.modalTitle}>Filter</Text>
                 <View style={styles.underline} />
@@ -540,12 +555,12 @@ export default function ProductScreen(props) {
                   setValue={callback => {
                     const selectedValue = callback(categoryValue);
                     setCategoryValue(selectedValue);
-                    const selectedItem = categoryItems.find(
-                      item => item.value === selectedValue,
-                    );
-                    if (selectedItem) {
-                      setHeading(selectedItem.label);
-                    }
+                    // const selectedItem = categoryItems.find(
+                    //   item => item.value === selectedValue,
+                    // );
+                    // if (selectedItem) {
+                    //   setHeading(selectedItem.label);
+                    // }
                   }}
                   setItems={setCategoryItems}
                   style={styles.dropdown}
@@ -602,25 +617,45 @@ export default function ProductScreen(props) {
                   zIndex={1500}
                   zIndexInverse={2500}
                 />
+                <View style={styles.filterButtonContainer}>
+                  <TouchableOpacity
+                    style={styles.submitButton}
+                    onPress={() => {
+                      console.log('On submit is calling -');
+                      
+                      // setCategory(categoryValue || category);
+                      // setSubCategory(subCategoryValue || 0);
+                    const selectedItem = categoryItems.find(
+                      item => item.value === (categoryValue || category),
+                    );
+                    if (selectedItem) {
+                      setHeading(selectedItem.label);
+                    }
+                      const filters = {
+                        selectedCategory: categoryValue || category,
+                        selectedSubCategory: subCategoryValue || 0,
+                        selectedSize: sizeValue || '',
+                        selectedThickness: thickValue || '',
+                      };
 
-                <TouchableOpacity
-                  style={styles.submitButton}
-                  onPress={() => {
-                    setCategory(categoryValue || category);
-                    setSubCategory(subCategoryValue || 0);
-
-                    const filters = {
-                      selectedCategory: categoryValue || category,
-                      selectedSubCategory: subCategoryValue || 0,
-                      selectedSize: sizeValue || '',
-                      selectedThickness: thickValue || '',
-                    };
-
-                    getAllProductsList('', filters);
-                    setIsFilterModalVisible(false);
-                  }}>
-                  <Text style={styles.submitButtonText}>Submit</Text>
-                </TouchableOpacity>
+                      getAllProductsList('', filters);
+                      setIsFilterModalVisible(false);
+                    }}>
+                    <Text style={styles.submitButtonText}>Submit</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.submitButton}
+                    onPress={() => {
+                      setCategoryValue(null);
+                      setSubCategoryValue(null);
+                      setSizeValue(null);
+                      setThickValue(null);
+                      setCategory(1);
+                      setSubCategory(0);
+                    }}>
+                    <Text style={styles.submitButtonText}>Reset</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </TouchableWithoutFeedback>
           </View>
@@ -741,7 +776,7 @@ const styles = StyleSheet.create({
     padding: 20,
     width: '100%',
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: -2},
+    shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 10,
@@ -775,6 +810,10 @@ const styles = StyleSheet.create({
   dropdownText: {
     fontSize: 14,
     color: '#000',
+  },
+  filterButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
   },
   submitButton: {
     marginTop: 20,
