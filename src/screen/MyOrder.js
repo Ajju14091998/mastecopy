@@ -18,7 +18,6 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Feather from 'react-native-vector-icons/Feather';
 
 export default function MyOrderScreen({navigation}) {
-
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
   const [showFromPicker, setShowFromPicker] = useState(false);
@@ -225,7 +224,8 @@ export default function MyOrderScreen({navigation}) {
                 styles.badge,
                 order.status === 'Fulfilled'
                   ? {backgroundColor: '#28a745'}
-                  : order.status === 'Partially'
+                  : order.status === 'Partially' ||
+                    order.status === 'Partially Fulfilled'
                   ? {backgroundColor: '#007bff'}
                   : order.status === 'Pending'
                   ? {backgroundColor: '#fd7e14'}
@@ -308,68 +308,70 @@ export default function MyOrderScreen({navigation}) {
                   />
                 )}
 
-                <TouchableOpacity
-                  style={styles.applyButton}
-                  onPress={async () => {
-                    try {
-                      const apiStatus =
-                        selectedStatus === 'Completed'
-                          ? 'Fulfilled'
-                          : selectedStatus === 'Cancel'
-                          ? 'Cancel'
-                          : selectedStatus === 'Pending'
-                          ? 'Pending'
-                          : '';
+                {/* Updated Button Row */}
+                <View style={styles.filterButtonsRow}>
+                  <TouchableOpacity
+                    style={[styles.filterButtonHalf, {marginRight: 8}]}
+                    onPress={resetFilter}>
+                    <Text style={styles.applyButtonText}>Reset</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.filterButtonHalf}
+                    onPress={async () => {
+                      try {
+                        const response = await fetchOrdersList({
+                          customerId: 0,
+                          fromDate: fromDate
+                            ? fromDate.toISOString().split('T')[0]
+                            : '',
+                          toDate: toDate
+                            ? toDate.toISOString().split('T')[0]
+                            : '',
+                          orderStatus: '', // Get all orders, we will filter manually
+                          pageNumber: 0,
+                          pageSize: 0,
+                        });
 
-                      const response = await fetchOrdersList({
-                        customerId: 0,
-                        fromDate: fromDate
-                          ? fromDate.toISOString().split('T')[0]
-                          : '',
-                        toDate: toDate
-                          ? toDate.toISOString().split('T')[0]
-                          : '',
-                        orderStatus: apiStatus,
-                        pageNumber: 0,
-                        pageSize: 0,
-                      });
+                        if (!isEmpty(response)) {
+                          const today = new Date().toLocaleDateString('en-GB');
+                          const allOrders = response.totalOrdersList || [];
 
-                      if (!isEmpty(response)) {
-                        const today = new Date().toLocaleDateString('en-GB'); // "dd/mm/yyyy"
-                        const allOrders = response.totalOrdersList || [];
+                          const filteredOrders = allOrders.filter(order => {
+                            const status = order.salesOrderStatus;
 
-                        // Filter those again based on selectedStatus
-                        const filteredOrders = allOrders.filter(order => {
-                          const status = order.salesOrderStatus;
-                          return (
-                            (selectedStatus === 'Completed' &&
-                              status === 'Fulfilled') ||
-                            (selectedStatus === 'Pending' &&
-                              status === 'Pending') ||
-                            (selectedStatus === 'Cancel' && status === 'Cancel')
+                            return (
+                              (selectedStatus === 'Completed' &&
+                                status === 'Fulfilled') ||
+                              (selectedStatus === 'Pending' &&
+                                status === 'Pending') ||
+                              (selectedStatus === 'Cancel' &&
+                                (status === 'Cancel' ||
+                                  status === 'Cancelled' ||
+                                  status === 'Canceled')) ||
+                              (selectedStatus === 'Partial Completed' &&
+                                (status === 'Partially' ||
+                                  status === 'Partially Fulfilled'))
+                            );
+                          });
+
+                          const todayOrders = filteredOrders.filter(
+                            order => order.salesOrderDate === today,
                           );
-                        });
 
-                        const todayOrders = filteredOrders.filter(
-                          order => order.salesOrderDate === today,
-                        );
+                          setOrderList({
+                            todayOrdersList: todayOrders,
+                            totalOrdersList: filteredOrders,
+                          });
+                        }
 
-                        setOrderList({
-                          todayOrdersList: todayOrders,
-                          totalOrdersList: filteredOrders,
-                        });
+                        setFilterModalVisible(false);
+                      } catch (e) {
+                        console.log('Error applying filters -', e);
                       }
-
-                      setFilterModalVisible(false);
-                    } catch (e) {
-                      console.log('Error applying filters -', e);
-                    }
-                  }}>
-                  <Text style={styles.applyButtonText}>Apply Filters</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.resetButton} onPress={resetFilter}>
-                  <Text style={styles.applyButtonText}>Reset Filters</Text>
-                </TouchableOpacity>
+                    }}>
+                    <Text style={styles.applyButtonText}>Apply</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </TouchableWithoutFeedback>
           </View>
@@ -588,13 +590,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 30,
   },
-  resetButton: {
-    backgroundColor: '#D00000',
-    paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 10,
-  },
   applyButtonText: {
     color: '#fff',
     fontWeight: '600',
@@ -622,5 +617,18 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 14,
     color: '#333',
+  },
+  filterButtonsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 15,
+  },
+
+  filterButtonHalf: {
+    flex: 1,
+    backgroundColor: '#D00000',
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
   },
 });

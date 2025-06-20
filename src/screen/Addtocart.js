@@ -145,9 +145,14 @@ const MyCartScreen = ({navigation}) => {
         keyExtractor={item => item.key}
         contentContainerStyle={{paddingHorizontal: 16, paddingBottom: 16}}
         ListEmptyComponent={
-          <Text style={{alignSelf: 'center', marginTop: 40}}>
-            Your cart is empty.
-          </Text>
+          <View style={styles.emptyContainer}>
+            <Image
+              source={require('../assets/images/emptycart.png')}
+              style={styles.emptyImage}
+              resizeMode="contain"
+            />
+            <Text style={styles.emptyText}>Your cart is empty.</Text>
+          </View>
         }
       />
 
@@ -317,4 +322,23 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 5,
   },
+
+  emptyContainer: {
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginTop: 60,
+},
+
+emptyImage: {
+  width: 200,
+  height: 200,
+  marginBottom: 20,
+},
+
+emptyText: {
+  fontSize: 16,
+  fontWeight: '600',
+  color: '#555',
+},
+
 });
