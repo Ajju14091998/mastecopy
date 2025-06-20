@@ -145,12 +145,14 @@ const IndividualOrder = ({navigation, route}) => {
             style={[
               styles.badge,
               orderDetails.salesOrderStatus === 'Fulfilled'
-                ? {backgroundColor: 'green'}
-                : orderDetails.salesOrderStatus === 'Partially'
-                ? {backgroundColor: 'red'}
+                ? {backgroundColor: '#28a745'}
+                : orderDetails.salesOrderStatus === 'Partial'
+                ? {backgroundColor: '#007bff'}
                 : orderDetails.salesOrderStatus === 'Pending'
-                ? {backgroundColor: '#F58731'}
-                : {backgroundColor: '#999'}, // fallback
+                ? {backgroundColor: '#fd7e14'}
+                : orderDetails.salesOrderStatus === 'Cancel'
+                ? {backgroundColor: '#D00000'}
+                : {backgroundColor: '#999'}, 
             ]}>
             <Text style={styles.badgeText}>
               {orderDetails.salesOrderStatus}

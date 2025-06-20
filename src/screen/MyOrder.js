@@ -17,6 +17,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Feather from 'react-native-vector-icons/Feather';
 
 export default function MyOrderScreen({navigation}) {
+
   const [fromDate, setFromDate] = useState(null);
   const [toDate, setToDate] = useState(null);
   const [showFromPicker, setShowFromPicker] = useState(false);
@@ -216,12 +217,14 @@ export default function MyOrderScreen({navigation}) {
               style={[
                 styles.badge,
                 order.status === 'Fulfilled'
-                  ? {backgroundColor: 'green'}
+                  ? {backgroundColor: '#28a745'}
                   : order.status === 'Partially'
-                  ? {backgroundColor: 'red'}
+                  ? {backgroundColor: '#007bff'}
                   : order.status === 'Pending'
-                  ? {backgroundColor: '#F58731'}
-                  : {backgroundColor: '#999'}, // fallback
+                  ? {backgroundColor: '#fd7e14'}
+                  : order.status === 'Cancel'
+                  ? {backgroundColor: '#D00000'}
+                  : {backgroundColor: '#999'},
               ]}>
               <Text style={styles.badgeText}>{order.status}</Text>
             </View>
@@ -243,23 +246,26 @@ export default function MyOrderScreen({navigation}) {
                 <View style={styles.modalDivider} />
 
                 <Text style={styles.filterLabel}>FILTER BY ORDER STATUS</Text>
-                {['Pending', 'Completed', 'Cancel'].map(status => (
-                  <TouchableOpacity
-                    key={status}
-                    style={styles.radioRow}
-                    onPress={() => setSelectedStatus(status)}>
-                    <View
-                      style={[
-                        styles.radioOuter,
-                        selectedStatus === status && styles.radioOuterSelected,
-                      ]}>
-                      {selectedStatus === status && (
-                        <View style={styles.radioInner} />
-                      )}
-                    </View>
-                    <Text style={styles.radioLabel}>{status}</Text>
-                  </TouchableOpacity>
-                ))}
+                {['Pending', 'Completed', 'Partial Completed', 'Cancel'].map(
+                  status => (
+                    <TouchableOpacity
+                      key={status}
+                      style={styles.radioRow}
+                      onPress={() => setSelectedStatus(status)}>
+                      <View
+                        style={[
+                          styles.radioOuter,
+                          selectedStatus === status &&
+                            styles.radioOuterSelected,
+                        ]}>
+                        {selectedStatus === status && (
+                          <View style={styles.radioInner} />
+                        )}
+                      </View>
+                      <Text style={styles.radioLabel}>{status}</Text>
+                    </TouchableOpacity>
+                  ),
+                )}
 
                 <Text style={styles.filterLabel}>FILTER BY DATE</Text>
                 <TouchableOpacity
