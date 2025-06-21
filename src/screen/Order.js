@@ -169,6 +169,9 @@ export default function ProductScreen(props) {
       });
       console.log('Filtered Products:', response);
       setProducts(response);
+      if(!isEmpty(selectedFilters)) {
+        setSubCategoryFromFilter(selectedSubCategory, subCategoryTabList[selectedSubCategory].value);
+      }
     } catch (e) {
       console.log('Error fetching product list', e);
     }
@@ -178,7 +181,7 @@ export default function ProductScreen(props) {
     try {
       const response = await fetchSubCategories(catId);
       if (response.length > 0) {
-        setSubCategoryTabList([...subCategoryTabList, ...response]);
+        setSubCategoryTabList([subCategoryTabList[0], ...response]);
       }
     } catch (e) {
       console.log('Error setting subcategory list -', e);
@@ -215,16 +218,18 @@ export default function ProductScreen(props) {
 
   const onCartPress = () => props.navigation.navigate('Addtocart');
 
+  const setSubCategoryFromFilter = (tab, subCat) => {
+    setSelectedTab(subCat);
+    setSubCategory(tab);
+  };
+
   const isFormInvalid = () => {
-    console.log('Selected thickness -', selectedThickness);
-    console.log('Selected size -', selectedSize);
     let valid = false;
     if (selectedThickness) {
       if (selectedSize) {
         valid = true;
       }
     }
-    console.log('valid -', valid);
     return valid;
   };
 
@@ -545,8 +550,8 @@ export default function ProductScreen(props) {
                 <Text style={styles.modalTitle}>Filter</Text>
                 <View style={styles.underline} />
 
-                <Text style={styles.dropdownLabel}>Category</Text>
-                <DropDownPicker
+                {/* <Text style={styles.dropdownLabel}>Category</Text> */}
+                {/* <DropDownPicker
                   placeholder="Select Category"
                   open={categoryOpen}
                   value={categoryValue}
@@ -567,7 +572,7 @@ export default function ProductScreen(props) {
                   textStyle={styles.dropdownText}
                   zIndex={3000}
                   zIndexInverse={1000}
-                />
+                /> */}
 
                 <Text style={styles.dropdownLabel}>Sub Category</Text>
                 <DropDownPicker
@@ -642,7 +647,7 @@ export default function ProductScreen(props) {
                       }
 
                       const filters = {
-                        selectedCategory: categoryValue || category,
+                        selectedCategory: category,
                         selectedSubCategory: subCategoryValue || 0,
                         selectedSize: sizeValue || '',
                         selectedThickness: thickValue || '',

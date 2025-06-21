@@ -75,6 +75,7 @@ const MyCartScreen = ({navigation}) => {
       productName,
       productCode,
       appProductImageUrl,
+      coilThickness,
     } = item;
     const currentQty = Number(quantity);
 
@@ -104,6 +105,7 @@ const MyCartScreen = ({navigation}) => {
               <Text style={styles.sizeText}>
                 {size}
                 {item.thickness ? ` | ${item.thickness}` : ''}
+                {item.coilThickness ? ` | ${item.coilThickness}` : ''}
               </Text>
             </View>
 
