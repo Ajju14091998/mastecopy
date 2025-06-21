@@ -46,7 +46,11 @@ const IndividualOrder = ({navigation, route}) => {
 
   const onDeleteItem = async item => {
     try {
-      const response = await deleteProductItemApi(orderDetails.id, item.id, 'ITEM');
+      const response = await deleteProductItemApi(
+        orderDetails.id,
+        item.id,
+        'ITEM',
+      );
       console.log('deleted item successfully -', response);
       if (response === 200) {
         getOrderDetail(orderDetails.id);
@@ -61,7 +65,12 @@ const IndividualOrder = ({navigation, route}) => {
       const response = await deleteProductItemApi(orderDetails.id, 0, 'ORDER');
       console.log('deleted product item successfully -', response);
       if (response === 200) {
-        navigation.goBack();
+        setShowConfirmModal(false); // Hide confirmation modal
+        setShowSuccessModal(true); // Show success modal
+        setTimeout(() => {
+          setShowSuccessModal(false); // Hide modal after 4 sec
+          navigation.goBack(); // Go back to My Order screen
+        }, 2000); // 2 seconds delay
       }
     } catch (e) {
       console.log('error deleting product item -', e);
@@ -81,18 +90,40 @@ const IndividualOrder = ({navigation, route}) => {
         <View style={styles.detailsRow}>
           <View style={styles.sizeBox}>
             <Text style={styles.sizeText}>
-              {item.size}
-              {item.thickness ? ` | ${item.thickness}` : ''}
+              {[
+                item.size,
+                item.thickness,
+                item.coilThickness > 0 ? `${item.coilThickness}mm` : null,
+              ]
+                .filter(Boolean)
+                .join(' | ')}
             </Text>
           </View>
         </View>
       </View>
+
       <View style={styles.deleteCol}>
-        {orderDetails?.salesOrderStatus !== 'Fulfilled' && (
-          <TouchableOpacity onPress={() => onDeleteItem(item)}>
-            <Icon name="delete" size={22} color="#D00000" />
-          </TouchableOpacity>
-        )}
+        {orderDetails?.salesOrderStatus !== 'Fulfilled' &&
+          orderDetails?.salesOrderStatus !== 'Partially Fulfilled' && (
+            <TouchableOpacity
+              onPress={() => onDeleteItem(item)}
+              disabled={
+                orderDetails?.salesOrderStatus === 'Pending' &&
+                products.length === 1
+              }>
+              <Icon
+                name="delete"
+                size={22}
+                color={
+                  orderDetails?.salesOrderStatus === 'Pending' &&
+                  products.length === 1
+                    ? '#ccc'
+                    : '#D00000'
+                }
+              />
+            </TouchableOpacity>
+          )}
+
         <View style={styles.qtyInlineRow}>
           <Text style={styles.qtyLabel}>QTY</Text>
           <Text style={styles.qtyValue}>{item.quantity}</Text>
@@ -131,7 +162,7 @@ const IndividualOrder = ({navigation, route}) => {
         <View style={styles.orderInfo}>
           <Text style={styles.infoText}>
             <Text style={styles.label}>Order id : </Text>
-            <Text style={styles.bold}>{orderDetails.id}</Text>
+            <Text style={styles.bold}>{orderDetails.salesOrderNumber}</Text>
           </Text>
           <Text style={styles.infoText}>
             <Text style={styles.label}>Order Date : </Text>
@@ -162,13 +193,14 @@ const IndividualOrder = ({navigation, route}) => {
             </Text>
           </View>
 
-          {orderDetails.salesOrderStatus !== 'Fulfilled' && (
-            <TouchableOpacity
-              style={styles.cancelBtn}
-              onPress={() => setShowConfirmModal(true)}>
-              <Text style={styles.cancelText}>Cancel Order</Text>
-            </TouchableOpacity>
-          )}
+          {orderDetails.salesOrderStatus !== 'Fulfilled' &&
+            orderDetails.salesOrderStatus !== 'Partially Fulfilled' && (
+              <TouchableOpacity
+                style={styles.cancelBtn}
+                onPress={() => setShowConfirmModal(true)}>
+                <Text style={styles.cancelText}>Cancel Order</Text>
+              </TouchableOpacity>
+            )}
         </View>
       )}
 

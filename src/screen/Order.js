@@ -169,8 +169,11 @@ export default function ProductScreen(props) {
       });
       console.log('Filtered Products:', response);
       setProducts(response);
-      if(!isEmpty(selectedFilters)) {
-        setSubCategoryFromFilter(selectedSubCategory, subCategoryTabList[selectedSubCategory].value);
+      if (!isEmpty(selectedFilters)) {
+        setSubCategoryFromFilter(
+          selectedSubCategory,
+          subCategoryTabList[selectedSubCategory].value,
+        );
       }
     } catch (e) {
       console.log('Error fetching product list', e);
@@ -449,6 +452,31 @@ export default function ProductScreen(props) {
                       })}
                     </View>
 
+                    {selectedProduct?.coilThickness > 0 && (
+                      <>
+                        <Text
+                          style={{
+                            fontSize: 12,
+                            fontWeight: '600',
+                            marginTop: 12,
+                          }}>
+                          Coil Thickness
+                        </Text>
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            flexWrap: 'wrap',
+                            gap: 8,
+                            marginTop: 8,
+                            marginLeft: 5,
+                          }}>
+                          <Text style={{fontWeight: '600', color: '#000'}}>
+                            {selectedProduct.coilThickness} MM
+                          </Text>
+                        </View>
+                      </>
+                    )}
+
                     {/* Quantity & Add to Cart */}
                     <View
                       style={{
@@ -550,30 +578,7 @@ export default function ProductScreen(props) {
                 <Text style={styles.modalTitle}>Filter</Text>
                 <View style={styles.underline} />
 
-                {/* <Text style={styles.dropdownLabel}>Category</Text> */}
-                {/* <DropDownPicker
-                  placeholder="Select Category"
-                  open={categoryOpen}
-                  value={categoryValue}
-                  items={categoryItems}
-                  setOpen={setCategoryOpen}
-                  setValue={callback => {
-                    const selectedValue = callback(categoryValue);
-                    setCategoryValue(selectedValue);
-                    // const selectedItem = categoryItems.find(
-                    //   item => item.value === selectedValue,
-                    // );
-                    // if (selectedItem) {
-                    //   setHeading(selectedItem.label);
-                    // }
-                  }}
-                  setItems={setCategoryItems}
-                  style={styles.dropdown}
-                  textStyle={styles.dropdownText}
-                  zIndex={3000}
-                  zIndexInverse={1000}
-                /> */}
-
+                {/* Sub Category Dropdown */}
                 <Text style={styles.dropdownLabel}>Sub Category</Text>
                 <DropDownPicker
                   placeholder="Select Sub Category"
@@ -589,6 +594,7 @@ export default function ProductScreen(props) {
                   zIndexInverse={1500}
                 />
 
+                {/* Size Dropdown */}
                 <Text style={styles.dropdownLabel}>Size</Text>
                 <DropDownPicker
                   placeholder="Select Size"
@@ -606,6 +612,7 @@ export default function ProductScreen(props) {
                   zIndexInverse={2000}
                 />
 
+                {/* Thickness Dropdown */}
                 <Text style={styles.dropdownLabel}>Thickness</Text>
                 <DropDownPicker
                   placeholder="Select Thickness"
@@ -622,20 +629,24 @@ export default function ProductScreen(props) {
                   zIndex={1500}
                   zIndexInverse={2500}
                 />
+
+                {/* Buttons */}
                 <View style={styles.filterButtonsRow}>
+                  {/* Reset Button */}
                   <TouchableOpacity
                     style={[styles.filterButtonHalf, {marginRight: 8}]}
                     onPress={() => {
                       setCategoryValue(null);
                       setSubCategoryValue(null);
-                      setSizeValue(null);
-                      setThickValue(null);
+                      setSizeValue([]); // array reset
+                      setThickValue([]); // array reset
                       setCategory(1);
                       setSubCategory(0);
                     }}>
                     <Text style={styles.applyButtonText}>Reset</Text>
                   </TouchableOpacity>
 
+                  {/* Apply Button */}
                   <TouchableOpacity
                     style={styles.filterButtonHalf}
                     onPress={() => {
@@ -649,9 +660,15 @@ export default function ProductScreen(props) {
                       const filters = {
                         selectedCategory: category,
                         selectedSubCategory: subCategoryValue || 0,
-                        selectedSize: sizeValue || '',
-                        selectedThickness: thickValue || '',
+                        selectedSize: Array.isArray(sizeValue)
+                          ? sizeValue.join(',')
+                          : '',
+                        selectedThickness: Array.isArray(thickValue)
+                          ? thickValue.join(',')
+                          : '',
                       };
+
+                      console.log('Filters:', filters); // Debug साठी
 
                       getAllProductsList('', filters);
                       setIsFilterModalVisible(false);
@@ -664,6 +681,7 @@ export default function ProductScreen(props) {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
+
       {itemsArray.length > 0 && (
         <FloatingCartButton products={itemsArray} onPress={onCartPress} />
       )}

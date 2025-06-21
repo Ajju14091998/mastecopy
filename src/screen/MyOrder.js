@@ -202,41 +202,52 @@ export default function MyOrderScreen({navigation}) {
 
       {/* Order List */}
       <ScrollView contentContainerStyle={{paddingBottom: 20}}>
-        {orders.map((order, index) => (
-          <TouchableOpacity
-            key={index}
-            onPress={() => navigation.navigate('IndividualOrder', {order})}
-            style={styles.orderCard}>
-            <Text style={styles.orderLine}>
-              <Text style={styles.label}>Order id : </Text>
-              <Text style={styles.value}>{order.id}</Text>
-            </Text>
-            <Text style={styles.orderLine}>
-              <Text style={styles.label}>Order Date : </Text>
-              <Text style={styles.value}>{order.date}</Text>
-            </Text>
-            <Text style={styles.orderLine}>
-              <Text style={styles.label}>Quantity : </Text>
-              <Text style={styles.value}>{order.qty}</Text>
-            </Text>
-            <View
-              style={[
-                styles.badge,
-                order.status === 'Fulfilled'
-                  ? {backgroundColor: '#28a745'}
-                  : order.status === 'Partially' ||
-                    order.status === 'Partially Fulfilled'
-                  ? {backgroundColor: '#007bff'}
-                  : order.status === 'Pending'
-                  ? {backgroundColor: '#fd7e14'}
-                  : order.status === 'Cancel'
-                  ? {backgroundColor: '#D00000'}
-                  : {backgroundColor: '#999'},
-              ]}>
-              <Text style={styles.badgeText}>{order.status}</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
+        {orders.map((order, index) => {
+          const isCancelled = ['Cancel', 'Cancelled', 'Canceled'].includes(
+            order.status,
+          );
+
+          return (
+            <TouchableOpacity
+              key={index}
+              disabled={isCancelled} // 👉 click disabled if cancelled
+              onPress={() => {
+                if (!isCancelled) {
+                  navigation.navigate('IndividualOrder', {order});
+                }
+              }}
+              style={styles.orderCard}>
+              <Text style={styles.orderLine}>
+                <Text style={styles.label}>Order id : </Text>
+                <Text style={styles.value}>{order.id}</Text>
+              </Text>
+              <Text style={styles.orderLine}>
+                <Text style={styles.label}>Order Date : </Text>
+                <Text style={styles.value}>{order.date}</Text>
+              </Text>
+              <Text style={styles.orderLine}>
+                <Text style={styles.label}>Quantity : </Text>
+                <Text style={styles.value}>{order.qty}</Text>
+              </Text>
+              <View
+                style={[
+                  styles.badge,
+                  order.status === 'Fulfilled'
+                    ? {backgroundColor: '#28a745'}
+                    : order.status === 'Partially' ||
+                      order.status === 'Partially Fulfilled'
+                    ? {backgroundColor: '#007bff'}
+                    : order.status === 'Pending'
+                    ? {backgroundColor: '#fd7e14'}
+                    : isCancelled
+                    ? {backgroundColor: '#D00000'}
+                    : {backgroundColor: '#999'},
+                ]}>
+                <Text style={styles.badgeText}>{order.status}</Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
 
       {/* Filter Modal */}
