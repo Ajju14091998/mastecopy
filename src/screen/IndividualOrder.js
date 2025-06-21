@@ -46,7 +46,7 @@ const IndividualOrder = ({navigation, route}) => {
 
   const onDeleteItem = async item => {
     try {
-      const response = await deleteProductItemApi(orderDetails.id, item.id);
+      const response = await deleteProductItemApi(orderDetails.id, item.id, 'ITEM');
       console.log('deleted item successfully -', response);
       if (response === 200) {
         getOrderDetail(orderDetails.id);
@@ -58,7 +58,7 @@ const IndividualOrder = ({navigation, route}) => {
 
   const onDeleteProductOrder = async () => {
     try {
-      const response = await deleteProductItemApi(orderDetails.id, 0);
+      const response = await deleteProductItemApi(orderDetails.id, 0, 'ORDER');
       console.log('deleted product item successfully -', response);
       if (response === 200) {
         navigation.goBack();

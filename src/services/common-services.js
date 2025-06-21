@@ -43,9 +43,9 @@ const addOrderApi = async (data) => {
   }
 };
 
-const deleteProductItemApi = async (salesOrderId, itemId) => {
+const deleteProductItemApi = async (salesOrderId, itemId, type) => {
   try {
-    const response = await api.post(`myorders/deleteorderdetails?salesOrderId=${salesOrderId}&itemId=${itemId}&type=ITEM`);
+    const response = await api.post(`myorders/deleteorderdetails?salesOrderId=${salesOrderId}&itemId=${itemId}&type=${type}`);
     console.log('delete order Response -', response);
     return response.status;
   } catch (error) {
