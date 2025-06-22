@@ -31,7 +31,6 @@ export default function ProductScreen(props) {
   const route = useRoute();
   const {catId, headingTitle} = route.params || {};
 
-  const [selectedCategory, setSelectedCategory] = useState(catId);
   const [heading, setHeading] = useState(headingTitle);
 
   const insets = useSafeAreaInsets();
@@ -81,7 +80,6 @@ export default function ProductScreen(props) {
   }));
 
   // Set these in useState
-  const [categoryOpen, setCategoryOpen] = useState(false);
   const [categoryValue, setCategoryValue] = useState(null);
   const [categoryItems, setCategoryItems] = useState(formattedCategories);
 
@@ -103,14 +101,6 @@ export default function ProductScreen(props) {
   const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
 
-  const sizeOptions = selectedProduct?.size
-    ? selectedProduct.size.split(',').map(s => s.trim())
-    : [];
-
-  const thicknessOptions = selectedProduct?.thickness
-    ? selectedProduct.thickness.split(',').map(t => t.trim())
-    : [];
-
   useEffect(() => {
     if (filterdata.length === 4) {
       setCategoryItems(
@@ -119,8 +109,11 @@ export default function ProductScreen(props) {
           value: item.key.toString(),
         })),
       );
+      if(isEmpty(heading)) {
+        setHeading(filterdata[0][category].value);
+      }
       setSubCategoryItems(
-        filterdata[1].map(item => ({
+        filterdata[1].filter(val => val.option1 === category).map(item => ({
           label: item.value,
           value: item.key.toString(),
         })),
@@ -128,23 +121,23 @@ export default function ProductScreen(props) {
       setSizeItems(
         filterdata[2].map(item => ({
           label: item.value,
-          value: item.key.toString(),
+          value: item.value.toString(),
         })),
       );
       setThickItems(
         filterdata[3].map(item => ({
           label: item.value,
-          value: item.key.toString(),
+          value: item.value.toString(),
         })),
       );
     }
-  }, [filterdata]);
+  }, [filterdata, category]);
 
   useEffect(() => {
     getAllProductsList();
     getAllFilterList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [category, subCategory]);
+  }, [category]);
 
   useEffect(() => {
     getAllSubCategory(category);
@@ -167,7 +160,6 @@ export default function ProductScreen(props) {
         thickness: selectedThickness,
         term,
       });
-      console.log('Filtered Products:', response);
       setProducts(response);
       if (!isEmpty(selectedFilters)) {
         setSubCategoryFromFilter(
@@ -194,7 +186,6 @@ export default function ProductScreen(props) {
   const getAllFilterList = async () => {
     try {
       const response = await fetchFilterList();
-      console.log('Fetch filter response in component -', response);
       if (response.length) {
         setFilterData(response);
       }
@@ -243,7 +234,12 @@ export default function ProductScreen(props) {
       onPress={() => {
         setSelectedTab(item.value);
         setSubCategory(item.key);
-        getAllProductsList();
+        getAllProductsList('', {
+          selectedCategory: category,
+          selectedSubCategory: item.key,
+          selectedSize: '',
+          selectedThickness: '',
+        });
       }}>
       <Text
         style={[
@@ -320,6 +316,9 @@ export default function ProductScreen(props) {
         columnWrapperStyle={styles.row}
         contentContainerStyle={{paddingBottom: 80}}
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={<View style={{flex: 1, justifyContent: 'center', alignItems: 'center', height: '100%'}}>
+            <Text>No Products</Text>
+          </View>}
       />
 
       {/* Product Detail Bottom Sheet */}
@@ -659,7 +658,7 @@ export default function ProductScreen(props) {
 
                       const filters = {
                         selectedCategory: category,
-                        selectedSubCategory: subCategoryValue || 0,
+                        selectedSubCategory: Number(subCategoryValue) || 0,
                         selectedSize: Array.isArray(sizeValue)
                           ? sizeValue.join(',')
                           : '',
@@ -667,8 +666,6 @@ export default function ProductScreen(props) {
                           ? thickValue.join(',')
                           : '',
                       };
-
-                      console.log('Filters:', filters); // Debug साठी
 
                       getAllProductsList('', filters);
                       setIsFilterModalVisible(false);
