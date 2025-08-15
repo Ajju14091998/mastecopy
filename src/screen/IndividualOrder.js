@@ -161,36 +161,49 @@ const IndividualOrder = ({navigation, route}) => {
       {orderDetails && (
         <View style={styles.orderInfo}>
           <Text style={styles.infoText}>
+            <Text style={styles.bold}>{route.params.order.customerName}</Text>
+          </Text>
+
+          <Text style={styles.infoText}>
             <Text style={styles.label}>Order id : </Text>
             <Text style={styles.bold}>{orderDetails.salesOrderNumber}</Text>
           </Text>
+
           <Text style={styles.infoText}>
             <Text style={styles.label}>Order Date : </Text>
             <Text style={styles.bold}>{orderDetails.salesOrderDate}</Text>
           </Text>
-          <Text style={styles.infoText}>
-            <Text style={styles.label}>Quantity : </Text>
-            <Text style={styles.bold}>{orderDetails.quantity}</Text>
-          </Text>
-          <View
-            style={[
-              styles.badge,
-              orderDetails.salesOrderStatus === 'Fulfilled'
-                ? {backgroundColor: '#28a745'}
-                : orderDetails.salesOrderStatus === 'Pending'
-                ? {backgroundColor: '#fd7e14'}
-                : orderDetails.salesOrderStatus === 'Cancel' ||
-                  orderDetails.salesOrderStatus === 'Cancelled' ||
-                  orderDetails.salesOrderStatus === 'Canceled'
-                ? {backgroundColor: '#D00000'}
-                : orderDetails.salesOrderStatus === 'Partially' ||
-                  orderDetails.salesOrderStatus === 'Partially Fulfilled'
-                ? {backgroundColor: '#007bff'}
-                : {backgroundColor: '#999'},
-            ]}>
-            <Text style={styles.badgeText}>
-              {orderDetails.salesOrderStatus}
-            </Text>
+
+          {/* 👇 Quantity and Status badge in same row */}
+          <View style={[styles.rowBetween, {marginBottom: 8}]}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text style={styles.label}>Quantity : </Text>
+              <Text style={[styles.bold, {fontSize: 14}]}>
+                {orderDetails.quantity}
+              </Text>
+            </View>
+
+            <View
+              style={[
+                styles.badge,
+                orderDetails.salesOrderStatus === 'Fulfilled'
+                  ? {backgroundColor: '#28a745'}
+                  : orderDetails.salesOrderStatus === 'Pending'
+                  ? {backgroundColor: '#fd7e14'}
+                  : ['Cancel', 'Cancelled', 'Canceled'].includes(
+                      orderDetails.salesOrderStatus,
+                    )
+                  ? {backgroundColor: '#D00000'}
+                  : ['Partially', 'Partially Fulfilled'].includes(
+                      orderDetails.salesOrderStatus,
+                    )
+                  ? {backgroundColor: '#007bff'}
+                  : {backgroundColor: '#999'},
+              ]}>
+              <Text style={styles.badgeText}>
+                {orderDetails.salesOrderStatus}
+              </Text>
+            </View>
           </View>
 
           {orderDetails.salesOrderStatus !== 'Fulfilled' &&
@@ -272,6 +285,7 @@ const styles = StyleSheet.create({
   },
   iconButton: {backgroundColor: '#D00000', padding: 8, borderRadius: 100},
   headerTitle: {fontSize: 18, fontWeight: '700', color: '#000'},
+
   orderInfo: {
     backgroundColor: '#fff',
     borderRadius: 12,
@@ -287,18 +301,30 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   infoText: {marginBottom: 4},
-  label: {fontSize: 13, color: '#777'},
-  bold: {fontSize: 13, fontWeight: '600', color: '#000'},
-  badge: {
-    position: 'absolute',
-    right: 16,
-    top: 16,
-    backgroundColor: '#F58731',
-    borderRadius: 12,
-    paddingVertical: 4,
-    paddingHorizontal: 12,
+  rowBetween: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  badgeText: {color: '#fff', fontSize: 12, fontWeight: '600'},
+  badge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  badgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  label: {
+    fontSize: 14,
+    color: '#555',
+  },
+  bold: {
+    fontWeight: '700',
+    color: '#000',
+  },
+
   cancelBtn: {
     marginTop: 16,
     backgroundColor: '#D00000',

@@ -57,10 +57,10 @@ export function CartProvider({ children }) {
   const [cart, dispatch] = useReducer(cartReducer, {});
 
   /* helpers that UI components call */
-  const addItem = (productObj, size, thickness, qty = 1) =>
+  const addItem = (productObj, size, thickness, qty = 1, thicknessId) =>
     dispatch({
       type: 'ADD',
-      payload: { ...productObj, size, thickness, qty },
+      payload: { ...productObj, size, thickness, qty, thicknessId},
     });
 
   const updateQty = (key, qty) =>

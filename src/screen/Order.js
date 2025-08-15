@@ -19,6 +19,7 @@ import {
   fetchProductList,
   fetchSubCategories,
   fetchFilterList,
+  fetchProductStock,
 } from '../services/common-services';
 import {useRoute} from '@react-navigation/native';
 import FloatingCartButton from '../component/FloatingButton';
@@ -99,7 +100,19 @@ export default function ProductScreen(props) {
 
   const [selectedThickness, setSelectedThickness] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
+  console.log(selectedSize);
   const [quantity, setQuantity] = useState(1);
+
+  const [selectedThicknessId, setSelectedThicknessId] = useState(null);
+  console.log(selectedThicknessId);
+
+  const [stock, setStock] = useState(0);
+
+  useEffect(() => {
+    if (selectedThicknessId) {
+      getProductStock(selectedThicknessId);
+    }
+  }, [selectedThicknessId]);
 
   useEffect(() => {
     if (filterdata.length === 4) {
@@ -109,14 +122,16 @@ export default function ProductScreen(props) {
           value: item.key.toString(),
         })),
       );
-      if(isEmpty(heading)) {
+      if (isEmpty(heading)) {
         setHeading(filterdata[0][category].value);
       }
       setSubCategoryItems(
-        filterdata[1].filter(val => val.option1 === category).map(item => ({
-          label: item.value,
-          value: item.key.toString(),
-        })),
+        filterdata[1]
+          .filter(val => val.option1 === category)
+          .map(item => ({
+            label: item.value,
+            value: item.key.toString(),
+          })),
       );
       setSizeItems(
         filterdata[2].map(item => ({
@@ -143,6 +158,17 @@ export default function ProductScreen(props) {
     getAllSubCategory(category);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [category]);
+
+  const getProductStock = async id => {
+    try {
+      const response = await fetchProductStock(id);
+      if (response) {
+        setStock(response);
+      }
+    } catch (e) {
+      console.log('Error fetching product stock', e);
+    }
+  };
 
   const getAllProductsList = async (term = '', selectedFilters = {}) => {
     const {
@@ -203,11 +229,31 @@ export default function ProductScreen(props) {
   };
 
   const addProductToCart = item => {
-    addItem(item, selectedSize, selectedThickness, quantity);
+    addItem(
+      item,
+      selectedSize,
+      selectedThickness,
+      quantity,
+      selectedThicknessId,
+    );
     setSelectedThickness(null);
     setSelectedSize(null);
     setQuantity(1);
+    setStock(0);
     setIsProductModalVisible(false);
+  };
+  const resetProductSelection = () => {
+    setSelectedThicknessId(null);
+    setSelectedThickness(null);
+    setSelectedSize(null);
+    setQuantity(1);
+    setStock(0);
+  };
+
+  const openProductModal = item => {
+    resetProductSelection();
+    setSelectedProduct(item);
+    setProductModalVisible(true);
   };
 
   const onCartPress = () => props.navigation.navigate('Addtocart');
@@ -316,20 +362,32 @@ export default function ProductScreen(props) {
         columnWrapperStyle={styles.row}
         contentContainerStyle={{paddingBottom: 80}}
         showsVerticalScrollIndicator={false}
-        ListEmptyComponent={<View style={{flex: 1, justifyContent: 'center', alignItems: 'center', height: '100%'}}>
+        ListEmptyComponent={
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              height: '100%',
+            }}>
             <Text>No Products</Text>
-          </View>}
+          </View>
+        }
       />
 
       {/* Product Detail Bottom Sheet */}
       <Modal visible={isProductModalVisible} animationType="slide" transparent>
         <TouchableWithoutFeedback
-          onPress={() => setIsProductModalVisible(false)}>
+          onPress={() => {
+            setIsProductModalVisible(false);
+            resetProductSelection(); // reset values if modal closed without Add to Cart
+          }}>
           <View style={styles.modalBackground}>
             <TouchableWithoutFeedback onPress={() => {}}>
               <View style={[styles.modalContainer, {paddingBottom: 30}]}>
                 {selectedProduct && (
                   <>
+                    {/* Product Image */}
                     <Image
                       source={{uri: selectedProduct.appProductImageUrl}}
                       style={{
@@ -341,6 +399,7 @@ export default function ProductScreen(props) {
                       resizeMode="cover"
                     />
 
+                    {/* Name + Code */}
                     <View
                       style={{
                         flexDirection: 'row',
@@ -354,25 +413,40 @@ export default function ProductScreen(props) {
                         }}>
                         {selectedProduct.productName}
                       </Text>
-                      <Text
-                        style={{
-                          fontSize: 14,
-                          fontWeight: '700',
-                          color: '#000',
-                        }}>
-                        {selectedProduct.productCode}
-                      </Text>
+                      {/* Quantity and Stock Badge Row */}
+                      {selectedThicknessId !== null && stock > 0 && (
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                          }}>
+                          <Text
+                            style={{
+                              fontSize: 14,
+                              fontWeight: '700',
+                              color: '#000',
+                            }}>
+                            Stock: {stock}
+                          </Text>
+                        </View>
+                      )}
                     </View>
 
                     <Text
-                      style={{marginTop: 8, fontWeight: '600', color: '#000'}}>
-                      {selectedProduct.productDesc}
+                      style={{
+                        fontSize: 14,
+                        fontWeight: '700',
+                        color: '#000',
+                        marginTop: 5,
+                      }}>
+                      {selectedProduct.productCode}
                     </Text>
 
-                    {/* Thickness */}
+                    {/* Size Selection */}
                     <Text
                       style={{fontSize: 12, fontWeight: '600', marginTop: 12}}>
-                      Thickness
+                      Size
                     </Text>
                     <View
                       style={{
@@ -381,15 +455,17 @@ export default function ProductScreen(props) {
                         gap: 8,
                         marginTop: 8,
                       }}>
-                      {selectedProduct.thickness
-                        ?.split(',')
-                        .map((item, index) => {
-                          const val = item.trim();
-                          const isSelected = selectedThickness === val;
+                      {JSON.parse(selectedProduct.productDetails || '[]').map(
+                        (detail, idx) => {
+                          const isSelected = selectedSize === detail.Size;
                           return (
                             <TouchableOpacity
-                              key={index}
-                              onPress={() => setSelectedThickness(val)}
+                              key={`size-${idx}`}
+                              onPress={() => {
+                                setSelectedSize(detail.Size);
+                                setSelectedThickness(null);
+                                setSelectedThicknessId(null);
+                              }}
                               style={{
                                 paddingHorizontal: 16,
                                 paddingVertical: 6,
@@ -405,76 +481,122 @@ export default function ProductScreen(props) {
                                   fontWeight: '600',
                                   color: isSelected ? '#fff' : '#000',
                                 }}>
-                                {val}
+                                {detail.Size}
                               </Text>
                             </TouchableOpacity>
                           );
-                        })}
+                        },
+                      )}
                     </View>
 
-                    {/* Size */}
-                    <Text
-                      style={{fontSize: 12, fontWeight: '600', marginTop: 12}}>
-                      Size
-                    </Text>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        flexWrap: 'wrap',
-                        gap: 8,
-                        marginTop: 8,
-                      }}>
-                      {selectedProduct.size?.split(',').map((item, index) => {
-                        const val = item.trim();
-                        const isSelected = selectedSize === val;
+                    {/* Thickness Selection */}
+                    {selectedSize &&
+                      (() => {
+                        const selectedDetail = JSON.parse(
+                          selectedProduct.productDetails || '[]',
+                        ).find(d => d.Size === selectedSize);
+
                         return (
-                          <TouchableOpacity
-                            key={index}
-                            onPress={() => setSelectedSize(val)}
-                            style={{
-                              paddingHorizontal: 16,
-                              paddingVertical: 6,
-                              borderRadius: 12,
-                              backgroundColor: isSelected ? '#D00000' : '#fff',
-                              borderWidth: 1,
-                              borderColor: isSelected ? '#D00000' : '#ccc',
-                            }}>
+                          <>
                             <Text
                               style={{
+                                fontSize: 12,
                                 fontWeight: '600',
-                                color: isSelected ? '#fff' : '#000',
+                                marginTop: 12,
                               }}>
-                              {val}
+                              Thickness
                             </Text>
-                          </TouchableOpacity>
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                flexWrap: 'wrap',
+                                gap: 8,
+                                marginTop: 8,
+                              }}>
+                              {(selectedDetail?.ThicknessDetails || []).map(
+                                (thick, idx) => {
+                                  const isSelected =
+                                    selectedThicknessId === thick.Id;
+                                  return (
+                                    <TouchableOpacity
+                                      key={`thickness-${idx}`}
+                                      onPress={() => {
+                                        setSelectedThickness(thick.Thickness);
+                                        setSelectedThicknessId(thick.Id);
+                                      }}
+                                      style={{
+                                        paddingHorizontal: 16,
+                                        paddingVertical: 6,
+                                        borderRadius: 12,
+                                        backgroundColor: isSelected
+                                          ? '#D00000'
+                                          : '#fff',
+                                        borderWidth: 1,
+                                        borderColor: isSelected
+                                          ? '#D00000'
+                                          : '#ccc',
+                                      }}>
+                                      <Text
+                                        style={{
+                                          fontWeight: '600',
+                                          color: isSelected ? '#fff' : '#000',
+                                        }}>
+                                        {thick.Thickness}
+                                      </Text>
+                                    </TouchableOpacity>
+                                  );
+                                },
+                              )}
+                            </View>
+                          </>
                         );
-                      })}
-                    </View>
+                      })()}
 
-                    {selectedProduct?.coilThickness > 0 && (
-                      <>
-                        <Text
-                          style={{
-                            fontSize: 12,
-                            fontWeight: '600',
-                            marginTop: 12,
-                          }}>
-                          Coil Thickness
-                        </Text>
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            flexWrap: 'wrap',
-                            gap: 8,
-                            marginTop: 8,
-                            marginLeft: 5,
-                          }}>
-                          <Text style={{fontWeight: '600', color: '#000'}}>
-                            {selectedProduct.coilThickness} MM
-                          </Text>
-                        </View>
-                      </>
-                    )}
+                    {/* Coil Thickness */}
+                    {selectedSize &&
+                      selectedThicknessId &&
+                      (() => {
+                        const selectedDetail = JSON.parse(
+                          selectedProduct.productDetails || '[]',
+                        ).find(d => d.Size === selectedSize);
+
+                        const thickDetail = (
+                          selectedDetail?.ThicknessDetails || []
+                        ).find(t => t.Id === selectedThicknessId);
+
+                        return thickDetail?.CoilThickness > 0 ? (
+                          <>
+                            <Text
+                              style={{
+                                fontSize: 12,
+                                fontWeight: '600',
+                                marginTop: 12,
+                              }}>
+                              Coil Thickness
+                            </Text>
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                flexWrap: 'wrap',
+                                gap: 8,
+                                marginTop: 8,
+                                marginLeft: 5,
+                              }}>
+                              <Text
+                                style={{
+                                  fontWeight: '600',
+                                  color: '#000',
+                                  backgroundColor: '#f0f0f0',
+                                  paddingHorizontal: 10,
+                                  paddingVertical: 4,
+                                  borderRadius: 6,
+                                }}>
+                                {thickDetail.CoilThickness} MM
+                              </Text>
+                            </View>
+                          </>
+                        ) : null;
+                      })()}
 
                     {/* Quantity & Add to Cart */}
                     <View
@@ -537,8 +659,10 @@ export default function ProductScreen(props) {
 
                       {/* Add to Cart */}
                       <TouchableOpacity
-                        onPress={() => addProductToCart(selectedProduct)}
-                        disabled={!isFormInvalid()}
+                        onPress={() =>
+                          addProductToCart(selectedProduct, selectedThicknessId)
+                        }
+                        disabled={!selectedSize || !selectedThicknessId}
                         style={{
                           flexDirection: 'row',
                           alignItems: 'center',
@@ -546,7 +670,8 @@ export default function ProductScreen(props) {
                           paddingVertical: 12,
                           paddingHorizontal: 20,
                           borderRadius: 8,
-                          opacity: !isFormInvalid() ? 0.6 : 1,
+                          opacity:
+                            !selectedSize || !selectedThicknessId ? 0.6 : 1,
                         }}>
                         <Icon name="shopping-cart" size={20} color="#fff" />
                         <Text

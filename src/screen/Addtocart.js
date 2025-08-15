@@ -1,5 +1,4 @@
-// MyCartScreen.js
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -9,16 +8,21 @@ import {
   StyleSheet,
   Modal,
   TextInput,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useCart} from '../context/CartContext';
-import {addOrderApi} from '../services/common-services';
+import {addOrderApi, fetchCustomerList} from '../services/common-services';
+import {Dropdown} from 'react-native-element-dropdown';
 
 const MyCartScreen = ({navigation}) => {
   const insets = useSafeAreaInsets();
 
-  /* ────────────────  Cart context  ──────────────── */
+  const [open, setOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [customerList, setCustomerList] = useState([]);
+
   const {
     itemsArray: cartData,
     totalQuantity,
@@ -27,10 +31,23 @@ const MyCartScreen = ({navigation}) => {
     clearCart,
   } = useCart();
 
-  /* ────────────────  Local ui state  ───────────── */
-  const [modalVisible, setModalVisible] = React.useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
-  /* ────────────────  Helpers  ───────────────────── */
+  // ✅ Load customer list on mount
+  useEffect(() => {
+    const loadCustomers = async () => {
+      const res = await fetchCustomerList();
+      if (Array.isArray(res)) {
+        const formatted = res.map(item => ({
+          label: item.value,
+          value: item.key,
+        }));
+        setCustomerList(formatted);
+      }
+    };
+    loadCustomers();
+  }, []);
+
   const handleQuantityChange = (val, key) => {
     const num = parseInt(val, 10);
     if (!isNaN(num) && num >= 1) updateQty(key, num);
@@ -40,18 +57,25 @@ const MyCartScreen = ({navigation}) => {
   const handleDecrement = (key, current) =>
     updateQty(key, Math.max(1, current - 1));
 
-  /* ────────────────  Checkout  ──────────────────── */
   const onCheckout = async () => {
-    if (cartData.length === 0) return;
+    if (!selectedCustomer) {
+      Alert.alert('Alert', 'Please select a customer.');
+      return;
+    }
+
+    if (cartData.length === 0) {
+      Alert.alert('Alert', 'Your cart is empty.');
+      return;
+    }
 
     const payload = {
       id: 0,
-      customerId: 0, // hard‑coded as requested
+      customerId: selectedCustomer,
       totalQuantity,
       itemList: cartData.map(
-        ({productId, quantity, size, thickness, coilThickness = 0}) => ({
+        ({quantity, size, thicknessId, thickness, coilThickness = 0}) => ({
           id: 0,
-          productId,
+          productId: thicknessId,
           quantity,
           size,
           thickness,
@@ -59,11 +83,18 @@ const MyCartScreen = ({navigation}) => {
         }),
       ),
     };
+
     try {
+      console.log('Checkout Payload:', payload);
       const res = await addOrderApi(payload);
-      if (res === 200) setModalVisible(true);
-    } catch (e) {
-      console.log('Error adding order:', e);
+      if (res === 200) {
+        setModalVisible(true);
+      } else {
+        Alert.alert('Error', 'Order submission failed. Please try again.');
+      }
+    } catch (error) {
+      console.log('Order API Error:', error);
+      Alert.alert('Error', 'Something went wrong while submitting the order.');
     }
   };
 
@@ -75,6 +106,7 @@ const MyCartScreen = ({navigation}) => {
       productName,
       productCode,
       appProductImageUrl,
+      thickness,
       coilThickness,
     } = item;
     const currentQty = Number(quantity);
@@ -85,14 +117,12 @@ const MyCartScreen = ({navigation}) => {
           source={appProductImageUrl ? {uri: appProductImageUrl} : item.image}
           style={styles.image}
         />
-
         <View style={styles.infoSection}>
           <View style={styles.topRow}>
             <View>
               <Text style={styles.name}>{productName}</Text>
               <Text style={styles.code}>{productCode}</Text>
             </View>
-
             <TouchableOpacity
               style={styles.deleteButton}
               onPress={() => removeItem(key)}>
@@ -100,30 +130,25 @@ const MyCartScreen = ({navigation}) => {
             </TouchableOpacity>
           </View>
           <View style={styles.bottomRow}>
-            {/* Size and Thickness */}
             <View style={styles.sizeTag}>
               <Text style={styles.sizeText}>
                 {size}
-                {item.thickness ? ` | ${item.thickness}` : ''}
-                {item.coilThickness ? ` | ${item.coilThickness}` : ''}
+                {thickness ? ` | ${thickness}` : ''}
+                {coilThickness ? ` | ${coilThickness}` : ''}
               </Text>
             </View>
-
-            {/* Quantity +/- buttons */}
             <View style={styles.actionSection}>
               <TouchableOpacity
                 onPress={() => handleDecrement(key, currentQty)}
                 style={styles.iconButton}>
                 <Icon name="remove-circle-outline" size={22} color="#333" />
               </TouchableOpacity>
-
               <TextInput
                 style={styles.quantity}
                 keyboardType="numeric"
                 value={String(currentQty)}
                 onChangeText={val => handleQuantityChange(val, key)}
               />
-
               <TouchableOpacity
                 onPress={() => handleIncrement(key, currentQty)}
                 style={styles.iconButton}>
@@ -136,9 +161,55 @@ const MyCartScreen = ({navigation}) => {
     );
   };
 
-  /* ────────────────  Screen  ────────────────────── */
   return (
     <View style={[styles.container, {paddingTop: insets.top + 20}]}>
+      <View style={{marginHorizontal: 16, marginBottom: 10}}>
+        <Dropdown
+          style={{
+            borderWidth: 1,
+            borderColor: '#ccc',
+            borderRadius: 8,
+            paddingHorizontal: 10,
+            minHeight: 45,
+            backgroundColor: '#fff', // ✅ Ensure single background layer
+          }}
+          containerStyle={{
+            borderRadius: 8,
+            maxHeight: 300, // ✅ Scroll enabled when list is large
+            backgroundColor: '#fff', // ✅ Match with input background
+          }}
+          data={customerList}
+          labelField="label"
+          valueField="value"
+          placeholder="Select Customer"
+          search
+          searchPlaceholder="Search customer..."
+          value={selectedCustomer}
+          onChange={item => {
+            setSelectedCustomer(item.value);
+          }}
+          renderItem={item => (
+            <View style={{padding: 10}}>
+              <Text style={{fontSize: 14}}>{item.label}</Text>
+            </View>
+          )}
+          selectedTextStyle={{
+            fontSize: 14,
+            fontWeight: '600',
+            color: '#000',
+          }}
+          inputSearchStyle={{
+            height: 40,
+            borderColor: '#ccc',
+            // borderWidth: 1,
+            borderRadius: 8,
+            paddingHorizontal: 10,
+            fontSize: 14,
+            backgroundColor: '#fff', // ✅ No layered border
+          }}
+        />
+      </View>
+
       <Text style={styles.title}>My Cart</Text>
 
       <FlatList
@@ -146,6 +217,7 @@ const MyCartScreen = ({navigation}) => {
         renderItem={renderItem}
         keyExtractor={item => item.key}
         contentContainerStyle={{paddingHorizontal: 16, paddingBottom: 16}}
+        keyboardShouldPersistTaps="handled"
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Image
@@ -158,7 +230,6 @@ const MyCartScreen = ({navigation}) => {
         }
       />
 
-      {/* Footer */}
       {cartData.length > 0 && (
         <View style={styles.footer}>
           <View style={styles.quantityContainer}>
@@ -177,7 +248,6 @@ const MyCartScreen = ({navigation}) => {
         </View>
       )}
 
-      {/* Success modal */}
       <Modal
         transparent
         visible={modalVisible}
@@ -326,21 +396,32 @@ const styles = StyleSheet.create({
   },
 
   emptyContainer: {
-  alignItems: 'center',
-  justifyContent: 'center',
-  marginTop: 60,
-},
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 60,
+  },
 
-emptyImage: {
-  width: 200,
-  height: 200,
-  marginBottom: 20,
-},
+  emptyImage: {
+    width: 200,
+    height: 200,
+    marginBottom: 20,
+  },
 
-emptyText: {
-  fontSize: 16,
-  fontWeight: '600',
-  color: '#555',
-},
+  emptyText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#555',
+  },
 
+  dropdownWrapper: {
+    zIndex: 1000,
+    marginHorizontal: 16,
+    marginBottom: 10,
+  },
+
+  dropdown: {
+    borderColor: '#ccc',
+    borderRadius: 8,
+    minHeight: 45,
+  },
 });

@@ -71,6 +71,7 @@ export default function MyOrderScreen({navigation}) {
         date: order.salesOrderDate,
         qty: order.quantity,
         status: order.salesOrderStatus,
+        customerName: order.customerName || 'N/A',
       }));
 
     setOrders(filtered);
@@ -210,7 +211,7 @@ export default function MyOrderScreen({navigation}) {
           return (
             <TouchableOpacity
               key={index}
-              disabled={isCancelled} // 👉 click disabled if cancelled
+              disabled={isCancelled}
               onPress={() => {
                 if (!isCancelled) {
                   navigation.navigate('IndividualOrder', {order});
@@ -218,32 +219,47 @@ export default function MyOrderScreen({navigation}) {
               }}
               style={styles.orderCard}>
               <Text style={styles.orderLine}>
+                <Text style={styles.value}>{order.customerName}</Text>
+              </Text>
+
+              <Text style={styles.orderLine}>
                 <Text style={styles.label}>Order id : </Text>
                 <Text style={styles.value}>{order.id}</Text>
               </Text>
+
               <Text style={styles.orderLine}>
                 <Text style={styles.label}>Order Date : </Text>
                 <Text style={styles.value}>{order.date}</Text>
               </Text>
-              <Text style={styles.orderLine}>
-                <Text style={styles.label}>Quantity : </Text>
-                <Text style={styles.value}>{order.qty}</Text>
-              </Text>
+
+              {/* Quantity + Badge in single row */}
               <View
-                style={[
-                  styles.badge,
-                  order.status === 'Fulfilled'
-                    ? {backgroundColor: '#28a745'}
-                    : order.status === 'Partially' ||
-                      order.status === 'Partially Fulfilled'
-                    ? {backgroundColor: '#007bff'}
-                    : order.status === 'Pending'
-                    ? {backgroundColor: '#fd7e14'}
-                    : isCancelled
-                    ? {backgroundColor: '#D00000'}
-                    : {backgroundColor: '#999'},
-                ]}>
-                <Text style={styles.badgeText}>{order.status}</Text>
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}>
+                <Text style={styles.orderLine}>
+                  <Text style={styles.label}>Quantity : </Text>
+                  <Text style={styles.value}>{order.qty}</Text>
+                </Text>
+
+                <View
+                  style={[
+                    styles.badge,
+                    order.status === 'Fulfilled'
+                      ? {backgroundColor: '#28a745'}
+                      : order.status === 'Partially' ||
+                        order.status === 'Partially Fulfilled'
+                      ? {backgroundColor: '#007bff'}
+                      : order.status === 'Pending'
+                      ? {backgroundColor: '#fd7e14'}
+                      : isCancelled
+                      ? {backgroundColor: '#D00000'}
+                      : {backgroundColor: '#999'},
+                  ]}>
+                  <Text style={styles.badgeText}>{order.status}</Text>
+                </View>
               </View>
             </TouchableOpacity>
           );
@@ -516,14 +532,12 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   badge: {
-    position: 'absolute',
-    right: 16,
-    top: 16,
-    backgroundColor: '#F58731',
     borderRadius: 12,
     paddingVertical: 4,
     paddingHorizontal: 12,
+    alignSelf: 'flex-start',
   },
+
   badgeText: {
     color: '#fff',
     fontSize: 12,
