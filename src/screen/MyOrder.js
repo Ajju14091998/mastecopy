@@ -72,6 +72,7 @@ export default function MyOrderScreen({navigation}) {
         qty: order.quantity,
         status: order.salesOrderStatus,
         customerName: order.customerName || 'N/A',
+        isCashSales: order.isCashSales,
       }));
 
     setOrders(filtered);
@@ -242,6 +243,9 @@ export default function MyOrderScreen({navigation}) {
                 <Text style={styles.orderLine}>
                   <Text style={styles.label}>Quantity : </Text>
                   <Text style={styles.value}>{order.qty}</Text>
+                </Text>
+                <Text style={styles.orderLine}>
+                  <Text style={styles.value}>{order.isCashSales}</Text>
                 </Text>
 
                 <View

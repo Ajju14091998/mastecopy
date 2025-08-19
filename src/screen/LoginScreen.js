@@ -7,20 +7,18 @@ import {
   Pressable,
   StyleSheet,
   Image,
-  
   ActivityIndicator,
   Dimensions,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import Textstyle from '../assets/style/Textstyle';
-import { StatusBar } from 'react-native';
-import { useAuth } from '../../AuthContext';
-
-
+import {StatusBar} from 'react-native';
+import {useAuth} from '../../AuthContext';
+import {KeyboardAvoidingView, ScrollView, Platform} from 'react-native';
 const {width, height} = Dimensions.get('window');
 
 const LoginScreen = () => {
-  const { login } = useAuth();
+  const {login} = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -48,96 +46,109 @@ const LoginScreen = () => {
   };
   const handleLoginUser = async () => {
     console.log('Calling login from component...');
-    
+
     const result = await login(email, password);
+    setLoading(false);
+
     if (!result.success) {
-      console.log(result.message);
+      setError(result.message || 'Invalid email or password');
+      return;
     }
+
+    // success case
+    setError('');
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+    <KeyboardAvoidingView
+      style={{flex: 1, backgroundColor: '#fff'}}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}>
+        <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
 
-      <Image
-        style={styles.logo}
-        source={require('../assets/images/logo.png')}
-        resizeMode="contain"
-      />
+        <Image
+          style={styles.logo}
+          source={require('../assets/images/logo.png')}
+          resizeMode="contain"
+        />
 
-      <View style={styles.welcomeContainer}>
-        <Text style={[Textstyle.psb, styles.welcomeText]}>Welcome!</Text>
-        <Text style={[Textstyle.pr, styles.subtitle]}>
-          please login or sign up to continue our app
-        </Text>
-      </View>
-
-      <View style={styles.inputContainer}>
-        <Text style={[Textstyle.psb, styles.inputLabel]}>
-          Email Address<Text style={{color: 'red'}}> *</Text>
-        </Text>
-        <View style={styles.inputWrapper}>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your email"
-            placeholderTextColor="#666"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={text => {
-              setEmail(text);
-              const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text);
-              setIsEmailValid(isValid || text === '');
-            }}
-          />
-          {email ? (
-            isEmailValid ? (
-              <Icon name="checkcircle" size={20} color="green" />
-            ) : (
-              <Icon name="closecircle" size={20} color="red" />
-            )
-          ) : null}
+        <View style={styles.welcomeContainer}>
+          <Text style={[Textstyle.psb, styles.welcomeText]}>Welcome!</Text>
+          <Text style={[Textstyle.pr, styles.subtitle]}>
+            please login or sign up to continue our app
+          </Text>
         </View>
-      </View>
 
-      <View style={styles.inputContainer}>
-        <Text style={[Textstyle.psb, styles.inputLabel]}>
-          Password<Text style={{color: 'red'}}> *</Text>
-        </Text>
-        <View style={styles.inputWrapper}>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your password"
-            placeholderTextColor="#666"
-            secureTextEntry={!showPassword}
-            value={password}
-            onChangeText={setPassword}
-          />
-          <Pressable onPress={() => setShowPassword(!showPassword)}>
-            <Icon
-              name={showPassword ? 'eye' : 'eyeo'}
-              size={20}
-              color="#999"
-              style={{marginRight: 6}}
+        <View style={styles.inputContainer}>
+          <Text style={[Textstyle.psb, styles.inputLabel]}>
+            Email Address<Text style={{color: 'red'}}> *</Text>
+          </Text>
+          <View style={styles.inputWrapper}>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your email"
+              placeholderTextColor="#666"
+              keyboardType="email-address"
+              value={email}
+              onChangeText={text => {
+                setEmail(text);
+                const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text);
+                setIsEmailValid(isValid || text === '');
+              }}
             />
-          </Pressable>
+            {email ? (
+              isEmailValid ? (
+                <Icon name="checkcircle" size={20} color="green" />
+              ) : (
+                <Icon name="closecircle" size={20} color="red" />
+              )
+            ) : null}
+          </View>
         </View>
-      </View>
 
-      {error ? (
-        <Text style={[Textstyle.pr, styles.errorText]}>{error}</Text>
-      ) : null}
+        <View style={styles.inputContainer}>
+          <Text style={[Textstyle.psb, styles.inputLabel]}>
+            Password<Text style={{color: 'red'}}> *</Text>
+          </Text>
+          <View style={styles.inputWrapper}>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your password"
+              placeholderTextColor="#666"
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={setPassword}
+            />
+            <Pressable onPress={() => setShowPassword(!showPassword)}>
+              <Icon
+                name={showPassword ? 'eye' : 'eyeo'}
+                size={20}
+                color="#999"
+                style={{marginRight: 6}}
+              />
+            </Pressable>
+          </View>
+        </View>
 
-      <Pressable
-        style={styles.loginButton}
-        onPress={handleLogin}
-        disabled={loading}>
-        {loading ? (
-          <ActivityIndicator size="small" color="#fff" />
-        ) : (
-          <Text style={[Textstyle.psb, styles.loginButtonText]}>Login</Text>
-        )}
-      </Pressable>
-    </View>
+        {error ? (
+          <Text style={[Textstyle.pr, styles.errorText]}>{error}</Text>
+        ) : null}
+
+        <Pressable
+          style={styles.loginButton}
+          onPress={handleLogin}
+          disabled={loading}>
+          {loading ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={[Textstyle.psb, styles.loginButtonText]}>Login</Text>
+          )}
+        </Pressable>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

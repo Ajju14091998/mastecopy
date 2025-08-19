@@ -22,6 +22,7 @@ const MyCartScreen = ({navigation}) => {
   const [open, setOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [customerList, setCustomerList] = useState([]);
+  const [isCashSale, setIsCashSale] = useState(false);
 
   const {
     itemsArray: cartData,
@@ -49,8 +50,16 @@ const MyCartScreen = ({navigation}) => {
   }, []);
 
   const handleQuantityChange = (val, key) => {
-    const num = parseInt(val, 10);
-    if (!isNaN(num) && num >= 1) updateQty(key, num);
+    // फक्त digits allow
+    const cleanVal = val.replace(/[^0-9]/g, '');
+
+    if (cleanVal === '') {
+      // input रिकामं असेल तर cart मधली qty 0 ठेवा
+      updateQty(key, 0);
+    } else {
+      // नाहीतर दिलेली value number म्हणून टाका
+      updateQty(key, parseInt(cleanVal, 10));
+    }
   };
 
   const handleIncrement = (key, current) => updateQty(key, current + 1);
@@ -68,10 +77,20 @@ const MyCartScreen = ({navigation}) => {
       return;
     }
 
+    // ✅ check quantity > 0
+    const invalidItems = cartData.filter(
+      item => !item.quantity || item.quantity === 0,
+    );
+    if (invalidItems.length > 0) {
+      Alert.alert('Alert', 'Please enter valid quantity for all items.');
+      return;
+    }
+
     const payload = {
       id: 0,
       customerId: selectedCustomer,
       totalQuantity,
+      isCashSales: isCashSale,
       itemList: cartData.map(
         ({quantity, size, thicknessId, thickness, coilThickness = 0}) => ({
           id: 0,
@@ -146,9 +165,10 @@ const MyCartScreen = ({navigation}) => {
               <TextInput
                 style={styles.quantity}
                 keyboardType="numeric"
-                value={String(currentQty)}
+                value={currentQty === 0 ? '' : String(currentQty)} // qty 0 असेल तर रिकामं दाखवा
                 onChangeText={val => handleQuantityChange(val, key)}
               />
+
               <TouchableOpacity
                 onPress={() => handleIncrement(key, currentQty)}
                 style={styles.iconButton}>
@@ -163,7 +183,7 @@ const MyCartScreen = ({navigation}) => {
 
   return (
     <View style={[styles.container, {paddingTop: insets.top + 20}]}>
-      <View style={{marginHorizontal: 16, marginBottom: 10}}>
+      <View style={{marginHorizontal: 16, marginBottom: 10, marginLeft: 15}}>
         <Dropdown
           style={{
             borderWidth: 1,
@@ -208,6 +228,27 @@ const MyCartScreen = ({navigation}) => {
             backgroundColor: '#fff', // ✅ No layered border
           }}
         />
+      </View>
+
+      <View style={{flexDirection: 'row', alignItems: 'center', margin: 10}}>
+        <TouchableOpacity
+          onPress={() => setIsCashSale(!isCashSale)}
+          style={{
+            width: 22,
+            height: 22,
+            borderWidth: 2,
+            borderColor: '#000',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginRight: 10,
+            marginLeft: 15,
+            borderRadius: 4,
+          }}>
+          {isCashSale && <Icon name="check" size={16} color="green" />}
+        </TouchableOpacity>
+        <Text style={{fontSize: 16, fontWeight: 'bold', color: '#000'}}>
+          Cash Sales
+        </Text>
       </View>
 
       <Text style={styles.title}>My Cart</Text>

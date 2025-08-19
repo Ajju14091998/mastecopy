@@ -183,6 +183,13 @@ const IndividualOrder = ({navigation, route}) => {
               </Text>
             </View>
 
+            {/* 👇 Cash Sales field */}
+            {orderDetails.isCashSales && (
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <Text style={[styles.bold, {fontSize: 14}]}>Cash Sales</Text>
+              </View>
+            )}
+
             <View
               style={[
                 styles.badge,

@@ -637,14 +637,17 @@ export default function ProductScreen(props) {
                             marginHorizontal: 4,
                           }}
                           keyboardType="numeric"
-                          value={quantity.toString()}
+                          value={quantity === 0 ? '' : quantity.toString()} // 👈 0 asel tar input blank dakhav
                           onChangeText={text => {
                             const num = parseInt(
                               text.replace(/[^0-9]/g, ''),
                               10,
                             );
-                            if (!isNaN(num)) setQuantity(num);
-                            else if (text === '') setQuantity(0);
+                            if (!isNaN(num)) {
+                              setQuantity(num); // user ne je takla te direct set
+                            } else {
+                              setQuantity(0); // blank asel tar 0 set
+                            }
                           }}
                         />
 
@@ -662,7 +665,9 @@ export default function ProductScreen(props) {
                         onPress={() =>
                           addProductToCart(selectedProduct, selectedThicknessId)
                         }
-                        disabled={!selectedSize || !selectedThicknessId}
+                        disabled={
+                          !selectedSize || !selectedThicknessId || quantity < 1
+                        } // 👈 added quantity condition
                         style={{
                           flexDirection: 'row',
                           alignItems: 'center',
@@ -671,7 +676,11 @@ export default function ProductScreen(props) {
                           paddingHorizontal: 20,
                           borderRadius: 8,
                           opacity:
-                            !selectedSize || !selectedThicknessId ? 0.6 : 1,
+                            !selectedSize ||
+                            !selectedThicknessId ||
+                            quantity < 1
+                              ? 0.6
+                              : 1, // 👈 same here
                         }}>
                         <Icon name="shopping-cart" size={20} color="#fff" />
                         <Text
