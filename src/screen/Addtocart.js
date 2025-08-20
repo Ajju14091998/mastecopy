@@ -48,23 +48,18 @@ const MyCartScreen = ({navigation}) => {
     };
     loadCustomers();
   }, []);
-
   const handleQuantityChange = (val, key) => {
-    // फक्त digits allow
     const cleanVal = val.replace(/[^0-9]/g, '');
-
     if (cleanVal === '') {
-      // input रिकामं असेल तर cart मधली qty 0 ठेवा
       updateQty(key, 0);
     } else {
-      // नाहीतर दिलेली value number म्हणून टाका
       updateQty(key, parseInt(cleanVal, 10));
     }
   };
 
   const handleIncrement = (key, current) => updateQty(key, current + 1);
   const handleDecrement = (key, current) =>
-    updateQty(key, Math.max(1, current - 1));
+    updateQty(key, Math.max(0, current - 1));
 
   const onCheckout = async () => {
     if (!selectedCustomer) {
@@ -77,7 +72,6 @@ const MyCartScreen = ({navigation}) => {
       return;
     }
 
-    // ✅ check quantity > 0
     const invalidItems = cartData.filter(
       item => !item.quantity || item.quantity === 0,
     );
@@ -165,7 +159,7 @@ const MyCartScreen = ({navigation}) => {
               <TextInput
                 style={styles.quantity}
                 keyboardType="numeric"
-                value={currentQty === 0 ? '' : String(currentQty)} // qty 0 असेल तर रिकामं दाखवा
+                value={currentQty === 0 ? '' : String(currentQty)} // 0 असेल तर रिकामा
                 onChangeText={val => handleQuantityChange(val, key)}
               />
 

@@ -25,9 +25,10 @@ function cartReducer(state, action) {
     /* ----------  UPDATE QUANTITY  ---------- */
     case 'UPDATE_QTY': {
       const {key, qty} = action.payload;
-      console.log('key -', key);
 
-      if (!state[key] || typeof qty !== 'number' || qty < 1) return state;
+      // qty = 0 allow; negative reject
+      if (!state[key] || typeof qty !== 'number' || qty < 0) return state;
+
       return {
         ...state,
         [key]: {...state[key], quantity: qty},
@@ -73,7 +74,8 @@ export function CartProvider({children}) {
   /* derived data */
   const itemsArray = useMemo(() => Object.values(cart), [cart]);
   const totalQuantity = useMemo(
-    () => itemsArray.reduce((sum, item) => sum + item.quantity, 0),
+    () =>
+      itemsArray.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0),
     [itemsArray],
   );
 
